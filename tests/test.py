@@ -1,15 +1,13 @@
 from slopy.react.component import Component
+from slopy.react.path import Path
 
 
+@Path("test")
 class MyFirstSlopyComponent(Component):
     def name(self):
-        return "something"
-
+        return "name"
     def path(self):
-        return "testurl"
+        return "path"
 
 
-
-myfirst = MyFirstSlopyComponent()
-result = myfirst.path()
-print(result)
+print(Path.PATH)

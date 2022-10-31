@@ -1,1 +1,1 @@
-from .component import Component
+from slopy.react.component import Component
