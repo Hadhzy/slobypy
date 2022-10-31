@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from slopy.react.path import Path
+
 
 #FIXME: type hinting for the abstractmethods
 
@@ -10,12 +10,8 @@ class Component(ABC):
     def name(self) -> str:
         pass
 
-    @abstractmethod
-    def path(self) -> Path:
-        pass
-
     def __str__(self):
-        return f"{self.name()}-{self.path()}"
+        return f"{self.name()}"
 
     def __repr__(self):
         return f"Component({self.name()=}{self.path()=})"
