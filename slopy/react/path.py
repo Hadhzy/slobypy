@@ -1,6 +1,6 @@
 # this project
 from slopy.react._types import PATH_TYPE, url_type, component_type
-from slopy.react.tools import path_checker
+from slopy.react.tools import url_checker
 
 # third-party
 from typing import List
@@ -17,7 +17,12 @@ class Path:
    ### Anomalies
    - When using this path decorator you don't have to pass out the component the decorator do it for you.
            """
-    PATHS = []
+    _PATHS = []
+
+    @classmethod
+    @property
+    def PATHS(cls) -> List[PATH_TYPE]:
+        return cls._PATHS
 
     def __init__(self, url: url_type) -> None:
         self.url = url
@@ -25,13 +30,10 @@ class Path:
     def __eq__(self, other) -> bool:
         return self.url == other.url
 
-    @classmethod
-    def get_paths(cls) -> List[PATH_TYPE]:
-        return cls.PATHS
 
     @classmethod
     def add_path(cls, path: PATH_TYPE) -> None:
-        cls.PATHS.append(path)
+        cls._PATHS.append(path)
 
     def __call__(self, component: component_type) -> None:
         self.add_path({"url": self.url, "component": component})

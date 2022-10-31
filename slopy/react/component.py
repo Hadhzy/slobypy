@@ -14,7 +14,7 @@ class Component(ABC):
         return f"{self.name()}"
 
     def __repr__(self):
-        return f"Component({self.name()=}{self.path()=})"
+        return f"Component({self.name()=})"
 
     #FIXME: I didn't find these events
     # def on_hover_start(self, event: Event):
