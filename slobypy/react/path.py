@@ -1,6 +1,6 @@
 # this project
-from slopy.react._types import PATH_TYPE, url_type, component_type
-from slopy.react.tools import url_checker
+from slobypy.react._types import PATH_TYPE, url_type, component_type
+from slobypy.react.tools import url_checker
 
 # third-party
 from typing import List

@@ -1,5 +1,5 @@
 # this project
-from slopy.react._types import url_type
+from slobypy.react._types import url_type
 # third party
 from urllib.parse import urlparse
 

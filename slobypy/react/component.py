@@ -22,7 +22,7 @@ class Component(ABC):
     #     This method is called when the mouse enters the component.
     #
     #     ### Arguments
-    #     - event: The `event` object that was emitted by `slopy`
+    #     - event: The `event` object that was emitted by `slobypy`
     #
     #     ### Returns
     #     - None
@@ -34,7 +34,7 @@ class Component(ABC):
     #     This method is called when the mouse leaves the component.
     #
     #     ### Arguments
-    #     - event: The `event` object that was emitted by `slopy`
+    #     - event: The `event` object that was emitted by `slobypy`
     #
     #     ### Returns
     #     - None
