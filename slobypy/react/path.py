@@ -25,10 +25,11 @@ class Path:
         return cls._PATHS
 
     def __init__(self, url: url_type) -> None:
-        self.url = url
+        self.url = url if url_checker(url) else "Not valid url"  # error here
 
     def __eq__(self, other) -> bool:
         return self.url == other.url
+
 
 
     @classmethod
