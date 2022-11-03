@@ -1,5 +1,6 @@
 from typing import TypedDict
 from slobypy.react.component import Component
+
 url_type = str
 component_type = Component
 
