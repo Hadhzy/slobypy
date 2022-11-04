@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.11"
 mypy = "^0.982"
 fastapi = "^0.85.2"
+validators = "^0.20.0"
 
 
 [build-system]

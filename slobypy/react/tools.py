@@ -1,18 +1,21 @@
 # this project
 from slobypy.react._types import url_type
 # third party
-from urllib.parse import urlparse
+import validators
+from validators import ValidationFailure
 
 
-#FIXME: for some reasons everything is true: https://stackoverflow.com/questions/7160737/how-to-validate-a-url-in-python-malformed-or-not
-def url_checker(url: url_type):
+#FIXME: if the user does not pass out a "full" url just a simple endpoint
+def url_checker(url: url_type) -> list[bool, url_type] | bool:
     """
     do the path_check here
     """
-    before_url = "http://localhost:3000/"
-    slopy_url = before_url + url
-    try:
-        slopy_result = urlparse(slopy_url)
-        return all([slopy_result.scheme, slopy_result.netloc])
-    except:
+    slobypy_result = validators.url(url)
+
+    if isinstance(slobypy_result, ValidationFailure):
         return False
+
+    return [slobypy_result, url]
+
+
+
