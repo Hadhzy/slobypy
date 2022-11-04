@@ -125,4 +125,5 @@ dmypy.json
 
 # IDE(s)
 .vscode
-/.idea
+/.idea!
+/test.py

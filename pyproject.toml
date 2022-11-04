@@ -13,11 +13,6 @@ mypy = "^0.982"
 fastapi = "^0.86.0"
 validators = "^0.20.0"
 
-
-
-python = "^3.11"
-fastapi = "^0.85.1"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

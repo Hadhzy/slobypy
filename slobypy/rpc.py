@@ -22,10 +22,16 @@ class Event:
     metadata and information about the event that was emitted.
 
     ### Arguments
-    - None
+    - name: The name of the component that emitted the event
+    - type: The type of event that was emitted
+    - time: The time that the event was emitted (according to React)
+    - data: The data that was emitted with the event
 
     ### Returns
     - None
     """
 
-    pass
+    name: str
+    type: str
+    time: int
+    data: dict
