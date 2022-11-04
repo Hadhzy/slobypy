@@ -1,7 +1,8 @@
+# Third-Party
 from abc import ABC, abstractmethod
 
 
-#FIXME: type hinting for the abstractmethods
+# FIXME: type hinting for the abstractmethods
 
 
 class Component(ABC):
@@ -16,7 +17,7 @@ class Component(ABC):
     def __repr__(self):
         return f"Component({self.name()=})"
 
-    #FIXME: I didn't find these events
+    # FIXME: I didn't find these events
     # def on_hover_start(self, event: Event):
     #     """
     #     This method is called when the mouse enters the component.

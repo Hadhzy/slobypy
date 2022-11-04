@@ -1,12 +1,12 @@
-# this project
+# This Project
 from slobypy.react._types import PATH_TYPE, url_type, component_type
 from slobypy.react.tools import url_checker
 
-# third-party
+# Third-Party
 from typing import Self
 
 
-#FIXME: to get the PATHS list use properties.
+# FIXME: to get the PATHS list use properties.
 class Path:
     """
    Path has 2 parts: the url and the component.
@@ -26,7 +26,6 @@ class Path:
     def __eq__(self, other) -> bool:
         return self.url == other.url
 
-
     @classmethod
     def add_path(cls, path: PATH_TYPE) -> None:
         cls._PATHS.append(path)
@@ -34,5 +33,3 @@ class Path:
     def __call__(self, component: component_type) -> Self:
         self.add_path({"url": self.url, "component": component})
         return self
-
-

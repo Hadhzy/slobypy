@@ -1,3 +1,4 @@
+# This Project
 from slobypy.rpc import Event
 
 
@@ -6,6 +7,7 @@ class EventHandler:
         description needed
 
     """
+
     @staticmethod
     def listen(event: Event = None):
         def listen_decorator(func):
@@ -13,5 +15,7 @@ class EventHandler:
                 result = func(*args, **kwargs)
                 print(event)
                 return result
+
             return wrapper
+
         return listen_decorator
