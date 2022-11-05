@@ -1,6 +1,6 @@
 # This Project
-from .rpc import Event
-from .react.component import Component
+from slobypy.rpc import Event
+from slobypy.react.component import Component
 
 # Third-Party
 from typing import Type, Union, Any
