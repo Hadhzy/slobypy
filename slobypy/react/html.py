@@ -22,4 +22,13 @@ class BaseElement:
         return " ".join([f'{key}="{value}"' for key, value in self.attrs.items()])
 
     def __repr__(self) -> str:
-        return f'{self.__name__}({self.attrs})'
+        return f'{self.__class__.__name__}({self.attrs})'
+
+
+class Button(BaseElement):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+button1 = Button()
+print(button1.__repr__())
