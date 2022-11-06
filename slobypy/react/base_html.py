@@ -25,6 +25,21 @@ class BaseElement:
                 new_kwargs.pop(key)
         self.attrs: SlobyPyATTRS = new_kwargs
 
+
+    def get_content(self) -> str:
+        rendered_html = ""
+        for element in self.content:
+            self.render_body_content(element=element, rendered_html=rendered_html)
+        return rendered_html
+
+    @staticmethod
+    def render_body_content(element, rendered_html) -> str:
+        if isinstance(element, BaseElement) or isinstance(element, Component):
+            rendered_html += element.render() + "\n"
+        else:
+            rendered_html += str(element) + "\n"
+        return rendered_html
+
     def render(self) -> str:
         """
         This method is used to render the element to HTML by recursing through the element's children and
@@ -38,10 +53,7 @@ class BaseElement:
         """
         rendered_html = f"<{self.tag} {self.render_attrs()}>"
         for element in self.content:
-            if isinstance(element, BaseElement) or isinstance(element, Component):
-                rendered_html += element.render() + "\n"
-            else:
-                rendered_html += str(element) + "\n"
+            self.render_body_content(element=element, rendered_html=rendered_html)
         return rendered_html + f"</{self.tag}>"
 
     def render_attrs(self) -> str:
