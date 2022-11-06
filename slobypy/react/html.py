@@ -1,9 +1,9 @@
 # Third-Party
-from _html_types import SlobyPyTAG, SlobyPyCONTENT, SlobyPyATTRS
+from _html_types import SlobyPyCONTENT, SlobyPyATTRS
 
 
 class BaseElement:
-    tag: SlobyPyTAG = ''
+    tag: str = ''
     __slots__ = ["content", "attrs"]
 
     def __init__(self, *args, **kwargs):
@@ -11,6 +11,16 @@ class BaseElement:
         self.attrs: SlobyPyATTRS = kwargs
 
     def render(self) -> str:
+        """
+        This method is used to render the element to HTML by recursing through the element's children and
+        rendering them to HTML.
+
+        ### Arguments
+        - None
+
+        ### Returns
+        - str: The html element as a string
+        """
         rendered_html = f"<{self.tag} {self.render_attrs()}>"
         for element in self.content:
             if isinstance(element, BaseElement):
@@ -19,12 +29,23 @@ class BaseElement:
                 rendered_html += str(element) + "\n"
         return rendered_html + f"</{self.tag}>"
 
-    #TODO: cleaner way to do that with type hint
-    def render_attrs(self) -> list[SlobyPyATTRS]:
-        return [dict(attr_key=value) for attr_key, value in self.attrs.items()]
+    def render_attrs(self) -> str:
+        """
+        This method is used to render the attributes of the element to HTML.
+
+        ### Arguments
+        - None
+
+        ### Returns
+        - str: The element's attributes as a string
+        """
+        return " ".join([f'{key}="{value}"' for key, value in self.attrs.items()])
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.attrs})'
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
 
 
 class Button(BaseElement):
@@ -40,12 +61,10 @@ class Button(BaseElement):
     ### Returns
     - None
     """
+    tag = 'button'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def __str__(self) -> str:
-        return self.__class__.__name__
 
 
 class P(BaseElement):
@@ -61,13 +80,7 @@ class P(BaseElement):
     ### Returns
     - None
     """
+    tag = 'p'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def __str__(self) -> str:
-        return self.__class__.__name__
-
-
-
-
