@@ -2,19 +2,22 @@
 from slobypy.react._types import url_type
 
 # Third-Party
-import validators
-from validators import ValidationFailure
+from urllib.parse import urlparse
 
 
-# FIXME: if the user does not pass out a "full" url just a simple endpoint
-# TODO: Create a regex for this as the validators library is inconsistent
-def url_checker(url: url_type) -> list[bool, url_type] | bool:
+def url_checker(url: url_type) -> str | bool:
     """
-    do the path_check here
+     ### Arguments
+    - url: The url of the component
+
+    ### Returns
+    url: if the url is valid
+    False: if the url is not valid
     """
-    slobypy_result = validators.url(url)
 
-    if isinstance(slobypy_result, ValidationFailure):
-        return False
+    slobypy_result = urlparse(url)
 
-    return [slobypy_result, url]
+    if slobypy_result.path and slobypy_result.scheme is not True:
+        return url
+
+    return False
