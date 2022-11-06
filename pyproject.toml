@@ -7,11 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 
-
 python = "^3.11"
 mypy = "^0.982"
 fastapi = "^0.86.0"
-validators = "^0.20.0"
 
 [build-system]
 requires = ["poetry-core"]
