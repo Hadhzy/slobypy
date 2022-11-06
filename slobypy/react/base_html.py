@@ -16,7 +16,12 @@ class BaseElement:
         new_kwargs = kwargs.copy()
         for key, value in kwargs.items():
             if callable(value):
-                self.listeners[key] = value
+                use_key = key
+                key_split = key.split("on")
+                if key_split[0] == '':
+                    key_split[1] = key_split[1].capitalize()
+                    use_key = "on".join(key_split)
+                self.listeners[use_key] = value
                 new_kwargs.pop(key)
         self.attrs: SlobyPyATTRS = new_kwargs
 
