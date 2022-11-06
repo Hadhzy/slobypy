@@ -10,11 +10,17 @@ class Component(ABC):
         pass
 
     @abstractmethod
-    def body(self):
+    def render(self):
         """
         Define the elements here
         """
         pass
+
+    def render_js(self):
+        """
+        Non-mandatory method to render/include the js of the component
+        """
+        return ""
 
     def __str__(self):
         return self.name
