@@ -25,13 +25,7 @@ class BaseElement:
                 new_kwargs.pop(key)
         self.attrs: SlobyPyATTRS = new_kwargs
 
-
-
     def _render_worker(self, tags=None) -> str:
-        #Todo: docsstring needed
-        """
-        """
-
         rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
         for element in self.content:
             if isinstance(element, BaseElement) or isinstance(element, Component):
@@ -53,8 +47,7 @@ class BaseElement:
        - str: The html element as a string
         """
 
-        rendered_html = self._render_worker()
-        return rendered_html
+        return self._render_worker()
 
     def render(self) -> str:
         """
@@ -68,8 +61,7 @@ class BaseElement:
         - str: The html element as a string
         """
 
-        rendered_html = self._render_worker(tags=True)
-        return rendered_html
+        return self._render_worker(tags=True)
 
     def render_attrs(self) -> str:
         """
