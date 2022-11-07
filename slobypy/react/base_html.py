@@ -40,7 +40,7 @@ class BaseElement:
        This method is used to get the content of the element without tags by recursing through the element's children and
        rendering them to HTML.
 
-       ### ArgumentsX
+       ### Arguments
        - None
 
        ### Returns
