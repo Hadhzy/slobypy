@@ -1,11 +1,11 @@
 # This Project
-from slobypy.react._types import url_type
+from slobypy.react._types import uri_type
 from slobypy.errors.react_errors import URI_ERROR
 # Third-Party
 from urllib.parse import urlparse
 
 
-def url_checker(url: url_type) -> str | bool:
+def uri_checker(uri: uri_type) -> str | bool:
     """
      ### Arguments
     - url: The url of the component
@@ -15,9 +15,9 @@ def url_checker(url: url_type) -> str | bool:
     False: if the url is not valid
     """
 
-    slobypy_result = urlparse(url)
+    slobypy_result = urlparse(uri)
 
     if slobypy_result.path and slobypy_result.scheme is not True:
-        return url
+        return uri
 
     raise URI_ERROR("Not valid url")

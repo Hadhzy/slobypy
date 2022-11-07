@@ -4,10 +4,10 @@ from slobypy.react.component import Component
 # Third-Party
 from typing import TypedDict
 
-url_type = str
+uri_type = str
 component_type = Component
 
 
 class PATH_TYPE(TypedDict):
-    url: url_type
+    uri: uri_type
     component: component_type

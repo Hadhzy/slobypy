@@ -1,7 +1,7 @@
 # This Project
 from .react import Component
 from .rpc import Event
-
+from .react.tools import uri_checker
 # Third-Party
 from typing import Union, Any, Callable, Type
 
@@ -53,7 +53,7 @@ class SlApp:
         - None
         """
         # TODO: Add URI checking regex
-        cls._components.append({"uri": uri, "component": component})
+        cls._components.append({"uri": uri_checker(uri), "component": component})
 
     def dispatch(self, event: Union[Event, Any]) -> None:
         """
