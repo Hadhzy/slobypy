@@ -26,23 +26,39 @@ class BaseElement:
         self.attrs: SlobyPyATTRS = new_kwargs
 
 
-    def get_content(self) -> str:
-        rendered_html = ""
+
+    def _render_worker(self, tags=None) -> str:
+        #Todo: docsstring needed
+        """
+        """
+
+        rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
         for element in self.content:
-            self.render_body_content(element=element, rendered_html=rendered_html)
+            if isinstance(element, BaseElement) or isinstance(element, Component):
+                rendered_html += element.render() + "\n"
+            else:
+                rendered_html += str(element)
+        rendered_html += f"</{self.tag}>" if tags else ""
         return rendered_html
 
-    @staticmethod
-    def render_body_content(element, rendered_html) -> str:
-        if isinstance(element, BaseElement) or isinstance(element, Component):
-            rendered_html += element.render() + "\n"
-        else:
-            rendered_html += str(element) + "\n"
+    def get_body_content(self):
+        """
+       This method is used to get the content of the element without tags by recursing through the element's children and
+       rendering them to HTML.
+
+       ### ArgumentsX
+       - None
+
+       ### Returns
+       - str: The html element as a string
+        """
+
+        rendered_html = self._render_worker()
         return rendered_html
 
     def render(self) -> str:
         """
-        This method is used to render the element to HTML by recursing through the element's children and
+        This method is used to render the element with TAGS to HTML by recursing through the element's children and
         rendering them to HTML.
 
         ### Arguments
@@ -51,10 +67,9 @@ class BaseElement:
         ### Returns
         - str: The html element as a string
         """
-        rendered_html = f"<{self.tag} {self.render_attrs()}>"
-        for element in self.content:
-            self.render_body_content(element=element, rendered_html=rendered_html)
-        return rendered_html + f"</{self.tag}>"
+
+        rendered_html = self._render_worker(tags=True)
+        return rendered_html
 
     def render_attrs(self) -> str:
         """
