@@ -19,9 +19,20 @@ class SlApp:
     """
     # Use list to prevent name conflicts
     _components = []
+    class MetaClass:
+        def __call__(self, obj, search):
+            return self._custom_getter(obj, search)
+
+        @staticmethod
+        def _custom_getter(obj, search):
+            for dict in SlApp._components:
+                if isinstance(dict["component"], obj):
+                    return dict[search]
 
     def __init__(self):
-        pass
+        self.meta_data = self.MetaClass()
+
+
 
     def component(self, uri: str) -> Callable:
         """

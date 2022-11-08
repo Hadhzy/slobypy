@@ -1,5 +1,8 @@
+#this project
+
 # Third-Party
 from abc import ABC, abstractmethod
+
 
 
 class Component(ABC):
@@ -16,14 +19,15 @@ class Component(ABC):
         """
         pass
 
+
     def render_js(self):
         """
         Non-mandatory method to render/include the js of the component
         """
         return ""
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> name:
+        return self.__class__.__name__
 
     def __repr__(self):
         return f"Component({self.name})"
