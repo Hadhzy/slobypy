@@ -46,7 +46,10 @@ class SlApp:
         """
 
         def wrap(component):
-            self.add(uri, component())
+            instance = component()
+            instance.uri = uri
+            self.add(uri, instance)
+            instance.mount()
             return component
 
         return wrap
