@@ -1,5 +1,5 @@
 # This Project
-from .react import Component
+from .react import Component, Reactive
 from .rpc import Event
 from .react.tools import uri_checker
 # Third-Party
@@ -31,6 +31,7 @@ class SlApp:
 
     def __init__(self):
         self.meta_data = self.MetaClass()
+        Reactive.app = self
 
 
 
@@ -87,4 +88,4 @@ class SlApp:
                     pass
 
     def render(self, obj):
-        pass
+        print("render")

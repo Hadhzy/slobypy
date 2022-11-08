@@ -1,7 +1,3 @@
-# This Project
-from slobypy import SlApp
-
-
 class NotSet:
     pass
 
@@ -10,7 +6,7 @@ NOT_SET = NotSet()
 
 
 class Reactive:
-    app: SlApp = None
+    app = None
 
     def __init__(self, value):
         self.value = value
