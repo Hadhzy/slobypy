@@ -85,3 +85,6 @@ class SlApp:
                     getattr(component, "on_" + event.type)(event)
                 except AttributeError:
                     pass
+
+    def render(self, obj):
+        pass
