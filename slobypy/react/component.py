@@ -1,8 +1,9 @@
-#this project
+# This Project
+from slobypy.react import BaseElement
 
 # Third-Party
 from abc import ABC, abstractmethod
-
+from typing import Generator, Type
 
 
 class Component(ABC):
@@ -13,12 +14,14 @@ class Component(ABC):
         pass
 
     @abstractmethod
-    def render(self):
+    def body(self) -> Generator[Type[BaseElement], None, None]:
         """
         Define the elements here
         """
         pass
 
+    def render(self):
+        pass
 
     def render_js(self):
         """
