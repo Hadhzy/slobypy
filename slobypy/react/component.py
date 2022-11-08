@@ -1,9 +1,10 @@
-# This Project
-from slobypy.react import BaseElement
+from __future__ import annotations
 
-# Third-Party
+# Built-in
 from abc import ABC, abstractmethod
-from typing import Generator, Type
+from typing import TYPE_CHECKING, Generator, Type
+if TYPE_CHECKING:
+    from slobypy.react import BaseElement
 
 
 class Component(ABC):
@@ -21,7 +22,7 @@ class Component(ABC):
         pass
 
     def render(self):
-        pass
+        return ''.join([element.render() for element in self.body()])
 
     def render_js(self):
         """
