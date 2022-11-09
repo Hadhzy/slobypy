@@ -46,10 +46,10 @@ class SlApp:
         """
 
         def wrap(component):
-            instance = component()
-            instance.uri = uri
-            self.add(uri, instance)
-            instance.mount()
+            instance = component()  # get the instance of it
+            instance.meta_data = {"uri": uri, "hash_instance": hash(instance)}  # add the meta_data
+            self.add(uri, instance)  # add the uri
+            instance.mount()  # after the component registration
             return component
 
         return wrap

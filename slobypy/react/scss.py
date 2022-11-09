@@ -1,7 +1,7 @@
-from slobypy.react.css_properties import POSSIBLE_ATTRIBUTES
+from slobypy.react.scss_properties import POSSIBLE_ATTRIBUTES
 
 
-class CSS:
+class SCSS:
     """
     This class is used to manage CSS styling for the React frontend. This class will prevent the creation of non-css
     attributes and will raise errors for incorrectly set attributes

@@ -1,6 +1,7 @@
 # This Project
 from . import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
+from .scss import SCSS
 
 # Built-in
 import string
@@ -9,12 +10,35 @@ import string
 class BaseElement:
     tag: str = ''
     listeners: dict = {}
-    __slots__ = ["content", "attrs"]
+
+    __slots__ = ["content", "attrs", "scss"]
 
     def __init__(self, *args, **kwargs):
         self.content: SlobyPyCONTENT = args
         new_kwargs = kwargs.copy()
-        for key, value in kwargs.items():
+
+        self.scss = SCSS()
+
+        # handle inline css
+        self.inline_scss(**kwargs)
+
+        self.create_listeners(kwargs, new_kwargs)
+        self.attrs: SlobyPyATTRS = new_kwargs
+
+    def _render_worker(self, tags=None) -> str:
+        rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
+        for element in self.content:
+            print(element)
+
+            if isinstance(element, BaseElement) or isinstance(element, Component):
+                rendered_html += element.render() + "\n"
+            else:
+                rendered_html += str(element)
+        rendered_html += f"</{self.tag}>" if tags else ""
+        return rendered_html
+
+    def create_listeners(self, item, new_kwargs):
+        for key, value in item.items():
             if callable(value):
                 use_key = key
                 key_split = key.split("on")
@@ -23,17 +47,15 @@ class BaseElement:
                     use_key = "on".join(key_split)
                 self.listeners[use_key] = value
                 new_kwargs.pop(key)
-        self.attrs: SlobyPyATTRS = new_kwargs
 
-    def _render_worker(self, tags=None) -> str:
-        rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
-        for element in self.content:
-            if isinstance(element, BaseElement) or isinstance(element, Component):
-                rendered_html += element.render() + "\n"
+    def inline_scss(self, **kwargs):
+
+        for key, value in kwargs.items():
+            if key in self.scss.POSSIBLE_ATTRIBUTES:
+                print("valid scss")
+                self.scss.__setattr__(key, value)
             else:
-                rendered_html += str(element)
-        rendered_html += f"</{self.tag}>" if tags else ""
-        return rendered_html
+                return
 
     def get_body_content(self):
         """
