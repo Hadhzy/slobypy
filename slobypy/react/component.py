@@ -12,16 +12,22 @@ class Component(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
+        """
+        Name of the component.
+        """
         pass
 
     @abstractmethod
     def body(self) -> Generator[Type[BaseElement], None, None]:
         """
-        Define the elements here
+        Use the elements here with yield syntax.
         """
         pass
 
     def render(self):
+        """
+        Get the component body with html elements and tags.
+        """
         return ''.join([element.render() for element in self.body()])
 
     def render_js(self):
@@ -31,7 +37,7 @@ class Component(ABC):
         return ""
 
     def __str__(self) -> name:
-        return self.__class__.__name__
+        return self.name
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Component({self.name})"

@@ -8,9 +8,20 @@ NOT_SET = NotSet()
 class Reactive:
     app = None
 
-    def __init__(self, value):
-        self.value = value
-        self.callbacks = []
+    def __init__(self, value) -> None:
+        """
+
+        Slobypy React init is used to re-render the component with the new data(like useEffect in react).
+
+        ### Arguments
+        - value: New value.
+
+        ### Returns
+        - None
+        """
+
+        self.value = value  # store the values
+        self.callbacks = []  # store the callbacks
 
     def __set__(self, obj, value):
         self.current_value = getattr(obj, self.public_name)

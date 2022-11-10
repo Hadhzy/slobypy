@@ -11,19 +11,30 @@ class BaseElement:
     tag: str = ''
     listeners: dict = {}
 
-    __slots__ = ["content", "attrs", "scss"]
+    __slots__ = ["content", "attrs", "style"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
+        """
+        Slobypy BaseElement init is used to serve the element with features, and get the attributes.
+
+        ### Arguments
+        - *args: The content of the element.
+        - **kwargs: The listeners the events and the inline css of the element.
+
+        ### Returns
+        - None
+        """
+
         self.content: SlobyPyCONTENT = args
         new_kwargs = kwargs.copy()
 
-        self.scss = SCSS()
+        self.style = SCSS()  # scss instance
 
-        # handle inline css
-        self.inline_scss(**kwargs)
 
-        self.create_listeners(kwargs, new_kwargs)
-        self.attrs: SlobyPyATTRS = new_kwargs
+        self._inline_scss(**kwargs)  # handle inline css
+
+        self._create_listeners(kwargs, new_kwargs)  # create listeners
+        self.attrs: SlobyPyATTRS = new_kwargs  #
 
     def _render_worker(self, tags=None) -> str:
         rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
@@ -37,7 +48,7 @@ class BaseElement:
         rendered_html += f"</{self.tag}>" if tags else ""
         return rendered_html
 
-    def create_listeners(self, item, new_kwargs):
+    def _create_listeners(self, item, new_kwargs):
         for key, value in item.items():
             if callable(value):
                 use_key = key
@@ -48,12 +59,12 @@ class BaseElement:
                 self.listeners[use_key] = value
                 new_kwargs.pop(key)
 
-    def inline_scss(self, **kwargs):
+    def _inline_scss(self, **kwargs):
 
         for key, value in kwargs.items():
-            if key in self.scss.POSSIBLE_ATTRIBUTES:
+            if key in self.style.POSSIBLE_ATTRIBUTES:
                 print("valid scss")
-                self.scss.__setattr__(key, value)
+                self.style.__setattr__(key, value)
             else:
                 return
 
