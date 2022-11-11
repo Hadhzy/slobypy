@@ -1,6 +1,4 @@
 from slobypy.react.scss import SCSS
-from slobypy.errors.scss_errors import PROPERTY_KEY_ERROR
-
 
 class SCSS_CLASS:
 
@@ -15,11 +13,8 @@ class SCSS_CLASS:
         self.properties = kwargs
 
         for key, value in kwargs.items():
-            try:
-                self.STYLE_CLASS.__setattr__(key, value)
-                self.style_data[key] = value
-            except:
-                raise PROPERTY_KEY_ERROR(f"Not valid property key: {key} ")
+            self.STYLE_CLASS.__setattr__(key, value)
+            self.style_data[key] = value
 
     def __str__(self) -> str:
         return f'{self.style_data}'

@@ -11,8 +11,6 @@ class BaseElement:
     tag: str = ''
     listeners: dict = {}
 
-    __slots__ = ["content", "attrs", "style"]
-
     def __init__(self, *args, **kwargs) -> None:
         """
         Slobypy BaseElement init is used to serve the element with features, and get the attributes.
