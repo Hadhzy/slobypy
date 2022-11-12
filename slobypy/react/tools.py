@@ -1,5 +1,5 @@
 # This Project
-from slobypy.react._types import uri_type
+from slobypy.react._react_types import uri_type
 from slobypy.errors.react_errors import URI_ERROR
 # Third-Party
 from urllib.parse import urlparse

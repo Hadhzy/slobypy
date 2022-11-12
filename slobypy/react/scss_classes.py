@@ -1,7 +1,7 @@
 from slobypy.react.scss import SCSS
 
-class SCSS_CLASS:
 
+class SCSS_CLASS:
     STYLE_CLASS = SCSS()
 
     def __init__(self, **kwargs) -> None:
