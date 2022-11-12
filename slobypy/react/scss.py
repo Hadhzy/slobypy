@@ -14,7 +14,6 @@ class SCSS:
     """
     POSSIBLE_ATTRIBUTES = POSSIBLE_ATTRIBUTES
 
-
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             self.__setattr__(key, value)

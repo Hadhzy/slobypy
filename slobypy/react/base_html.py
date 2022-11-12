@@ -5,12 +5,8 @@ from .scss import SCSS
 
 # Built-in
 import string
-from typing import TypeVar, TYPE_CHECKING
-
 
 from .inheritance_map import SlobyPyInheritanceMap
-
-T = TypeVar("T")
 
 CLASS_NAME_PROPERTY = "className"
 
@@ -43,8 +39,6 @@ class BaseElement:
         self._create_listeners(kwargs, new_kwargs)  # create listeners
         self.attrs: SlobyPyATTRS = new_kwargs  # set attributes
 
-
-
     def _render_worker(self, tags=None) -> str:
         rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
         for element in self.content:
@@ -69,7 +63,6 @@ class BaseElement:
                 new_kwargs.pop(key)
 
     def _inline_scss(self, **kwargs):
-
         for key, value in kwargs.items():
             if key in self.style.POSSIBLE_ATTRIBUTES:
                 self.style.__setattr__(key, value)
