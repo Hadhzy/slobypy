@@ -5,7 +5,7 @@ from .scss import SCSS
 
 # Built-in
 import string
-from typing import TypeVar, TYPE_CHECKING
+from typing import TypeVar, Self
 
 
 from .inheritance_map import SlobyPyInheritanceMap
@@ -42,13 +42,14 @@ class BaseElement:
 
         self._create_listeners(kwargs, new_kwargs)  # create listeners
         self.attrs: SlobyPyATTRS = new_kwargs  # set attributes
-
+        self.parent: Self = None  # parent element
 
 
     def _render_worker(self, tags=None) -> str:
-        rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
+        rendered_html = f"<{self.tag} {self.render_attrs()}>" if tags else ""
         for element in self.content:
             if isinstance(element, BaseElement) or isinstance(element, Component):
+                element.parent = self
                 rendered_html += element.render() + "\n"
             else:
                 rendered_html += str(element)
@@ -76,7 +77,7 @@ class BaseElement:
 
             if key == CLASS_NAME_PROPERTY:
                 self.classNames.append(value)
-                self.sloby_py_inheritance_map.add_element(self.tag, self.classNames)  # add to the inheritance_map
+                self.sloby_py_inheritance_map.add_element(self.tag, self.classNames)  # add to the inheritance_map #Todo: extend the inheritance_map
             else:
                 return
 
@@ -149,8 +150,12 @@ class BaseElement:
         return "\n".join(rendered_js)
 
     @classmethod
-    def get_inheritance_map(cls):
-        print(cls.sloby_py_inheritance_map)
+    def get_inheritance_map(cls) -> str:
+        return f"{cls.sloby_py_inheritance_map}"
+
+    #Todo: create an iterator, that can loop through the elements.
+    def __iter__(self):
+        pass
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.attrs})'
