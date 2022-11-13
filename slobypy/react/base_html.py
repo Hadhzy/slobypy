@@ -2,13 +2,12 @@
 from . import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
-
+from .scss_classes import SCSS_CLASS
 # Built-in
 import string
 
 from typing import Self
 
-from .inheritance_map import SlobyPyInheritanceMap
 
 CLASS_NAME_PROPERTY = "className"
 
@@ -16,7 +15,7 @@ CLASS_NAME_PROPERTY = "className"
 class BaseElement:
     tag: str = ''
     listeners: dict = {}
-    sloby_py_inheritance_map = SlobyPyInheritanceMap()
+    scss_class = SCSS_CLASS()
 
     def __init__(self, *args, **kwargs) -> None:
         """
@@ -34,8 +33,7 @@ class BaseElement:
         new_kwargs = kwargs.copy()
 
         self.style = SCSS()  # scss instance
-        self.classNames: list = []
-
+        self.classNames: list = []  # contain all the classNames
         self._inline_scss(**kwargs)  # handle inline css
 
         self._create_listeners(kwargs, new_kwargs)  # create listeners
@@ -44,11 +42,12 @@ class BaseElement:
         self.parent: Self = None  # parent element
 
 
+
     def _render_worker(self, tags=None) -> str:
         rendered_html = f"<{self.tag} {self.render_attrs()}>" if tags else ""
         for element in self.content:
             if isinstance(element, BaseElement) or isinstance(element, Component):
-                element.parent = self
+
                 rendered_html += element.render() + "\n"
             else:
                 rendered_html += str(element)
@@ -71,13 +70,30 @@ class BaseElement:
     def _inline_scss(self, **kwargs):
         for key, value in kwargs.items():
             if key in self.style.POSSIBLE_ATTRIBUTES:
-                self.style.__setattr__(key, value)
+                self.style.__setattr__(key, value)  # check if it is a valid property name
 
             if key == CLASS_NAME_PROPERTY:
-                self.classNames.append(value)
-                self.sloby_py_inheritance_map.add_element(self.tag, self.classNames)  # add to the inheritance_map #Todo: extend the inheritance_map
+                self._check_classname_in_scss(value)  # call the check classname method
+                self.classNames.append(value)  # extend teh classNames list with the actual classname
             else:
                 return
+
+    # Todo: finish the classname check
+    def _check_classname_in_scss(self, value):
+        for style_dict in self.scss_class.get_style_data():  # get the
+            try:
+                for element in self.content:
+                    if issubclass(element, BaseElement):
+                        if style_dict["name"] == value:
+                            print("here")
+                            for key, value in element.attrs.items():
+                                if key == CLASS_NAME_PROPERTY and style_dict[value]:
+                                    print("correct")
+                                else:
+                                    print("error")
+
+            except:
+                continue  # if there is no "name" property just continue
 
     def get_body_content(self):
         """
@@ -146,10 +162,6 @@ class BaseElement:
             rendered_js.append(
                 f'function {"".join(int_to_str[n] for n in str(value.__hash__()))}(e) {{\n  console.log("TBD")\n}}')
         return "\n".join(rendered_js)
-
-    @classmethod
-    def get_inheritance_map(cls) -> str:
-        return f"{cls.sloby_py_inheritance_map}"
 
     #Todo: create an iterator, that can loop through the elements.
     def __iter__(self):

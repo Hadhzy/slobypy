@@ -1,19 +1,25 @@
-from slopy.react.component import Component
-from slopy.react.path import Path
+from slobypy.react.scss_classes import SCSS_CLASS
+from slobypy.react import *
 
 
-@Path("test")
-class MyFirstSlopyComponent(Component):
-    def name(self):
-        return "test"
+
+my_class = SCSS_CLASS(
+    name="base_class",
+    position="relative",
+    child1=SCSS_CLASS(
+
+    )
+)
+
+my_class_2 = SCSS_CLASS(
+    name="base_class",
+    position="relative",
+    child1=SCSS_CLASS(
+
+    )
+)
+p = P("test", P("test", className="child1"), className="base_class")
 
 
-@Path("second")
-class MySecondSlopyComponent(Component):
-    def name(self):
-        return "test2"
-
-
-print(Path.get_paths())
-print(Path.get_paths()[0])
-
+print(p.content)
+print(SCSS_CLASS.STYLES)

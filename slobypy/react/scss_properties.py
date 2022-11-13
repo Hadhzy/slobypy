@@ -1,4 +1,4 @@
-POSSIBLE_ATTRIBUTES = ["_webkit_line_clamp", "_webkit_text_fill_color", "_webkit_text_stroke",
+POSSIBLE_ATTRIBUTES = ["_webkit_line_clamp", "name", "_webkit_text_fill_color", "_webkit_text_stroke",
                        "_webkit_text_stroke_color", "_webkit_text_stroke_width", "accent_color", "align_content",
                        "align_items", "align_self", "align_tracks", "all", "animation", "animation_composition",
                        "animation_delay", "animation_direction", "animation_duration", "animation_fill_mode",
