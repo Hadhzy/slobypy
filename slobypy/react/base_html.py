@@ -80,7 +80,7 @@ class BaseElement:
     # Todo: finish the classname check
     def _check_classname_in_scss(self, kwargs):
         current_style_dict = None  # current scss class
-        content_element_end = False
+        find_one = False  # the error switcher
 
         for key, value in kwargs.items():
             if key == CLASS_NAME_PROPERTY:
@@ -90,15 +90,20 @@ class BaseElement:
                             current_style_dict = style_dict
                     except:
                         continue
-        for content_element in self.content:
-            if isinstance(content_element, type) and issubclass(content_element, BaseElement):  # class and subclass of the element
-                for key, value in current_style_dict.items():
-                    if key in self.classNames:
-                        break
-                else:
-                    print("not valid scss handle")
 
-                break
+        for content_element in self.content:
+            if isinstance(content_element, BaseElement):  # class and subclass of the element
+                for key, value in current_style_dict.items():
+                    if key != "name" and type(current_style_dict[key]) == dict:  # check the depth here and
+                        find_one = True
+                        print("correct")
+                        break
+                    else:
+                        find_one = False
+
+                if find_one is not True:
+                    print("error")
+
 
 
     def depth_of_the_element(self, element) -> int:
