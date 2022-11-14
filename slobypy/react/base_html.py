@@ -3,9 +3,9 @@ from . import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSS_CLASS
+from slobypy.errors.scss_errors import PROPERTY_KEY_ERROR
 # Built-in
 import string
-
 from typing import Self
 
 
@@ -34,7 +34,8 @@ class BaseElement:
 
         self.style = SCSS()  # scss instance
         self.classNames: list = []  # contain all the classNames
-        self._inline_scss(**kwargs)  # handle inline css
+        self._inline_scss(new_kwargs)  # handle inline css
+        self._check_classname_in_scss(new_kwargs)  # check the valid classnames
 
         self._create_listeners(kwargs, new_kwargs)  # create listeners
         self.attrs: SlobyPyATTRS = new_kwargs  # set attributes
@@ -67,33 +68,50 @@ class BaseElement:
                 self.listeners[use_key] = value
                 new_kwargs.pop(key)
 
-    def _inline_scss(self, **kwargs):
+    def _inline_scss(self, kwargs):
         for key, value in kwargs.items():
-            if key in self.style.POSSIBLE_ATTRIBUTES:
-                self.style.__setattr__(key, value)  # check if it is a valid property name
-
             if key == CLASS_NAME_PROPERTY:
-                self._check_classname_in_scss(value)  # call the check classname method
-                self.classNames.append(value)  # extend teh classNames list with the actual classname
-            else:
-                return
+                self.classNames.append(value)  # extend the classNames list with the actual classname
+
+            self.style.__setattr__(key, value)  # check if it is a valid property name
+
+
 
     # Todo: finish the classname check
-    def _check_classname_in_scss(self, value):
-        for style_dict in self.scss_class.get_style_data():  # get the
-            try:
-                for element in self.content:
-                    if issubclass(element, BaseElement):
-                        if style_dict["name"] == value:
-                            print("here")
-                            for key, value in element.attrs.items():
-                                if key == CLASS_NAME_PROPERTY and style_dict[value]:
-                                    print("correct")
-                                else:
-                                    print("error")
+    def _check_classname_in_scss(self, kwargs):
+        current_style_dict = None  # current scss class
+        content_element_end = False
 
-            except:
-                continue  # if there is no "name" property just continue
+        for key, value in kwargs.items():
+            if key == CLASS_NAME_PROPERTY:
+                for style_dict in self.scss_class.get_style_data():
+                    try:
+                        if style_dict["name"] == value:
+                            current_style_dict = style_dict
+                    except:
+                        continue
+        for content_element in self.content:
+            if isinstance(content_element, type) and issubclass(content_element, BaseElement):  # class and subclass of the element
+                for key, value in current_style_dict.items():
+                    if key in self.classNames:
+                        break
+                else:
+                    print("not valid scss handle")
+
+                break
+
+
+    def depth_of_the_element(self, element) -> int:
+        """
+        This method is used to return the depth of the element, depth -> integer, the element position from the component.
+
+        ### Arguments
+       - element: element
+
+       ### Returns
+       - int: the depth of the element.
+        """
+        pass
 
     def get_body_content(self):
         """
