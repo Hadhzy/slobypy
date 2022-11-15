@@ -13,7 +13,9 @@ class SCSS_CLASS:
         """
         self._style_data: dict = {}
         self.properties = kwargs
+
         depth = 0
+
         for key, value in kwargs.items():
             try:
                 self.STYLE_CLASS.__setattr__(key, value)
@@ -30,7 +32,7 @@ class SCSS_CLASS:
         return self._style_data
 
     @classmethod
-    def get_style_data(cls) -> list:
+    def get_styles(cls) -> list:
         return cls._STYLES
 
     def __str__(self) -> str:

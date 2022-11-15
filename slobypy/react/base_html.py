@@ -3,7 +3,7 @@ from . import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSS_CLASS
-from slobypy.errors.scss_errors import PROPERTY_KEY_ERROR
+from slobypy.errors.scss_errors import PROPERTY_KEY_ERROR, NOT_SAME
 # Built-in
 import string
 from typing import Self
@@ -75,7 +75,11 @@ class BaseElement:
 
             self.style.__setattr__(key, value)  # check if it is a valid property name
 
-
+    @staticmethod
+    def _get_element_classname(element) -> str:
+        for key, value in element.attrs.items():
+            if key == CLASS_NAME_PROPERTY:
+                return value
 
     # Todo: finish the classname check
     def _check_classname_in_scss(self, kwargs):
@@ -92,17 +96,16 @@ class BaseElement:
                         continue
 
         for content_element in self.content:
-            if isinstance(content_element, BaseElement):  # class and subclass of the element
+            if isinstance(content_element, BaseElement) and current_style_dict is not None:  # class and subclass of the element
                 for key, value in current_style_dict.items():
-                    if key != "name" and type(current_style_dict[key]) == dict:  # check the depth here and
+                    if key != "name" and type(current_style_dict[key]) == dict and key == self._get_element_classname(content_element):  # check the depth here
                         find_one = True
-                        print("correct")
                         break
                     else:
                         find_one = False
 
                 if find_one is not True:
-                    print("error")
+                    raise NOT_SAME("There isn't a valid child!")  # Todo: Extend the error message.
 
 
 
@@ -118,7 +121,7 @@ class BaseElement:
         """
         pass
 
-    def get_body_content(self):
+    def get_body_content(self) -> str:
         """
        This method is used to get the content of the element without tags by recursing through the element's children and
        rendering them to HTML.
