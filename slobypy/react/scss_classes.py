@@ -23,10 +23,23 @@ class SCSS_CLASS:
 
                 depth += 1
             except:  # Todo: a child or a not valid scss property, handle them.
-                self.style_data[key] = {key: depth}
+                if SCSS_CLASS.html_element_base_class_state is not False:
+                    self.style_data[key] = {key: depth}
+                else:
+                    print("test")
 
 
         self._STYLES.append(self._style_data)
+
+    @classmethod
+    def gate(cls, **kwargs):
+        """
+            Get information from the base_element
+        """
+        result = yield
+        obj = object.__new__(cls)
+        obj.__init__(**kwargs)
+        yield obj
 
     @property
     def style_data(self) -> dict:

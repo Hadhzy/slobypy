@@ -106,7 +106,11 @@ class BaseElement:
                 if find_one is not True:
                     raise NOT_SAME("There isn't a valid child!")  # Todo: Extend the error message.
 
+        if current_style_dict:
+            builder = self.scss_class.gate()
+            builder.send(None)
 
+            builder.send(True)
 
     def depth_of_the_element(self, element) -> int:
         """

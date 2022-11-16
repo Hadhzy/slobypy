@@ -30,6 +30,6 @@ class SCSS:
         else:
             raise AttributeError(f"Attribute {item} is not a valid CSS attribute")
 
-    def render(self):
+    def render(self) -> str:
         return "; ".join([f"{key.replace('_', '-')}: {value}" if type(
             value) == str else f"{key.replace('_', '-')}: {' '.join(value)}" for key, value in self.__dict__.items()])
