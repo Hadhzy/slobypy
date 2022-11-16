@@ -3,11 +3,10 @@ from . import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSS_CLASS
-from slobypy.errors.scss_errors import PROPERTY_KEY_ERROR, NOT_SAME
+from slobypy.errors.scss_errors import NOT_SAME
 # Built-in
 import string
 from typing import Self
-
 
 CLASS_NAME_PROPERTY = "className"
 
@@ -88,7 +87,7 @@ class BaseElement:
 
         for key, value in kwargs.items():
             if key == CLASS_NAME_PROPERTY:
-                for style_dict in self.scss_class.get_style_data():
+                for style_dict in self.scss_class.get_styles():
                     try:
                         if style_dict["name"] == value:
                             current_style_dict = style_dict

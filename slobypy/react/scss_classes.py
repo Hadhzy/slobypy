@@ -1,3 +1,4 @@
+#This project
 from slobypy.react.scss import SCSS
 
 
@@ -13,7 +14,6 @@ class SCSS_CLASS:
         """
         self._style_data: dict = {}
         self.properties = kwargs
-
         depth = 0
 
         for key, value in kwargs.items():
@@ -24,6 +24,7 @@ class SCSS_CLASS:
                 depth += 1
             except:  # Todo: a child or a not valid scss property, handle them.
                 self.style_data[key] = {key: depth}
+
 
         self._STYLES.append(self._style_data)
 
