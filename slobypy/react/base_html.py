@@ -27,7 +27,6 @@ class BaseElement:
         ### Returns
         - None
         """
-        print(kwargs.items())
         self.content: SlobyPyCONTENT = args
         new_kwargs = kwargs.copy()
         self.style = SCSS()  # scss instance
@@ -94,9 +93,6 @@ class BaseElement:
                             there_is_class_name = True
                     except:
                          continue
-
-        if current_style_dict is None:
-            self.scss_class.throw_an_error_manually()
 
         for content_element in self.content:
             if isinstance(content_element, BaseElement) and current_style_dict is not None:  # class and subclass of the element
