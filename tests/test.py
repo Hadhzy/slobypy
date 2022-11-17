@@ -11,5 +11,5 @@ my_class = SCSS_CLASS(
     )
 )
 
-p = P("test", P("test", className="child1"), className="base_class")
+p = P("test", P("test"))
 
