@@ -84,6 +84,7 @@ class BaseElement:
     def _check_classname_in_scss(self, kwargs):
         current_style_dict = None  # current scss class
         find_one = False  # the error switcher
+        there_is_class_name = False
 
         for key, value in kwargs.items():
             if key == CLASS_NAME_PROPERTY:
@@ -91,8 +92,9 @@ class BaseElement:
                     try:
                         if style_dict["name"] == value:
                             current_style_dict = style_dict
+                            there_is_class_name = True
                     except:
-                        continue
+                         continue
 
         for content_element in self.content:
             if isinstance(content_element, BaseElement) and current_style_dict is not None:  # class and subclass of the element
@@ -106,6 +108,8 @@ class BaseElement:
                 if find_one is not True:
                     raise NOT_SAME("There isn't a valid child!")  # Todo: Extend the error message.
 
+        if not there_is_class_name:
+            self.scss_class.throw_an_error()
 
     def depth_of_the_element(self, element) -> int:
         """
