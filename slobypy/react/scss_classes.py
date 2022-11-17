@@ -12,29 +12,20 @@ class SCSS_CLASS:
         Create scss classes.
 
         """
-        self._style_data: dict = {}
         self.properties = kwargs
-        self.not_valid_last: dict = {}
-        depth = 0
+        self._style_data: list = []
 
         for key, value in kwargs.items():
-            try:
-                self.STYLE_CLASS.__setattr__(key, value)
-                self._style_data[key] = value
-
-                depth += 1
-            except:  # Todo: a child or a not valid scss property, handle them.
-                self.style_data[key] = {key: depth}
-                self.not_valid_last = {key: value}
-
-        self._STYLES.append(self._style_data)
-
-    def throw_an_error(self):
-        for key, value in self.not_valid_last.items():
             self.STYLE_CLASS.__setattr__(key, value)
+            self._style_data.append({key: value})  # update local style data
+            self.add_style(key, value)  # update global style data
+
+    @classmethod
+    def add_style(cls, key: str, value: str):
+        cls._STYLES.append({key: value})
 
     @property
-    def style_data(self) -> dict:
+    def style_data(self) -> list:
         return self._style_data
 
     @classmethod
@@ -42,4 +33,4 @@ class SCSS_CLASS:
         return cls._STYLES
 
     def __str__(self) -> str:
-        return f'{self.style_data}'
+        return f'{self._style_data}'

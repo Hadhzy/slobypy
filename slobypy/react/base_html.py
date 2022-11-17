@@ -35,7 +35,6 @@ class BaseElement:
 
         self._create_listeners(kwargs, new_kwargs)  # create listeners
         self.attrs: SlobyPyATTRS = new_kwargs  # set attributes
-        self._check_classname_in_scss(new_kwargs)  # check the valid classnames
         self.parent: Self = None  # parent element
 
 
@@ -72,42 +71,10 @@ class BaseElement:
             self.style.__setattr__(key, value)  # check if it is a valid property name
 
     @staticmethod
-    def _get_element_classname(element) -> str:
+    def get_element_classname(element) -> str:
         for key, value in element.attrs.items():
             if key == CLASS_NAME_PROPERTY:
                 return value
-
-    # Todo: finish the classname check
-    def _check_classname_in_scss(self, base_element_kwargs):
-        current_style_dict = None  # current scss class
-        find_one = False  # the error switcher
-
-        there_is_class_name = False
-
-        for key, value in base_element_kwargs.items():
-            if key == CLASS_NAME_PROPERTY:
-                for style_dict in self.scss_class.get_styles():
-                    try:
-                        if style_dict["name"] == value:
-                            current_style_dict = style_dict
-                            there_is_class_name = True
-                    except:
-                         continue
-
-        for content_element in self.content:
-            if isinstance(content_element, BaseElement) and current_style_dict is not None:  # class and subclass of the element
-                for key, value in current_style_dict.items():
-                    if key != "name" and type(current_style_dict[key]) == dict and key == self._get_element_classname(content_element):  # check the depth here
-                        find_one = True
-                        break
-                    else:
-                        find_one = False
-
-                if find_one is not True:
-                    raise NOT_SAME("There isn't a valid child!")  # Todo: Extend the error message.
-
-        if not there_is_class_name:
-            self.scss_class.throw_an_error()
 
     def depth_of_the_element(self, element) -> int:
         """
