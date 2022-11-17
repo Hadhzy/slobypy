@@ -26,12 +26,8 @@ class SCSS_CLASS:
             except:  # Todo: a child or a not valid scss property, handle them.
                 self.style_data[key] = {key: depth}
                 self.not_valid_last = {key: value}
-        self._STYLES.append(self._style_data)
 
-    def throw_an_error_manually(self):
-        for style_dict in self.get_styles():
-            for key, value in style_dict.items():
-                self.STYLE_CLASS.__setattr__(key, value)
+        self._STYLES.append(self._style_data)
 
     def throw_an_error(self):
         for key, value in self.not_valid_last.items():
