@@ -27,18 +27,16 @@ class BaseElement:
         ### Returns
         - None
         """
-
+        print(kwargs.items())
         self.content: SlobyPyCONTENT = args
         new_kwargs = kwargs.copy()
-
         self.style = SCSS()  # scss instance
         self.classNames: list = []  # contain all the classNames
         self._inline_scss(new_kwargs)  # handle inline css
-        self._check_classname_in_scss(new_kwargs)  # check the valid classnames
 
         self._create_listeners(kwargs, new_kwargs)  # create listeners
         self.attrs: SlobyPyATTRS = new_kwargs  # set attributes
-
+        self._check_classname_in_scss(new_kwargs)  # check the valid classnames
         self.parent: Self = None  # parent element
 
 
@@ -81,12 +79,13 @@ class BaseElement:
                 return value
 
     # Todo: finish the classname check
-    def _check_classname_in_scss(self, kwargs):
+    def _check_classname_in_scss(self, base_element_kwargs):
         current_style_dict = None  # current scss class
         find_one = False  # the error switcher
+
         there_is_class_name = False
 
-        for key, value in kwargs.items():
+        for key, value in base_element_kwargs.items():
             if key == CLASS_NAME_PROPERTY:
                 for style_dict in self.scss_class.get_styles():
                     try:
@@ -95,6 +94,9 @@ class BaseElement:
                             there_is_class_name = True
                     except:
                          continue
+
+        if current_style_dict is None:
+            self.scss_class.throw_an_error_manually()
 
         for content_element in self.content:
             if isinstance(content_element, BaseElement) and current_style_dict is not None:  # class and subclass of the element
