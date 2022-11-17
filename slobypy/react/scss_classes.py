@@ -27,6 +27,10 @@ class SCSS_CLASS:
 
         self._STYLES.append(self._style_data)
 
+    def throw_an_error_manually(self):
+        for style_dict in self.get_styles():
+            for key, value in style_dict.items():
+                self.STYLE_CLASS.__setattr__(key, value)
 
     @property
     def style_data(self) -> dict:
