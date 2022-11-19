@@ -98,7 +98,7 @@ class SlApp:
         """
         print(self.render())
 
-    def render(self, obj=None, route: str = '/') -> str:
+    def render(self, obj=None, route: str = False) -> str:
         """
         This method is used to render the app to HTML.
 

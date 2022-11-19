@@ -1,6 +1,9 @@
 #This project
 from slobypy.react.scss import SCSS
 
+# Built In
+from typing import Generator, Type
+
 
 class SCSS_CLASS:
     STYLE_CLASS = SCSS()
@@ -14,6 +17,7 @@ class SCSS_CLASS:
         """
         self.properties = kwargs
         self._style_data: list = []
+
 
         for key, value in kwargs.items():
             self.STYLE_CLASS.__setattr__(key, value)
@@ -79,3 +83,12 @@ class SCSS_CLASS:
 
     def __str__(self) -> str:
         return f'{self._style_data}'
+
+    def __iter__(self) -> Generator[Type[dict], None, None]:
+        start = 0
+        stop = len(self._STYLES)
+        curr = start
+
+        while curr < stop:
+            yield self._STYLES[curr]
+            curr += 1
