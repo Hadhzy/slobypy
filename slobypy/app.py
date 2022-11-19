@@ -20,18 +20,8 @@ class SlApp:
     # Use list to prevent name conflicts
     _components = []
 
-    class MetaClass:
-        def __call__(self, obj, search):
-            return self._custom_getter(obj, search)
-
-        @staticmethod
-        def _custom_getter(obj, search):
-            for dict in SlApp._components:
-                if isinstance(dict["component"], obj):
-                    return dict[search]
 
     def __init__(self):
-        self.meta_data = self.MetaClass()
         Reactive.app = self
 
     def component(self, uri: str) -> Callable:
@@ -96,9 +86,9 @@ class SlApp:
         ### Returns
         - None
         """
-        print(self.render())
+        print(self._render())
 
-    def render(self, obj=None, route: str = False) -> str:
+    def _render(self, obj=None, route: str = False) -> str:
         """
         This method is used to render the app to HTML.
 

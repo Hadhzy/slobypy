@@ -1,9 +1,9 @@
 # This Project
-from . import Component
+from slobypy import react as react
+from slobypy.react import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSS_CLASS
-from slobypy.errors.scss_errors import NOT_SAME
 # Built-in
 import string
 from typing import Self
@@ -37,6 +37,7 @@ class BaseElement:
         self.attrs: SlobyPyATTRS = new_kwargs  # set attributes
         self.parent: Self = None  # parent element
 
+        self._find_same_base_classes()  # check scss classes
 
 
     def _render_worker(self, tags=None) -> str:
@@ -71,10 +72,35 @@ class BaseElement:
             self.style.__setattr__(key, value)  # check if it is a valid property name
 
     @staticmethod
-    def get_element_classname(element) -> str:
+    def get_element_classname(element: Self) -> str:
+        """
+        This method is used to return the element "base(root)" classname.
+        ### Arguments
+        The element(itself)
+        ### Returns
+        value: the classname
+        """
+
         for key, value in element.attrs.items():
             if key == CLASS_NAME_PROPERTY:
                 return value
+
+    def _find_same_base_classes(self):
+        current_class = None  # the actual scss class
+
+        for scss_global_class in react.Design.get_registered_classes():  # get all the classes
+            if scss_global_class.properties["name"] == self.get_element_classname(self):  # same classname match
+
+                scss_global_class.check_scss_properties()  # check if the properties valid
+
+                return scss_global_class  # if it is valid just return it
+
+            elif scss_global_class.properties["name"] != self.get_element_classname(self):
+                scss_global_class.check_scss_properties()  # check if the properties valid
+
+        if current_class is None:
+            return
+
 
     def depth_of_the_element(self, element) -> int:
         """
