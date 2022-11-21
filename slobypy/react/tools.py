@@ -11,8 +11,8 @@ def uri_checker(uri: uri_type) -> str | bool:
     - url: The url of the component
 
     ### Returns
-    url: if the url is valid
-    False: if the url is not valid
+    url: if the uri is valid
+    error: if the uri is not valid
     """
 
     slobypy_result = urlparse(uri)
@@ -20,4 +20,4 @@ def uri_checker(uri: uri_type) -> str | bool:
     if slobypy_result.path and slobypy_result.scheme is not True:
         return uri
 
-    raise URI_ERROR("Not valid url")
+    raise URI_ERROR(f"Not valid uri")

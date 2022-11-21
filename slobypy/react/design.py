@@ -13,7 +13,8 @@ class Design:
                 cls._REGISTERED_CLASSES.append(scss_class_item)
 
         if isinstance(scss_class, SCSS_CLASS):
-            cls._REGISTERED_CLASSES.append(scss_class)
+            if scss_class not in cls._REGISTERED_CLASSES:
+                cls._REGISTERED_CLASSES.append(scss_class)
 
     @classmethod
     def get_registered_classes(cls) -> list[SCSS_CLASS]:

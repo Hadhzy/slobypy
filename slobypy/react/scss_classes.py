@@ -1,6 +1,6 @@
 #This project
 from slobypy.react.scss import SCSS
-
+from slobypy import react
 # Built-in
 from typing import Generator, Type
 
@@ -9,10 +9,14 @@ class SCSS_CLASS:
     STYLE_CLASS = SCSS()
     _STYLES: list = []  # contain the style of the classes
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, register=False, **kwargs) -> None:
         """
         Create scss classes.
         """
+
+        if register:  # register it automatically
+            react.Design.register(self)
+
         self.properties = kwargs
         self._style_data: list = []
 
