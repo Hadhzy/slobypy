@@ -7,6 +7,7 @@ from .scss_classes import SCSS_CLASS
 # Built-in
 import string
 from typing import Self
+from typing import Generator, Type
 
 CLASS_NAME_PROPERTY = "className"
 
@@ -182,9 +183,14 @@ class BaseElement:
                 f'function {"".join(int_to_str[n] for n in str(value.__hash__()))}(e) {{\n  console.log("TBD")\n}}')
         return "\n".join(rendered_js)
 
-    #Todo: create an iterator, that can loop through the elements.
-    def __iter__(self):
-        pass
+    #Todo: Extend this with kwargs
+    def __iter__(self) -> Generator[Type[dict], None, None]:
+        start = 0
+        stop = len(self.content)
+        curr = start
+        while curr < stop:
+            yield self.content[curr]
+            curr += 1
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.attrs})'
