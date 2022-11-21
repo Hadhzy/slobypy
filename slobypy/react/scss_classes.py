@@ -25,6 +25,20 @@ class SCSS_CLASS:
             self._style_data.append({key: value})  # update local style data
             self.add_style_global(key=key, value=value)  # update global style data
 
+    def render(self) -> str:
+        """
+        This method is used to render the scss class.
+        """
+        curr = ".{"
+        end = "}"
+
+        for key, value in self.properties.items():
+            curr += f"\n {key}:{value};"
+
+        curr += "\n" + end
+
+        return curr
+
     def check_scss_properties(self) -> None:
         """
         This method is used to check the scss properties, manually.
