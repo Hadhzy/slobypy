@@ -10,7 +10,7 @@
 
 <p align="center"><b>You can build a website with the Sloby editor and you can connect with python(slobypy).</b></p>
 
-
+**Simple scss class**
 ```py
 my_class = SCSS_CLASS(
     name="base_class1",
@@ -29,6 +29,7 @@ print(my_class.render())
 ```
 --------------------
 
+**Simple html element**
 ```py
 p = P("paragraph body", P("child1"))
 print(p.render())
@@ -38,6 +39,7 @@ print(p.render())
 </p>
 ```
 -----------
+**Simple component with abstract methods.**
 ```py
 class MyFirstComponent(Component):
     def name(self):
@@ -55,4 +57,14 @@ print(component1.render())
 ```
 ```
 <p >inside the component body</p>
+```
+-----------
+
+**Component "registration" with the uri"**
+```py
+app = SlApp()
+
+@app.component(uri="test/first")
+class MyFirstComponent(Component):
+  ...
 ```
