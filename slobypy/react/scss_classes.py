@@ -2,7 +2,8 @@
 from slobypy.react.scss import SCSS
 from slobypy import react
 # Built-in
-from typing import Generator, Type
+from typing import Generator, Type, Self, TYPE_CHECKING
+from slobypy.react.scss_group import SCSS_GROUP
 
 
 class SCSS_CLASS:
@@ -19,11 +20,19 @@ class SCSS_CLASS:
 
         self.properties = kwargs
         self._style_data: list = []
-
+        self.child: Self = None
 
         for key, value in kwargs.items():
+            if key == "scss_group":
+               self._add_group(value)  # add the class to the group
+
             self._style_data.append({key: value})  # update local style data
             self.add_style_global(key=key, value=value)  # update global style data
+
+    def _add_group(self, value):
+        for group in SCSS_GROUP.GROUPS:
+            if isinstance(group, value):
+                group.add(self)
 
     def render(self) -> str:
         """
@@ -34,6 +43,8 @@ class SCSS_CLASS:
 
         for key, value in self.properties.items():
             curr += f"\n {key}:{value};"
+            if self.child:
+                curr += self.child.render()
 
         curr += "\n" + end
 
