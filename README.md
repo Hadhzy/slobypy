@@ -7,8 +7,8 @@
 </p>
 
 -----------
-
-<p align="center"><b>You can build a website with the Sloby editor and you can connect with python(slobypy).</b></p>
+<p align="center"><b>Use python to build a website(slobypy), use the editor(sloby) to get the best experience.</b></p>
+<p align="center"><b>Build a website with the Sloby editor and connect with python(slobypy).</b></p>
 
 **Simple scss class**
 ```py
