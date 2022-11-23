@@ -10,6 +10,20 @@
 <p align="center"><b>Use python to build a website(slobypy), use the editor(sloby) to get the best experience.</b></p>
 <p align="center"><b>Build a website with the Sloby editor and connect with python(slobypy).</b></p>
 
+## 📝 Table of Contents
+- [📝 Table of Contents](#-table-of-contents)
+- [ :information_source: About the project <a name = "about"></a>](#-about-)
+- [🏁 Examples <a name = "examples"></a>](#-examples-)
+- [⛏️ Built Using <a name = "built_using"></a>](#️-built-using-)
+- [✍️ Authors <a name = "authors"></a>](#️-authors-)
+- [💾 Docs  <a name = "docs"></a>](#-docs-)
+--------------
+## 📃 About <a name = "about"></a>
+
+## 💾 Docs <a name = "docs"></a>
+----------------
+[🎉**Contributors**🎉](https://github.com/FlurryGlo//contributors)
+
 **Simple scss class**
 ```py
 my_class = SCSS_CLASS(
