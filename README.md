@@ -22,7 +22,7 @@
 
 ## 💾 Docs <a name = "docs"></a>
 ----------------
-[🎉**Contributors**🎉](https://github.com/FlurryGlo//contributors)
+[🎉**Contributors**🎉](https://github.com/FlurryGlo/slobypy/graphs/contributors)
 
 **Simple scss class**
 ```py
