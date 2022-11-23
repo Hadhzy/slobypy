@@ -1,10 +1,12 @@
+from __future__ import annotations
 # This project
 
 # Built-in
-from typing import TYPE_CHECKING, Self
 
-if TYPE_CHECKING:
-    from slobypy.react.scss_classes import SCSS_CLASS
+from typing import TYPE_CHECKING, Self
+from slobypy.errors.scss_errors import RELATIONSHIP_ERROR
+import slobypy.react.scss_classes as scss
+
 
 
 class SCSS_GROUP_BASE:
@@ -13,7 +15,7 @@ class SCSS_GROUP_BASE:
 
 
     @property
-    def child_classes(self) -> "list[dict[SCSS_CLASS, dict]]":
+    def child_classes(self) -> list[dict[scss.SCSS_CLASS, dict]]:
         return self._child_classes
 
 
@@ -21,34 +23,43 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
     """
     This class is representing a group of scss classes
     """
-    GROUPS: list = [Self]
+    GROUPS: list = [Self]  # all-groups
 
     def __init__(self, name):
         self.GROUPS.append(self)  # update the global group
         self.name = name  # get the name
-        self._child_classes: "list[dict[SCSS_CLASS]]" = []  # store the local classes
+        self._child_classes: list[dict[scss.SCSS_CLASS]] = []  # store the local classes
 
-        super().__init__(self._child_classes)
+        super().__init__(self._child_classes)  # pass the child_classes out
 
 
-    def add(self, scss_class: "SCSS_CLASS"):
+    def add(self, scss_class: scss.SCSS_CLASS):
         self._child_classes.append({scss_class: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
 
-    def relationship(self, scss_class: "SCSS_CLASS", parent: "SCSS_CLASS" = None, child: "SCSS_CLASS" = None) -> None:
+    def relationship(self, scss_class: scss.SCSS_CLASS, parent: scss.SCSS_CLASS = None, child: scss.SCSS_CLASS = None) -> None:
         """
         The relationship method can create-relationship between the CHILD_CLASSES.
         # """
-        #
-        # if isinstance(scss_class, SCSS_CLASS) and scss_class in self._child_classes:
-        #     for class_dict in self._child_classes:
-        #         class_dict[scss_class] = {"parent": parent if isinstance(parent, SCSS_CLASS) else "", "child": child if isinstance(child, SCSS_CLASS) else scss_class.child)}
-        #
-        # elif isinstance(scss_class, SCSS_CLASS) and scss_class not in self._child_classes:
-        #     if isinstance(parent, SCSS_CLASS):
-        #         self._child_classes.append(parent)
-        #
-        #     self._child_classes.append({scss_class: {"parent": parent if isinstance(parent, SCSS_CLASS) else "", "child": child if isinstance(child, SCSS_CLASS) and child.child != "" else ""}})
-        pass
+
+        if not isinstance(scss_class, scss.SCSS_CLASS):
+            raise RELATIONSHIP_ERROR(f"This scss class:{scss_class} is not an scss class")
+
+        if child and parent:
+            raise RELATIONSHIP_ERROR(f"You can't bind 2 different things(child&parent)")
+
+        if child:
+            for scss_class_local in self._child_classes:
+                try:
+                    scss_class_local[scss_class]["child"] = child
+                except:
+                    continue
+
+        #Todo: handle this parent logic
+        if parent:
+            for scss_class_local in self._child_classes:
+                if scss_class_local[scss_class]:
+                    scss_class_local[scss_class]["parent"] = child
+
 
     def render(self) -> str:
         """
@@ -57,8 +68,11 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
         render_group = ""
 
         for child_class_dict in self._child_classes:
-            for scss_class, value in child_class_dict.items():
+            for scss_class, relationship in child_class_dict.items():
+                render_group += scss_class.render()[:-1]
 
-                render_group += scss_class.render()
-
+                for key, value in relationship.items():
+                    if value != "":
+                        render_group += value.render()
+                render_group += "}" "\n"
         return render_group

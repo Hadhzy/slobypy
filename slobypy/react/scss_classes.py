@@ -1,9 +1,10 @@
+from __future__ import annotations
 #This project
 from slobypy.react.scss import SCSS
 from slobypy import react
 # Built-in
 from typing import Generator, Type, Self, TYPE_CHECKING
-from slobypy.react.scss_group import SCSS_GROUP
+import slobypy.react.scss_group as sc_group
 
 
 class SCSS_CLASS:
@@ -23,16 +24,16 @@ class SCSS_CLASS:
         self.child: Self = None
 
         for key, value in kwargs.items():
-            if key == "scss_group":
-               self._add_group(value)  # add the class to the group
+            # if key == "scss_group":
+            #    self._add_group(value)  # add the class to the group
 
             self._style_data.append({key: value})  # update local style data
             self.add_style_global(key=key, value=value)  # update global style data
 
+    #Todo: Find a way to use scss_group as a kwarg
     def _add_group(self, value):
-        for group in SCSS_GROUP.GROUPS:
-            if isinstance(group, value):
-                group.add(self)
+        # for group in sc_group.SCSS_GROUP.GROUPS:
+        pass
 
     def render(self) -> str:
         """
