@@ -2,8 +2,7 @@ from __future__ import annotations
 # This project
 
 # Built-in
-
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from slobypy.errors.scss_errors import RELATIONSHIP_ERROR
 import slobypy.react.scss_classes as scss
 
@@ -76,3 +75,12 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
                         render_group += value.render()
                 render_group += "}" "\n"
         return render_group
+
+    def __iter__(self):
+        start = 0
+        end = len(self._child_classes)
+        curr = start
+
+        while curr < end:
+            yield self._child_classes[curr]
+            curr += 1
