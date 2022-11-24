@@ -32,8 +32,14 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
         super().__init__(self._child_classes)  # pass the child_classes out
 
 
-    def add(self, scss_class: scss.SCSS_CLASS):
-        self._child_classes.append({scss_class: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
+    def add(self, scss_class: scss.SCSS_CLASS | list[scss.SCSS_CLASS]):
+
+        if isinstance(scss_class, scss.SCSS_CLASS):
+            self._child_classes.append({scss_class: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
+
+        if isinstance(scss_class, list):
+            for scss_class_item in scss_class:
+                self._child_classes.append({scss_class_item: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
 
     def relationship(self, scss_class: scss.SCSS_CLASS, parent: scss.SCSS_CLASS = None, child: scss.SCSS_CLASS = None) -> None:
         """
@@ -68,12 +74,14 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
 
         for child_class_dict in self._child_classes:
             for scss_class, relationship in child_class_dict.items():
-                render_group += scss_class.render()[:-1]
+                render_group += scss_class.render()[:-1]  # cut the last brace
 
                 for key, value in relationship.items():
                     if value != "":
                         render_group += value.render()
+
                 render_group += "}" "\n"
+
         return render_group
 
     def __iter__(self):

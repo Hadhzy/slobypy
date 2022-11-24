@@ -2,9 +2,9 @@ from __future__ import annotations
 #This project
 from slobypy.react.scss import SCSS
 from slobypy import react
+from slobypy.errors.scss_errors import NO_NAME
 # Built-in
-from typing import Generator, Type, Self, TYPE_CHECKING
-import slobypy.react.scss_group as sc_group
+from typing import Generator, Type, Self
 
 
 class SCSS_CLASS:
@@ -39,12 +39,21 @@ class SCSS_CLASS:
         """
         This method is used to render the scss class.
         """
-        curr = ".{"
+        curr = ""
         end = "}"
 
+        if "name" not in self.properties:  # THE NAME SHOULD BE THE FIRST PARAMETER
+            raise NO_NAME("You should define a name!")
+
+        curr += self.properties["name"] + ".{"  # add the name into it
+
         for key, value in self.properties.items():
-            curr += f"\n {key}:{value};"
-            if self.child:
+
+            if key == "name":  # skip the name property
+                continue
+
+            curr += f"\n {key}:{value};"  # make one line
+            if self.child:  # render the child element
                 curr += self.child.render()
 
         curr += "\n" + end
