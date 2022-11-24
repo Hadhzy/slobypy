@@ -45,7 +45,7 @@ class SCSS_CLASS:
         if "name" not in self.properties:  # THE NAME SHOULD BE THE FIRST PARAMETER
             raise NO_NAME("You should define a name!")
 
-        curr += self.properties["name"] + ".{"  # add the name into it
+        curr += "." + self.properties["name"] + "{"  # add the name into it
 
         for key, value in self.properties.items():
 

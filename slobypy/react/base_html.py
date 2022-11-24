@@ -1,4 +1,6 @@
+from __future__ import annotations
 # This Project
+import slobypy.react.scss_group as group
 from slobypy import react as react
 from slobypy.react import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
@@ -10,6 +12,7 @@ from typing import Self
 from typing import Generator, Type
 
 CLASS_NAME_PROPERTY = "className"
+SCSS_GROUP_PROPERTY = "ScssGroup"
 
 
 class BaseElement:
@@ -67,6 +70,9 @@ class BaseElement:
 
     def _inline_scss(self, kwargs):
         for key, value in kwargs.items():
+            if key == SCSS_GROUP_PROPERTY:
+                self._handle_scss_group(scss_group=value)
+
             if key == CLASS_NAME_PROPERTY:
                 self.classNames.append(value)  # extend the classNames list with the actual classname
 
@@ -85,6 +91,11 @@ class BaseElement:
         for key, value in element.attrs.items():
             if key == CLASS_NAME_PROPERTY:
                 return value
+
+    @staticmethod
+    def _handle_scss_group(scss_group: group.SCSS_GROUP):
+        if not isinstance(scss_group, group.SCSS_GROUP):
+            raise NameError(f"{scss_group} is not a valid group!")
 
     def _find_same_base_classes(self):
         current_class = None  # the actual scss class

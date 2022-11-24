@@ -78,12 +78,12 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
 
                 for key, value in relationship.items():
                     if value != "":
+                        render_group += "\n"
                         render_group += value.render()
 
                 render_group += "}" "\n"
 
         return render_group
-
     def __iter__(self):
         start = 0
         end = len(self._child_classes)
