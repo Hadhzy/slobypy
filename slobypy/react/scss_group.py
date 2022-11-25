@@ -44,7 +44,7 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
     def relationship(self, scss_class: scss.SCSS_CLASS, parent: scss.SCSS_CLASS = None, child: scss.SCSS_CLASS = None) -> None:
         """
         The relationship method can create-relationship between the CHILD_CLASSES.
-        # """
+        """
 
         if not isinstance(scss_class, scss.SCSS_CLASS):
             raise RELATIONSHIP_ERROR(f"This scss class:{scss_class} is not an scss class")
