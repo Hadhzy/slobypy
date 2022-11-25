@@ -54,8 +54,6 @@ class SCSS_CLASS:
                 continue
 
             curr += f"\n {key}:{value};"  # make one line
-            if self.child:  # render the child element
-                curr += self.child.render()
 
         curr += "\n" + end
 
