@@ -9,5 +9,6 @@ class NOT_SAME(Exception):
 class RELATIONSHIP_ERROR(Exception):
     pass
 
+
 class NO_NAME(Exception):
     pass

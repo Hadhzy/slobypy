@@ -6,6 +6,7 @@ from slobypy.react import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSS_CLASS
+from .design import Design
 # Built-in
 import string
 from typing import Self
@@ -94,8 +95,12 @@ class BaseElement:
 
     @staticmethod
     def _handle_scss_group(scss_group: group.SCSS_GROUP):
-        if not isinstance(scss_group, group.SCSS_GROUP):
+
+        if not isinstance(scss_group, group.SCSS_GROUP):  # not a valid scss_group
             raise NameError(f"{scss_group} is not a valid group!")
+
+        if scss_group in Design.get_registered_groups():  # find a group and return that
+            return scss_group
 
     def _find_same_base_classes(self):
         current_class = None  # the actual scss class

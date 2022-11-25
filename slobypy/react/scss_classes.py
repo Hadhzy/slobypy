@@ -8,6 +8,7 @@ from typing import Generator, Type, Self
 
 
 class SCSS_CLASS:
+
     STYLE_CLASS = SCSS()
     _STYLES: list = []  # contain the style of the classes
 

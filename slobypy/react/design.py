@@ -19,19 +19,19 @@ class Design:
 
         if isinstance(scss_class, SCSS_GROUP):
             if scss_class not in cls._REGISTERED_CLASSES:
-                cls._REGISTERED_CLASSES.append(scss_class) # register the group
+                cls._REGISTERED_CLASSES.append(scss_class)  # register the group
 
     @classmethod
     def get_registered_classes(cls) -> list[SCSS_CLASS]:
         return cls._REGISTERED_CLASSES
 
+    @classmethod
+    def get_registered_groups(cls) -> list[SCSS_GROUP]:
+        groups = []
 
+        for scss_class in cls.get_registered_classes():
 
+            if isinstance(scss_class, SCSS_GROUP):
+                groups.append(scss_class)
 
-
-
-
-
-
-
-
+        return groups
