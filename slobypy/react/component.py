@@ -6,6 +6,18 @@ from typing import TYPE_CHECKING, Generator, Type
 if TYPE_CHECKING:
     from slobypy.react import BaseElement
 
+__all__ = (
+    "Component",
+    "UseParams"
+)
+
+
+class UseParams:
+    """
+    Use params is used to define the props between components
+    """
+    pass
+
 
 class Component(ABC):
     @property
@@ -29,6 +41,7 @@ class Component(ABC):
         """
         return ''.join([element.render() for element in self.body()])
 
+    # noinspection PyMethodMayBeStatic
     def render_js(self):
         """
         Non-mandatory method to render/include the js of the component
