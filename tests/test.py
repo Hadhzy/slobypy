@@ -1,14 +1,40 @@
-from slobypy.react.scss_classes import SCSS_CLASS
+from slobypy.app import SlApp
 from slobypy.react import *
-import inspect
+from slobypy.react.component import *
 
-my_class = SCSS_CLASS(
-    name="base_class",
-    position="relative",
-    child1=SCSS_CLASS(
-        position="relative1"
-    )
-)
 
-p = P("test", P("test"))
+app = SlApp()
 
+
+@app.component("firstcomponent/test")
+class MyComponent1(Component):
+
+
+    def name(self):
+        return "test"
+
+    def body(self):
+        yield P("test")
+
+    def mount(self):
+        pass
+
+
+@app.component("secondcomponent/test")
+class MyComponent2(Component):
+    def name(self):
+        return "test"
+
+    def body(self):
+        yield P("test")
+
+    def mount(self):
+        print("here")
+
+
+component1 = MyComponent1()
+component2 = MyComponent2()
+component2.mount()
+
+
+#
