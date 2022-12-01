@@ -1,3 +1,4 @@
+from __future__ import annotations
 # This Project
 from .react import Component, Reactive
 from .rpc import Event
@@ -87,6 +88,9 @@ class SlApp:
         - None
         """
         print(self._render())
+
+    def _check_props(self):
+        pass
 
     def _render(self, obj=None, route: str = False) -> str:
         """
