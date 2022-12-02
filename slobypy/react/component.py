@@ -33,6 +33,13 @@ class UseParams:
 
 
 class Component(ABC):
+
+    def __init__(self, props=None) -> None:
+        if props is None:
+            self.props = {}
+        else:
+            self.props = props
+
     @property
     @abstractmethod
     def name(self) -> str:

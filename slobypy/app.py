@@ -40,7 +40,6 @@ class SlApp:
             instance = component()  # get the instance of it
             instance.meta_data = {"uri": uri, "hash_instance": hash(instance)}  # add the meta_data
             self.add(uri, instance)  # add the uri
-            instance.mount()  # after the component registration
             return component
 
         return wrap
@@ -77,7 +76,7 @@ class SlApp:
                 except AttributeError:
                     pass
 
-    def run(self):
+    def run(self, route="/"):
         """
         This method is used to run the app.
 
@@ -87,7 +86,7 @@ class SlApp:
         ### Returns
         - None
         """
-        print(self._render())
+        print(self._render(route=route))
 
     def _check_props(self):
         pass
@@ -104,10 +103,17 @@ class SlApp:
         - str: The HTML string
         """
         if obj:
+            # Don't mount as this *should* be only run on a re-render
             return obj.render()
         elif route:
             for component in self._components:
                 if component["uri"] == route:
+                    component["component"].mount()
                     return component["component"].render()
         else:
-            return "".join([component["component"].render() for component in self._components])
+            result = ""
+            for component in self._components:
+                component["component"].mount()
+                component["component"].render()
+                result += component["component"].render()
+            return result

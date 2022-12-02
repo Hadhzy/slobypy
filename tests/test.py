@@ -2,19 +2,18 @@ from slobypy.app import SlApp
 from slobypy.react import *
 from slobypy.react.component import *
 
-
 app = SlApp()
 
 
 @app.component("firstcomponent/test")
 class MyComponent1(Component):
 
-
     def name(self):
         return "test"
 
     def body(self):
         yield P("test")
+        yield MyComponent2(props={"test_prop_value": "the test value"})
 
     def mount(self):
         pass
@@ -26,15 +25,10 @@ class MyComponent2(Component):
         return "test"
 
     def body(self):
-        yield P("test")
+        yield P(self.props["test_prop_value"])
 
     def mount(self):
-        print("here")
+        print("test prop:", self.props["test_prop_value"])
 
 
-component1 = MyComponent1()
-component2 = MyComponent2()
-component2.mount()
-
-
-#
+app.run('firstcomponent/test')
