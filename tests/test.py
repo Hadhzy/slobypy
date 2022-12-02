@@ -19,7 +19,6 @@ class MyComponent1(Component):
         pass
 
 
-@app.component("secondcomponent/test")
 class MyComponent2(Component):
     def name(self):
         return "test"
@@ -30,5 +29,16 @@ class MyComponent2(Component):
     def mount(self):
         print("test prop:", self.props["test_prop_value"])
 
+@app.component("secondcomponent/fake")
+class FakeComponent(Component):
+    def name(self):
+        return "im a fake"
 
-app.run('firstcomponent/test')
+    def body(self):
+        yield P("this is a fake prop, something is wrong, this shouldnt be rendered!")
+
+    def mount(self):
+        print("bad run")
+
+
+print(app._render(route='firstcomponent/test'))

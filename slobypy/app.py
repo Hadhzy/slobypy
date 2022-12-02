@@ -76,7 +76,7 @@ class SlApp:
                 except AttributeError:
                     pass
 
-    def run(self, route="/"):
+    def run(self):
         """
         This method is used to run the app.
 
@@ -86,7 +86,7 @@ class SlApp:
         ### Returns
         - None
         """
-        print(self._render(route=route))
+        print(self._render())
 
     def _check_props(self):
         pass
