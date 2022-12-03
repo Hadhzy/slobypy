@@ -1,14 +1,15 @@
 from __future__ import annotations
-#This project
-from slobypy.react.scss import SCSS
-from slobypy import react
-from slobypy.errors.scss_errors import NO_NAME
+
 # Built-in
 from typing import Generator, Type, Self
 
+# This project
+from slobypy.react.scss import SCSS
+from slobypy import react
+from slobypy.errors.scss_errors import NO_NAME
 
-class SCSS_CLASS:
 
+class SCSSClass:
     STYLE_CLASS = SCSS()
     _STYLES: list = []  # contain the style of the classes
 
@@ -31,9 +32,9 @@ class SCSS_CLASS:
             self._style_data.append({key: value})  # update local style data
             self.add_style_global(key=key, value=value)  # update global style data
 
-    #Todo: Find a way to use scss_group as a kwarg
+    # Todo: Find a way to use scss_group as a kwarg
     def _add_group(self, value):
-        # for group in sc_group.SCSS_GROUP.GROUPS:
+        # for group in sc_group.SCSSGroup.GROUPS:
         pass
 
     def render(self) -> str:
@@ -65,7 +66,7 @@ class SCSS_CLASS:
         """
 
         for key, value in self.properties.items():
-            self.STYLE_CLASS.__setattr__(key, value)
+            self.STYLE_CLASS.__setattr__(key, value)  # pylint: disable=unnecessary-dunder-call
 
     def add_class_style(self, *dict: dict | list[dict], key: str = "", value: str = "") -> None:
         """
@@ -83,7 +84,6 @@ class SCSS_CLASS:
         else:
             self._style_data.append({key: value})
             self.add_style_global(key=value, value=value)
-
 
     @classmethod
     def add_style_global(cls, *dict: dict | list[dict] | tuple, key: str = "", value: str = "") -> None:

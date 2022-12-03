@@ -27,9 +27,8 @@ class SCSS:
     def __getattr__(self, item):
         if item in self.POSSIBLE_ATTRIBUTES:
             return self.__dict__.get(item, None)
-        else:
-            raise AttributeError(f"Attribute {item} is not a valid CSS attribute")
+        raise AttributeError(f"Attribute {item} is not a valid CSS attribute")
 
     def render(self) -> str:
-        return "; ".join([f"{key.replace('_', '-')}: {value}" if type(
-            value) == str else f"{key.replace('_', '-')}: {' '.join(value)}" for key, value in self.__dict__.items()])
+        return "; ".join([f"{key.replace('_', '-')}: {value}" if isinstance(
+            value, str) else f"{key.replace('_', '-')}: {' '.join(value)}" for key, value in self.__dict__.items()])

@@ -1,4 +1,4 @@
-class NotSet:
+class NotSet:  # pylint: disable=too-few-public-methods
     pass
 
 
@@ -10,7 +10,6 @@ class Reactive:
 
     def __init__(self, value) -> None:
         """
-
         Slobypy React init is used to re-render the component with the new data(like useEffect in react).
 
         ### Arguments
@@ -19,6 +18,9 @@ class Reactive:
         ### Returns
         - None
         """
+        self.current_value = None
+        self.public_name = None
+        self.internal_name = None
 
         self.value = value  # store the values
         self.callbacks = []  # store the callbacks
@@ -33,6 +35,7 @@ class Reactive:
         value = getattr(obj, self.internal_name, NOT_SET)
         if not isinstance(value, NotSet):
             return value
+        return None
 
     def __set_name__(self, owner, name):
         self.public_name = name

@@ -5,7 +5,7 @@ from slobypy import react as react
 from slobypy.react import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
-from .scss_classes import SCSS_CLASS
+from .scss_classes import SCSSClass
 from .design import Design
 # Built-in
 import string
@@ -19,7 +19,7 @@ SCSS_GROUP_PROPERTY = "ScssGroup"
 class BaseElement:
     tag: str = ''
     listeners: dict = {}
-    scss_class = SCSS_CLASS()
+    scss_class = SCSSClass()
 
     def __init__(self, *args, **kwargs) -> None:
         """
@@ -94,9 +94,9 @@ class BaseElement:
                 return value
 
     @staticmethod
-    def _handle_scss_group(scss_group: group.SCSS_GROUP):
+    def _handle_scss_group(scss_group: group.SCSSGroup):
 
-        if not isinstance(scss_group, group.SCSS_GROUP):  # not a valid scss_group
+        if not isinstance(scss_group, group.SCSSGroup):  # not a valid scss_group
             raise NameError(f"{scss_group} is not a valid group!")
 
         if scss_group in Design.get_registered_groups():  # find a group and return that

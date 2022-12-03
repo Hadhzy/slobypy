@@ -1,14 +1,18 @@
+# pylint: disable=unnecessary-pass
+
 from __future__ import annotations
 
 # Built-in
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generator, Type
+
 if TYPE_CHECKING:
     from slobypy.react import BaseElement
 
 __all__ = (
     "Component",
 )
+
 
 class Component(ABC):
 
