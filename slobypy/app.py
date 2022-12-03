@@ -1,10 +1,12 @@
 from __future__ import annotations
+
+# Third-Party
+from typing import Union, Any, Callable, Type
+
 # This Project
 from .react import Component, Reactive
 from .rpc import Event
 from .react.tools import uri_checker
-# Third-Party
-from typing import Union, Any, Callable, Type
 
 
 class SlApp:
@@ -20,7 +22,6 @@ class SlApp:
     """
     # Use list to prevent name conflicts
     _components = []
-
 
     def __init__(self):
         Reactive.app = self
@@ -105,15 +106,16 @@ class SlApp:
         if obj:
             # Don't mount as this *should* be only run on a re-render
             return obj.render()
-        elif route:
+
+        if route:
             for component in self._components:
                 if component["uri"] == route:
                     component["component"].mount()
                     return component["component"].render()
-        else:
-            result = ""
-            for component in self._components:
-                component["component"].mount()
-                component["component"].render()
-                result += component["component"].render()
-            return result
+
+        result = ""
+        for component in self._components:
+            component["component"].mount()
+            component["component"].render()
+            result += component["component"].render()
+        return result

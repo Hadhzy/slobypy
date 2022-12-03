@@ -1,3 +1,6 @@
+# pylint: disable=too-many-lines
+# pylint: disable=invalid-name
+
 # This Project
 from .base_html import BaseElement
 
@@ -16,9 +19,6 @@ class A(BaseElement):
     """
     tag = 'a'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Abbr(BaseElement):
     """
@@ -34,9 +34,6 @@ class Abbr(BaseElement):
     """
     tag = 'abbr'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Address(BaseElement):
     """
@@ -50,10 +47,6 @@ class Address(BaseElement):
     ### Returns
     - None
     """
-    tag = 'address'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Area(BaseElement):
@@ -70,9 +63,6 @@ class Area(BaseElement):
     """
     tag = 'area'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Article(BaseElement):
     """
@@ -87,9 +77,6 @@ class Article(BaseElement):
     - None
     """
     tag = 'article'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Aside(BaseElement):
@@ -106,9 +93,6 @@ class Aside(BaseElement):
     """
     tag = 'aside'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Audio(BaseElement):
     """
@@ -123,9 +107,6 @@ class Audio(BaseElement):
     - None
     """
     tag = 'audio'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class B(BaseElement):
@@ -142,9 +123,6 @@ class B(BaseElement):
     """
     tag = 'b'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Base(BaseElement):
     """
@@ -159,9 +137,6 @@ class Base(BaseElement):
     - None
     """
     tag = 'base'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Bdi(BaseElement):
@@ -178,9 +153,6 @@ class Bdi(BaseElement):
     """
     tag = 'bdi'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Bdo(BaseElement):
     """
@@ -195,9 +167,6 @@ class Bdo(BaseElement):
     - None
     """
     tag = 'bdo'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Blockquote(BaseElement):
@@ -214,9 +183,6 @@ class Blockquote(BaseElement):
     """
     tag = 'blockquote'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Body(BaseElement):
     """
@@ -231,9 +197,6 @@ class Body(BaseElement):
     - None
     """
     tag = 'body'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Br(BaseElement):
@@ -250,9 +213,6 @@ class Br(BaseElement):
     """
     tag = 'br'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Button(BaseElement):
     """
@@ -267,9 +227,6 @@ class Button(BaseElement):
     - None
     """
     tag = 'button'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Canvas(BaseElement):
@@ -286,9 +243,6 @@ class Canvas(BaseElement):
     """
     tag = 'canvas'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Caption(BaseElement):
     """
@@ -303,9 +257,6 @@ class Caption(BaseElement):
     - None
     """
     tag = 'caption'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Cite(BaseElement):
@@ -322,9 +273,6 @@ class Cite(BaseElement):
     """
     tag = 'cite'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Code(BaseElement):
     """
@@ -339,9 +287,6 @@ class Code(BaseElement):
     - None
     """
     tag = 'code'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Col(BaseElement):
@@ -358,9 +303,6 @@ class Col(BaseElement):
     """
     tag = 'col'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Colgroup(BaseElement):
     """
@@ -375,9 +317,6 @@ class Colgroup(BaseElement):
     - None
     """
     tag = 'colgroup'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Data(BaseElement):
@@ -394,9 +333,6 @@ class Data(BaseElement):
     """
     tag = 'data'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Datalist(BaseElement):
     """
@@ -411,9 +347,6 @@ class Datalist(BaseElement):
     - None
     """
     tag = 'datalist'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Dd(BaseElement):
@@ -430,9 +363,6 @@ class Dd(BaseElement):
     """
     tag = 'dd'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Del(BaseElement):
     """
@@ -447,9 +377,6 @@ class Del(BaseElement):
     - None
     """
     tag = 'del'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Details(BaseElement):
@@ -466,9 +393,6 @@ class Details(BaseElement):
     """
     tag = 'details'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Dfn(BaseElement):
     """
@@ -483,9 +407,6 @@ class Dfn(BaseElement):
     - None
     """
     tag = 'dfn'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Dialog(BaseElement):
@@ -502,9 +423,6 @@ class Dialog(BaseElement):
     """
     tag = 'dialog'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Div(BaseElement):
     """
@@ -519,9 +437,6 @@ class Div(BaseElement):
     - None
     """
     tag = 'div'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Dl(BaseElement):
@@ -538,9 +453,6 @@ class Dl(BaseElement):
     """
     tag = 'dl'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Dt(BaseElement):
     """
@@ -555,9 +467,6 @@ class Dt(BaseElement):
     - None
     """
     tag = 'dt'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Em(BaseElement):
@@ -574,9 +483,6 @@ class Em(BaseElement):
     """
     tag = 'em'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Embed(BaseElement):
     """
@@ -591,9 +497,6 @@ class Embed(BaseElement):
     - None
     """
     tag = 'embed'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Fieldset(BaseElement):
@@ -610,9 +513,6 @@ class Fieldset(BaseElement):
     """
     tag = 'fieldset'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Figcaption(BaseElement):
     """
@@ -627,9 +527,6 @@ class Figcaption(BaseElement):
     - None
     """
     tag = 'figcaption'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Figure(BaseElement):
@@ -646,9 +543,6 @@ class Figure(BaseElement):
     """
     tag = 'figure'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Footer(BaseElement):
     """
@@ -663,9 +557,6 @@ class Footer(BaseElement):
     - None
     """
     tag = 'footer'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Form(BaseElement):
@@ -682,9 +573,6 @@ class Form(BaseElement):
     """
     tag = 'form'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class H1(BaseElement):
     """
@@ -699,9 +587,6 @@ class H1(BaseElement):
     - None
     """
     tag = 'h1'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Head(BaseElement):
@@ -718,9 +603,6 @@ class Head(BaseElement):
     """
     tag = 'head'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Header(BaseElement):
     """
@@ -735,9 +617,6 @@ class Header(BaseElement):
     - None
     """
     tag = 'header'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Hgroup(BaseElement):
@@ -754,9 +633,6 @@ class Hgroup(BaseElement):
     """
     tag = 'hgroup'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Hr(BaseElement):
     """
@@ -771,9 +647,6 @@ class Hr(BaseElement):
     - None
     """
     tag = 'hr'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Html(BaseElement):
@@ -790,9 +663,6 @@ class Html(BaseElement):
     """
     tag = 'html'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class I(BaseElement):
     """
@@ -807,9 +677,6 @@ class I(BaseElement):
     - None
     """
     tag = 'i'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Iframe(BaseElement):
@@ -826,9 +693,6 @@ class Iframe(BaseElement):
     """
     tag = 'iframe'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Img(BaseElement):
     """
@@ -843,9 +707,6 @@ class Img(BaseElement):
     - None
     """
     tag = 'img'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Input(BaseElement):
@@ -862,9 +723,6 @@ class Input(BaseElement):
     """
     tag = 'input'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Ins(BaseElement):
     """
@@ -879,9 +737,6 @@ class Ins(BaseElement):
     - None
     """
     tag = 'ins'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Kbd(BaseElement):
@@ -898,9 +753,6 @@ class Kbd(BaseElement):
     """
     tag = 'kbd'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Label(BaseElement):
     """
@@ -915,9 +767,6 @@ class Label(BaseElement):
     - None
     """
     tag = 'label'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Legend(BaseElement):
@@ -934,9 +783,6 @@ class Legend(BaseElement):
     """
     tag = 'legend'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Li(BaseElement):
     """
@@ -951,9 +797,6 @@ class Li(BaseElement):
     - None
     """
     tag = 'li'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Link(BaseElement):
@@ -970,9 +813,6 @@ class Link(BaseElement):
     """
     tag = 'link'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Main(BaseElement):
     """
@@ -987,9 +827,6 @@ class Main(BaseElement):
     - None
     """
     tag = 'main'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Map(BaseElement):
@@ -1006,9 +843,6 @@ class Map(BaseElement):
     """
     tag = 'map'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Mark(BaseElement):
     """
@@ -1023,9 +857,6 @@ class Mark(BaseElement):
     - None
     """
     tag = 'mark'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Menu(BaseElement):
@@ -1042,9 +873,6 @@ class Menu(BaseElement):
     """
     tag = 'menu'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Meta(BaseElement):
     """
@@ -1059,9 +887,6 @@ class Meta(BaseElement):
     - None
     """
     tag = 'meta'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Meter(BaseElement):
@@ -1078,9 +903,6 @@ class Meter(BaseElement):
     """
     tag = 'meter'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Nav(BaseElement):
     """
@@ -1095,9 +917,6 @@ class Nav(BaseElement):
     - None
     """
     tag = 'nav'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Noscript(BaseElement):
@@ -1114,9 +933,6 @@ class Noscript(BaseElement):
     """
     tag = 'noscript'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Object(BaseElement):
     """
@@ -1131,9 +947,6 @@ class Object(BaseElement):
     - None
     """
     tag = 'object'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Ol(BaseElement):
@@ -1150,9 +963,6 @@ class Ol(BaseElement):
     """
     tag = 'ol'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Optgroup(BaseElement):
     """
@@ -1167,9 +977,6 @@ class Optgroup(BaseElement):
     - None
     """
     tag = 'optgroup'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Option(BaseElement):
@@ -1186,9 +993,6 @@ class Option(BaseElement):
     """
     tag = 'option'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Output(BaseElement):
     """
@@ -1203,9 +1007,6 @@ class Output(BaseElement):
     - None
     """
     tag = 'output'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class P(BaseElement):
@@ -1222,9 +1023,6 @@ class P(BaseElement):
     """
     tag = 'p'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Picture(BaseElement):
     """
@@ -1239,9 +1037,6 @@ class Picture(BaseElement):
     - None
     """
     tag = 'picture'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Portal(BaseElement):
@@ -1258,9 +1053,6 @@ class Portal(BaseElement):
     """
     tag = 'portal'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Pre(BaseElement):
     """
@@ -1275,9 +1067,6 @@ class Pre(BaseElement):
     - None
     """
     tag = 'pre'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Progress(BaseElement):
@@ -1294,9 +1083,6 @@ class Progress(BaseElement):
     """
     tag = 'progress'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Q(BaseElement):
     """
@@ -1311,9 +1097,6 @@ class Q(BaseElement):
     - None
     """
     tag = 'q'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Rp(BaseElement):
@@ -1330,9 +1113,6 @@ class Rp(BaseElement):
     """
     tag = 'rp'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Rt(BaseElement):
     """
@@ -1347,9 +1127,6 @@ class Rt(BaseElement):
     - None
     """
     tag = 'rt'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Ruby(BaseElement):
@@ -1366,9 +1143,6 @@ class Ruby(BaseElement):
     """
     tag = 'ruby'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class S(BaseElement):
     """
@@ -1383,9 +1157,6 @@ class S(BaseElement):
     - None
     """
     tag = 's'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Samp(BaseElement):
@@ -1402,9 +1173,6 @@ class Samp(BaseElement):
     """
     tag = 'samp'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Script(BaseElement):
     """
@@ -1419,9 +1187,6 @@ class Script(BaseElement):
     - None
     """
     tag = 'script'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Section(BaseElement):
@@ -1438,9 +1203,6 @@ class Section(BaseElement):
     """
     tag = 'section'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Select(BaseElement):
     """
@@ -1455,9 +1217,6 @@ class Select(BaseElement):
     - None
     """
     tag = 'select'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Slot(BaseElement):
@@ -1474,9 +1233,6 @@ class Slot(BaseElement):
     """
     tag = 'slot'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Small(BaseElement):
     """
@@ -1491,9 +1247,6 @@ class Small(BaseElement):
     - None
     """
     tag = 'small'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Source(BaseElement):
@@ -1510,9 +1263,6 @@ class Source(BaseElement):
     """
     tag = 'source'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Span(BaseElement):
     """
@@ -1527,9 +1277,6 @@ class Span(BaseElement):
     - None
     """
     tag = 'span'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Strong(BaseElement):
@@ -1546,9 +1293,6 @@ class Strong(BaseElement):
     """
     tag = 'strong'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Style(BaseElement):
     """
@@ -1563,9 +1307,6 @@ class Style(BaseElement):
     - None
     """
     tag = 'style'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Sub(BaseElement):
@@ -1582,9 +1323,6 @@ class Sub(BaseElement):
     """
     tag = 'sub'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Summary(BaseElement):
     """
@@ -1599,9 +1337,6 @@ class Summary(BaseElement):
     - None
     """
     tag = 'summary'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Sup(BaseElement):
@@ -1618,9 +1353,6 @@ class Sup(BaseElement):
     """
     tag = 'sup'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Table(BaseElement):
     """
@@ -1635,9 +1367,6 @@ class Table(BaseElement):
     - None
     """
     tag = 'table'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Tbody(BaseElement):
@@ -1654,9 +1383,6 @@ class Tbody(BaseElement):
     """
     tag = 'tbody'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Td(BaseElement):
     """
@@ -1671,9 +1397,6 @@ class Td(BaseElement):
     - None
     """
     tag = 'td'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Template(BaseElement):
@@ -1690,9 +1413,6 @@ class Template(BaseElement):
     """
     tag = 'template'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Textarea(BaseElement):
     """
@@ -1707,9 +1427,6 @@ class Textarea(BaseElement):
     - None
     """
     tag = 'textarea'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Tfoot(BaseElement):
@@ -1726,9 +1443,6 @@ class Tfoot(BaseElement):
     """
     tag = 'tfoot'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Th(BaseElement):
     """
@@ -1743,9 +1457,6 @@ class Th(BaseElement):
     - None
     """
     tag = 'th'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Thead(BaseElement):
@@ -1762,9 +1473,6 @@ class Thead(BaseElement):
     """
     tag = 'thead'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Time(BaseElement):
     """
@@ -1779,9 +1487,6 @@ class Time(BaseElement):
     - None
     """
     tag = 'time'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Title(BaseElement):
@@ -1798,9 +1503,6 @@ class Title(BaseElement):
     """
     tag = 'title'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Tr(BaseElement):
     """
@@ -1815,9 +1517,6 @@ class Tr(BaseElement):
     - None
     """
     tag = 'tr'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Track(BaseElement):
@@ -1834,9 +1533,6 @@ class Track(BaseElement):
     """
     tag = 'track'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class U(BaseElement):
     """
@@ -1851,9 +1547,6 @@ class U(BaseElement):
     - None
     """
     tag = 'u'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Ul(BaseElement):
@@ -1870,9 +1563,6 @@ class Ul(BaseElement):
     """
     tag = 'ul'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Var(BaseElement):
     """
@@ -1887,9 +1577,6 @@ class Var(BaseElement):
     - None
     """
     tag = 'var'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Video(BaseElement):
@@ -1906,9 +1593,6 @@ class Video(BaseElement):
     """
     tag = 'video'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class Wbr(BaseElement):
     """
@@ -1923,6 +1607,3 @@ class Wbr(BaseElement):
     - None
     """
     tag = 'wbr'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)

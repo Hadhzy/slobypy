@@ -8,29 +8,7 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Component",
-    "UseParams"
 )
-
-
-class UseParams:
-    """
-    Use params is used to define the props between components
-    """
-    _PARAMS: dict = {}
-    _COMPONENTS_GET: list = []
-
-    def __init__(self) -> None:
-        pass
-
-    def send(self, component_name: str, **kwargs):
-        self._PARAMS[component_name] = kwargs
-
-    def get(self, component_name: str):
-        try:
-            return self._PARAMS[component_name]
-        except:
-            pass
-
 
 class Component(ABC):
 

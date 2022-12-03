@@ -7,11 +7,9 @@ from slobypy.errors.scss_errors import RELATIONSHIP_ERROR
 import slobypy.react.scss_classes as scss
 
 
-
 class SCSS_GROUP_BASE:
     def __init__(self, child_classes):
         self._child_classes = child_classes
-
 
     @property
     def child_classes(self) -> list[dict[scss.SCSS_CLASS, dict]]:
@@ -31,17 +29,19 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
 
         super().__init__(self._child_classes)  # pass the child_classes out
 
-
     def add(self, scss_class: scss.SCSS_CLASS | list[scss.SCSS_CLASS]):
 
         if isinstance(scss_class, scss.SCSS_CLASS):
-            self._child_classes.append({scss_class: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
+            self._child_classes.append(
+                {scss_class: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
 
         if isinstance(scss_class, list):
             for scss_class_item in scss_class:
-                self._child_classes.append({scss_class_item: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
+                self._child_classes.append(
+                    {scss_class_item: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
 
-    def relationship(self, scss_class: scss.SCSS_CLASS, parent: scss.SCSS_CLASS = None, child: scss.SCSS_CLASS = None) -> None:
+    def relationship(self, scss_class: scss.SCSS_CLASS, parent: scss.SCSS_CLASS = None,
+                     child: scss.SCSS_CLASS = None) -> None:
         """
         The relationship method can create-relationship between the CHILD_CLASSES.
         """
@@ -59,12 +59,11 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
                 except:
                     continue
 
-        #Todo: handle this parent logic
+        # Todo: handle this parent logic
         if parent:
             for scss_class_local in self._child_classes:
                 if scss_class_local[scss_class]:
                     scss_class_local[scss_class]["parent"] = child
-
 
     def render(self) -> str:
         """
@@ -84,6 +83,7 @@ class SCSS_GROUP(SCSS_GROUP_BASE):
                 render_group += "}" "\n"
 
         return render_group
+
     def __iter__(self):
         start = 0
         end = len(self._child_classes)
