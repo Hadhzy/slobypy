@@ -30,5 +30,14 @@ class SCSS:
         raise AttributeError(f"Attribute {item} is not a valid CSS attribute")
 
     def render(self) -> str:
+        """
+        This method is used to render the SCSS attributes to website-ready CSS.
+
+        ### Arguments
+        - None
+
+        ### Returns
+        - str: The CSS data as a string
+        """
         return "; ".join([f"{key.replace('_', '-')}: {value}" if isinstance(
             value, str) else f"{key.replace('_', '-')}: {' '.join(value)}" for key, value in self.__dict__.items()])

@@ -8,12 +8,13 @@ from slobypy.errors.scss_errors import RelationshipError
 import slobypy.react.scss_classes as scss
 
 
-class SCSSGroupBase: # pylint: disable=too-few-public-methods
+class SCSSGroupBase:  # pylint: disable=too-few-public-methods
     def __init__(self, child_classes):
         self._child_classes = child_classes
 
     @property
     def child_classes(self) -> list[dict[scss.SCSSClass, dict]]:
+        """Get all the child classes of the group."""
         return self._child_classes
 
 
@@ -31,7 +32,15 @@ class SCSSGroup(SCSSGroupBase):
         super().__init__(self._child_classes)  # pass the child_classes out
 
     def add(self, scss_class: scss.SCSSClass | list[scss.SCSSClass]):
+        """
+        Add a scss class to the group
 
+        ### Arguments
+        - scss_class (scss.SCSSClass | list[scss.SCSSClass]): The scss class or list of scss classes
+
+        ### Returns
+        - None
+        """
         if isinstance(scss_class, scss.SCSSClass):
             self._child_classes.append(
                 {scss_class: {"parent": "", "child": ""}})  # add a brand new scss_class to the local group
