@@ -1,16 +1,21 @@
+# pylint: disable=unused-private-member
+
 from __future__ import annotations
-# This project
-from slobypy.react import Design
+
 # Built-in
 import json
 from typing import Self
+
+# This project
+from slobypy.react import Design
 
 
 class DataBuilder:
     """
     This class is build the data for the frontend.
     """
-    __JSON_DATA = ""  # Todo: Type hint here
+    # Todo: Type hint here
+    __JSON_DATA = ""  # pylint: disable=invalid-name
 
     def make_scss_data(self) -> Self:
         """
@@ -34,7 +39,8 @@ class DataBuilder:
         value: None
         """
 
-        self.__JSON_DATA += json.dumps(components_data)  # add the component_data to the json data based on the app render
+        self.__JSON_DATA += json.dumps(
+            components_data)  # add the component_data to the json data based on the app render
 
         return self
 

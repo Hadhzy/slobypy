@@ -1,16 +1,21 @@
+# pylint: disable=unnecessary-pass
+# pylint: disable=unnecessary-dunder-call
+
 from __future__ import annotations
+
+# Built-in
+import string
+from typing import Self
+from typing import Generator, Type
+
 # This Project
 import slobypy.react.scss_group as group
-from slobypy import react as react
+from slobypy import react
 from slobypy.react import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSSClass
 from .design import Design
-# Built-in
-import string
-from typing import Self
-from typing import Generator, Type
 
 CLASS_NAME_PROPERTY = "className"
 SCSS_GROUP_PROPERTY = "ScssGroup"
@@ -35,7 +40,7 @@ class BaseElement:
         self.content: SlobyPyCONTENT = args
         new_kwargs = kwargs.copy()
         self.style = SCSS()  # scss instance
-        self.classNames: list = []  # contain all the classNames
+        self.class_names: list = []  # contain all the class_names
         self._inline_scss(new_kwargs)  # handle inline css
 
         self._create_listeners(kwargs, new_kwargs)  # create listeners
@@ -44,12 +49,10 @@ class BaseElement:
 
         self._find_same_base_classes()  # check scss classes
 
-
     def _render_worker(self, tags=None) -> str:
         rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
         for element in self.content:
-            if isinstance(element, BaseElement) or isinstance(element, Component):
-
+            if isinstance(element, (BaseElement, Component)):
                 rendered_html += element.render() + "\n"
             else:
                 rendered_html += str(element)
@@ -75,12 +78,13 @@ class BaseElement:
                 self._handle_scss_group(scss_group=value)
 
             if key == CLASS_NAME_PROPERTY:
-                self.classNames.append(value)  # extend the classNames list with the actual classname
+                self.class_names.append(value)  # extend the class_names list with the actual classname
 
-            self.style.__setattr__(key, value)  # check if it is a valid property name
+            # check if it is a valid property name
+            self.style.__setattr__(key, value)
 
     @staticmethod
-    def get_element_classname(element: Self) -> str:
+    def get_element_classname(element: Self) -> str | None:
         """
         This method is used to return the element "base(root)" classname.
         ### Arguments
@@ -92,19 +96,19 @@ class BaseElement:
         for key, value in element.attrs.items():
             if key == CLASS_NAME_PROPERTY:
                 return value
+        return None
 
     @staticmethod
     def _handle_scss_group(scss_group: group.SCSSGroup):
-
         if not isinstance(scss_group, group.SCSSGroup):  # not a valid scss_group
             raise NameError(f"{scss_group} is not a valid group!")
 
         if scss_group in Design.get_registered_groups():  # find a group and return that
             return scss_group
 
-    def _find_same_base_classes(self):
-        current_class = None  # the actual scss class
+        return None
 
+    def _find_same_base_classes(self):
         for scss_global_class in react.Design.get_registered_classes():  # get all the classes
             if scss_global_class.properties["name"] == self.get_element_classname(self):  # same classname match
 
@@ -112,12 +116,10 @@ class BaseElement:
 
                 return scss_global_class  # if it is valid just return it
 
-            elif scss_global_class.properties["name"] != self.get_element_classname(self):
+            if scss_global_class.properties["name"] != self.get_element_classname(self):
                 scss_global_class.check_scss_properties()  # check if the properties valid
 
-        if current_class is None:
-            return
-
+        return None
 
     def depth_of_the_element(self, element) -> int:
         """
@@ -188,18 +190,18 @@ class BaseElement:
         int_to_str = dict(zip(numbers, letters))
         rendered_js = []
         for element in self.content:
-            if isinstance(element, BaseElement) or isinstance(element, Component):
-                js = element.render_js()
+            if isinstance(element, (BaseElement, Component)):
+                js = element.render_js()  # pylint: disable=invalid-name
                 if js:
                     rendered_js.append(js)
-        for key, value in self.listeners.items():
+        for value in self.listeners.values():
             # TODO: Add js code to emit event over the socket
             # Using __hash__ to create a unique function name to prevent name collisions
             rendered_js.append(
                 f'function {"".join(int_to_str[n] for n in str(value.__hash__()))}(e) {{\n  console.log("TBD")\n}}')
         return "\n".join(rendered_js)
 
-    #Todo: Extend this with kwargs
+    # Todo: Extend this with kwargs
     def __iter__(self) -> Generator[Type[dict], None, None]:
         start = 0
         stop = len(self.content)

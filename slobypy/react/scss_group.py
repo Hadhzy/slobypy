@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Self
 
 # This project
-from slobypy.errors.scss_errors import RELATIONSHIP_ERROR
+from slobypy.errors.scss_errors import RelationshipError
 import slobypy.react.scss_classes as scss
 
 
@@ -48,10 +48,10 @@ class SCSSGroup(SCSSGroupBase):
         """
 
         if not isinstance(scss_class, scss.SCSSClass):
-            raise RELATIONSHIP_ERROR(f"This scss class:{scss_class} is not an scss class")
+            raise RelationshipError(f"This scss class:{scss_class} is not an scss class")
 
         if child and parent:
-            raise RELATIONSHIP_ERROR("You can't bind 2 different things(child&parent)")
+            raise RelationshipError("You can't bind 2 different things(child&parent)")
 
         if child:
             for scss_class_local in self._child_classes:

@@ -6,7 +6,7 @@ from typing import Generator, Type, Self
 # This project
 from slobypy.react.scss import SCSS
 from slobypy import react
-from slobypy.errors.scss_errors import NO_NAME
+from slobypy.errors.scss_errors import NoName
 
 
 class SCSSClass:
@@ -45,7 +45,7 @@ class SCSSClass:
         end = "}"
 
         if "name" not in self.properties:  # THE NAME SHOULD BE THE FIRST PARAMETER
-            raise NO_NAME("You should define a name!")
+            raise NoName("You should define a name!")
 
         curr += "." + self.properties["name"] + "{"  # add the name into it
 

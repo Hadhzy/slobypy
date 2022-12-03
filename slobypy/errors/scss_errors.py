@@ -1,14 +1,14 @@
-class PROPERTY_KEY_ERROR(Exception):
+class PropertyKeyError(Exception):
     pass
 
 
-class NOT_SAME(Exception):
+class NotSame(Exception):
     pass
 
 
-class RELATIONSHIP_ERROR(Exception):
+class RelationshipError(Exception):
     pass
 
 
-class NO_NAME(Exception):
+class NoName(Exception):
     pass

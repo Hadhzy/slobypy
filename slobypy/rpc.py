@@ -6,7 +6,7 @@ import asyncio
 import json
 
 from dataclasses import dataclass
-from websockets import serve
+from websockets import serve  # pylint: disable=no-name-in-module
 from websockets.legacy.server import WebSocketServerProtocol
 
 
@@ -24,7 +24,7 @@ class RPC:
 
     def __init__(self):
         self.event_loop = asyncio.get_event_loop()
-        self.ws = None
+        self.ws = None  # pylint: disable=invalid-name
         self.conn = []
 
         self.event_loop.run_until_complete(self.create_ws(self._handle_ws))
@@ -171,6 +171,7 @@ class RPC:
 
         # Create task to watch for heartbeat
         self.event_loop.create_task(self._wait_for_hearbeat(conn))
+
 
 @dataclass
 class Event:

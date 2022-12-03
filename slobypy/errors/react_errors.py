@@ -1,2 +1,2 @@
-class URI_ERROR(Exception):
+class URIError(Exception):
     pass
