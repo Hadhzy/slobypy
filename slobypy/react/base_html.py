@@ -46,7 +46,7 @@ class BaseElement:
 
 
     def _render_worker(self, tags=None) -> str:
-        rendered_html = f"<{self.tag} {self.render_attrs()}>" if tags else ""
+        rendered_html = f"<{self.tag}{self.render_attrs()}>" if tags else ""
         for element in self.content:
             if isinstance(element, BaseElement) or isinstance(element, Component):
 
@@ -169,8 +169,8 @@ class BaseElement:
         ### Returns
         - str: The element's attributes as a string
         """
-        return " ".join([f'{key}="{value}"' for key, value in self.attrs.items()] +
-                        [f'{key}={value.__name__}' for key, value in self.listeners.items()])
+        return " ".join([f' {key}="{value}"' for key, value in self.attrs.items()] +
+                        [f' {key}={value.__name__}' for key, value in self.listeners.items()])
 
     def render_js(self) -> str:
         """
