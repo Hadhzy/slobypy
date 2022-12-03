@@ -10,28 +10,33 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-          cache: 'poetry'
+
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.2.2"
 
       - name: Install dependencies
         run: |
           poetry env use "3.11"
           poetry install
+
       - name: Check for docstring's
         run: |
           poetry run pylint --limit-inference-results 0 --disable all --enable missing-function-docstring missing-module-docstring missing-class-docstring empty-docstring ./slobypy
+
       - name: Run Pylint check
         run: |
           poetry run pylint --fail-under 10 --limit-inference-results 0 ./slobypy
+
       - name: Run MyPy check
         run: |
           poetry run mypy --ignore-missing-imports --follow-imports silent --install-types --non-interactive ./slobypy
+
       - name: Run Black check
         run: |
           poetry run black --check ./slobypy
