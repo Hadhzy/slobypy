@@ -68,7 +68,7 @@ class SCSSClass:
         for key, value in self.properties.items():
             self.STYLE_CLASS.__setattr__(key, value)  # pylint: disable=unnecessary-dunder-call
 
-    def add_class_style(self, *dict: dict | list[dict], key: str = "", value: str = "") -> None:
+    def add_class_style(self, *scss_class_dict: dict | list[dict], key: str = "", value: str = "") -> None:
         """
         This method is used to add the style to the local class.
         ### Arguments
@@ -79,8 +79,8 @@ class SCSSClass:
         None
         """
         if dict:
-            self._style_data.append(dict)
-            self.add_style_global(dict)
+            self._style_data.append(scss_class_dict)
+            self.add_style_global(scss_class_dict)
         else:
             self._style_data.append({key: value})
             self.add_style_global(key=value, value=value)
