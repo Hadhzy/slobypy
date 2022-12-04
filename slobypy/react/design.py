@@ -5,6 +5,7 @@ from slobypy.react.scss_group import SCSSGroup
 
 class Design:
     _REGISTERED_CLASSES: list = []
+    USED_CLASSES: list = []  # Used scss class and scss group
 
     @classmethod
     def register(cls, scss_class: list[SCSSClass] | SCSSClass | SCSSGroup):

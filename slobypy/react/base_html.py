@@ -98,13 +98,16 @@ class BaseElement:
                 return value
         return None
 
-    @staticmethod
-    def _handle_scss_group(scss_group: group.SCSSGroup):
+
+    #noinspection PyMethodMayBeStatic
+    def _handle_scss_group(self, scss_group: group.SCSSGroup):
         if not isinstance(scss_group, group.SCSSGroup):  # not a valid scss_group
             raise NameError(f"{scss_group} is not a valid group!")
 
         if scss_group in Design.get_registered_groups():  # find a group and return that
-            return scss_group
+            for scss_global_group in react.Design.get_registered_groups():
+                if scss_global_group.name == scss_group:
+                    Design.USED_CLASSES.append(scss_group)
 
         return None
 
@@ -114,7 +117,7 @@ class BaseElement:
 
                 scss_global_class.check_scss_properties()  # check if the properties valid
 
-                return scss_global_class  # if it is valid just return it
+                Design.USED_CLASSES.append(scss_global_class)  # Add to the used class list
 
             if scss_global_class.properties["name"] != self.get_element_classname(self):
                 scss_global_class.check_scss_properties()  # check if the properties valid
