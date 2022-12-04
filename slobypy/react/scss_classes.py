@@ -23,23 +23,43 @@ class SCSSClass:
 
         self.properties = kwargs
         self._style_data: list = []
-        self.child: Self = None
+        self.child_classes: Self | list[Self] = []
 
         for key, value in kwargs.items():
-            # if key == "scss_group":
-            #    self._add_group(value)  # add the class to the group
-
             self._style_data.append({key: value})  # update local style data
             self.add_style_global(key=key, value=value)  # update global style data
 
-    # Todo: Find a way to use scss_group as a kwarg
-    def _add_group(self, value):
-        # for group in sc_group.SCSSGroup.GROUPS:
-        pass
+    def child(self, child_scss_class: Self):
 
-    def render(self) -> str:
+        if isinstance(child_scss_class, SCSSClass):
+            self.child_classes.append({self: child_scss_class})
+
+        return self
+
+    #Todo: Render with children
+    def render(self):
         """
-        This method is used to render the scss class.
+        This method is used to render the whole scss class with children.
+        """
+        render_group = ""
+        self_render = 0  # render the scss class
+
+        for child_class in self.child_classes:
+            self_render += 1
+
+            render_group += self.render_single_class()[:-1] if self_render == 1 else ""
+
+            for key, value in child_class.items():
+                render_group += value.render_simple_class()
+
+            render_group += "\n"
+        render_group += "}"
+
+        return render_group
+
+    def render_single_class(self) -> str:
+        """
+        This method is used to render the scss single class.
         """
         curr = ""
         end = "}"
