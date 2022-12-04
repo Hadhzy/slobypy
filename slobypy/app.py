@@ -7,6 +7,7 @@ from typing import Union, Any, Callable, Type
 from .react import Component, Reactive
 from .rpc import Event
 from .react.tools import uri_checker
+from .communication.data_builder import DataBuilder
 
 
 class SlApp:
@@ -87,11 +88,14 @@ class SlApp:
         ### Returns
         - None
         """
-        print(self._render())
+        data_builder = DataBuilder()  # Todo: pass out the data via websockets
+        data = data_builder.make_scss_data().make_app_component_data(self._render()).get_json()  # json-data
+
 
     def _check_props(self):
         pass
 
+    #Todo: Extend the render with more informal component data.
     def _render(self, obj=None, route: str = False) -> str:
         """
         This method is used to render the app to HTML.
