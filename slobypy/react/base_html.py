@@ -16,6 +16,7 @@ from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSSClass
 from .design import Design
+from .scss_properties import POSSIBLE_ATTRIBUTES
 
 CLASS_NAME_PROPERTY = "className"
 SCSS_GROUP_PROPERTY = "ScssGroup"
@@ -23,7 +24,7 @@ SCSS_GROUP_PROPERTY = "ScssGroup"
 
 class BaseElement:
     tag: str = ''
-    listeners: dict = {}
+    int_to_str = dict(zip([str(i) for i in range(10)], string.ascii_lowercase))
     scss_class = SCSSClass()
 
     def __init__(self, *args, **kwargs) -> None:
@@ -41,6 +42,7 @@ class BaseElement:
         new_kwargs = kwargs.copy()
         self.style = SCSS()  # scss instance
         self.class_names: list = []  # contain all the class_names
+        self.listeners: dict = {}  # contain all the listeners
         self._inline_scss(new_kwargs)  # handle inline css
 
         self._create_listeners(kwargs, new_kwargs)  # create listeners
@@ -81,7 +83,8 @@ class BaseElement:
                 self.class_names.append(value)  # extend the class_names list with the actual classname
 
             # check if it is a valid property name
-            self.style.__setattr__(key, value)
+            if key in POSSIBLE_ATTRIBUTES:
+                self.style.__setattr__(key, value)
 
     @staticmethod
     def get_element_classname(element: Self) -> str | None:
@@ -175,7 +178,8 @@ class BaseElement:
         - str: The element's attributes as a string
         """
         return " ".join([f' {key}="{value}"' for key, value in self.attrs.items()] +
-                        [f' {key}={value.__name__}' for key, value in self.listeners.items()])
+                        [f' {key}={{{"".join(self.int_to_str[n] for n in str(value.__hash__()))}}}' for key, value in
+                         self.listeners.items()])
 
     def render_js(self) -> str:
         """
@@ -188,9 +192,6 @@ class BaseElement:
         ### Returns
         - str: The JavaScript code as a string
         """
-        letters = string.ascii_lowercase
-        numbers = [str(i) for i in range(10)]
-        int_to_str = dict(zip(numbers, letters))
         rendered_js = []
         for element in self.content:
             if isinstance(element, (BaseElement, Component)):
@@ -201,7 +202,7 @@ class BaseElement:
             # TODO: Add js code to emit event over the socket
             # Using __hash__ to create a unique function name to prevent name collisions
             rendered_js.append(
-                f'function {"".join(int_to_str[n] for n in str(value.__hash__()))}(e) {{\n  console.log("TBD")\n}}')
+                f'function {"".join(self.int_to_str[n] for n in str(value.__hash__()))}(e) {{\n  console.log("TBD")\n}}')
         return "\n".join(rendered_js)
 
     # Todo: Extend this with kwargs
