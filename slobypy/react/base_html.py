@@ -98,7 +98,6 @@ class BaseElement:
                 return value
         return None
 
-
     def _find_same_base_classes(self):
         for scss_global_class in react.Design.get_registered_classes():  # get all the classes
             if scss_global_class.properties["name"] == self.get_element_classname(self):  # same classname match

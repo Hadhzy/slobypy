@@ -50,11 +50,9 @@ class SlApp:
     def add(cls, uri: str, component: Type[Component]) -> None:
         """
         This method is used to add a component to the app.
-
         ### Arguments
         - uri (str): The uri of the component
         - component (Type[Component]): The component to add
-
         ### Returns
         - None
         """
@@ -91,11 +89,10 @@ class SlApp:
         data_builder = DataBuilder()  # Todo: pass out the data via websockets
         data = data_builder.make_scss_data().make_app_component_data(self._render()).get_json()  # json-data
 
-
     def _check_props(self):
         pass
 
-    #Todo: Extend the render with more informal component data.
+    # Todo: Extend the render with more informal component data.
     def _render(self, obj=None, route: str = False) -> str:
         """
         This method is used to render the app to HTML.

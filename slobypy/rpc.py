@@ -22,7 +22,8 @@ class RPC:
     - None
     """
 
-    def __init__(self):
+    def __init__(self, app):
+        self.app = app
         self.event_loop = asyncio.get_event_loop()
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
@@ -88,6 +89,8 @@ class RPC:
             await self._identify(conn, data["data"])
         elif data["type"] == "heartbeat":
             await self._heartbeat(conn)
+        elif data["type"] == "new_shard":
+            await self._new_shard(conn, data["data"])
 
     async def send(self, conn, data: dict):
         """
@@ -171,6 +174,24 @@ class RPC:
 
         # Create task to watch for heartbeat
         self.event_loop.create_task(self._wait_for_hearbeat(conn))
+
+    async def _new_shard(self, conn, data: dict):
+        self.conn[conn.id - 1]["shards"][str(data["id"])] = data
+        # Serve initial route
+        await self._update_shard_data(conn, data["id"], await self._get_route(data["route"]))
+
+    async def _update_shard_data(self, conn, shard_id, html: str):
+        await self.send(conn, {
+            "type": "update_shard_data",
+            "data": {
+                "id": shard_id,
+                "html": html,
+            },
+            "sequence": random.randint(1000, 9999),
+        })
+
+    async def _get_route(self, route):
+        return self.app._render(route=route)
 
 
 @dataclass

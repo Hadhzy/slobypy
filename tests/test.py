@@ -63,6 +63,3 @@ class MyComponent2(Component):
 
 my_component2 = MyComponent2()
 my_component1 = MyComponent1()
-
-
-

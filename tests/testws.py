@@ -6,7 +6,7 @@ from slobypy.rpc import *
 app = SlApp()
 
 
-@app.component("firstcomponent/test")
+@app.component("/route1")
 class MyComponent1(Component):
 
     def name(self):
@@ -30,6 +30,7 @@ class MyComponent2(Component):
     def mount(self):
         print("test prop:", self.props["test_prop_value"])
 
+
 @app.component("secondcomponent/fake")
 class FakeComponent(Component):
     def name(self):
@@ -42,4 +43,4 @@ class FakeComponent(Component):
         print("bad run")
 
 
-r = RPC()
+r = RPC(app)

@@ -46,9 +46,9 @@ class Component(ABC):
     # noinspection PyMethodMayBeStatic
     def render_js(self):
         """
-        Non-mandatory method to render/include the js of the component
+        Get any javascript code that is needed for the component
         """
-        return ""
+        return ''.join([element.render_js() for element in self.body()])
 
     def __str__(self) -> name:
         return self.name
