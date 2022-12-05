@@ -24,6 +24,7 @@ class SCSSClass:
         self.properties = kwargs
         self._style_data: list = []
         self.child_classes: Self | list[Self] = []
+        self.render_group: str = ""
 
         for key, value in kwargs.items():
             self._style_data.append({key: value})  # update local style data
@@ -31,33 +32,47 @@ class SCSSClass:
 
     def child(self, child_scss_class: Self):
 
+        react.Design.register(child_scss_class)  # register the child
+
         if isinstance(child_scss_class, SCSSClass):
             self.child_classes.append({self: child_scss_class})
 
         return self
 
-    #Todo: Render with children
     def render(self):
+
+        if not self.child_classes:  # without children
+            return self.__render_single_class()
+
+        return self._render()  # with children
+
+    #Todo: Render with multiple children
+    def _render(self, scss_class=None):
         """
         This method is used to render the whole scss class with children.
         """
-        render_group = ""
-        self_render = 0  # render the scss class
+        if scss_class is None:
+            scss_class = self
 
-        for child_class in self.child_classes:
-            self_render += 1
+        self.render_group += scss_class.__render_single_class()[:-1]  # render the parent
 
-            render_group += self.render_single_class()[:-1] if self_render == 1 else ""
+        for child_class in scss_class.child_classes:
 
             for key, value in child_class.items():
-                render_group += value.render_simple_class()
 
-            render_group += "\n"
-        render_group += "}"
+                if value.child_classes:
+                    return self._render(value)  # there is child
 
-        return render_group
+                else:
+                    self.render_group += value.__render_single_class()  # there is no child anymore #Todo: Don't break the whole render
 
-    def render_single_class(self) -> str:
+            self.render_group += "\n"
+
+        self.render_group += "}"
+
+        return self.render_group
+
+    def __render_single_class(self) -> str:
         """
         This method is used to render the scss single class.
         """
