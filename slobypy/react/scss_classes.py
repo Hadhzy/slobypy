@@ -17,9 +17,11 @@ class SCSSClass:
         """
         Create scss classes.
         """
+        self.register = False  # Register the parent
 
         if register:  # register it automatically
             react.Design.register(self)
+            self.register = True
 
         self.properties = kwargs
         self._style_data: list = []
@@ -31,25 +33,31 @@ class SCSSClass:
             self.add_style_global(key=key, value=value)  # update global style data
 
     def child(self, child_scss_class: Self):
+        """
+        Register a child
+        """
+
         if isinstance(child_scss_class, SCSSClass):
             self.child_classes.append({self: child_scss_class})
 
         return self
 
     def render(self):
+        """
+        This method is used to render the whole scss class with children.
+        """
 
         if not self.child_classes:  # without children
             return self.__render_single_class()
 
         return self._render()  # with children
 
-    #Todo: Render with multiple children
     def _render(self, scss_class=None):
-        """
-        This method is used to render the whole scss class with children.
-        """
         if scss_class is None:
             scss_class = self
+
+        if self.register:
+            scss_class.check_scss_properties()
 
         self.render_group += scss_class.__render_single_class()[:-1]  # render the parent
 
@@ -62,7 +70,7 @@ class SCSSClass:
                     self._render(value)  # there is child
 
                 else:
-                    self.render_group += value.__render_single_class()  # there is no child anymore #Todo: Don't break the whole render
+                    self.render_group += value.__render_single_class()
             self.render_group += "\n"
 
         self.render_group += "}"
@@ -158,6 +166,7 @@ class SCSSClass:
     def __str__(self) -> str:
         return f'{self._style_data}'
 
+    #Todo: Configure
     def __iter__(self) -> Generator[Type[dict], None, None]:
         start = 0
         stop = len(self.style_data)
