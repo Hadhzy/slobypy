@@ -31,9 +31,6 @@ class SCSSClass:
             self.add_style_global(key=key, value=value)  # update global style data
 
     def child(self, child_scss_class: Self):
-
-        react.Design.register(child_scss_class)  # register the child
-
         if isinstance(child_scss_class, SCSSClass):
             self.child_classes.append({self: child_scss_class})
 
@@ -61,11 +58,11 @@ class SCSSClass:
             for key, value in child_class.items():
 
                 if value.child_classes:
-                    return self._render(value)  # there is child
+                    self.render_group += "\n"
+                    self._render(value)  # there is child
 
                 else:
                     self.render_group += value.__render_single_class()  # there is no child anymore #Todo: Don't break the whole render
-
             self.render_group += "\n"
 
         self.render_group += "}"
