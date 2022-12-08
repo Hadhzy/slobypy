@@ -3,8 +3,8 @@ from slobypy.react.scss_classes import SCSSClass
 
 
 class Design:
-    _REGISTERED_CLASSES: list = []
-    USED_CLASSES: list = []  # Used scss class and scss group
+    _REGISTERED_CLASSES: list[SCSSClass] = []
+    USED_CLASSES: list[SCSSClass] = []  # Used scss class and scss group
 
     @classmethod
     def register(cls, scss_class: list[SCSSClass] | SCSSClass):

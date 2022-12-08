@@ -35,6 +35,10 @@ class SCSSClass:
     def child(self, child_scss_class: Self):
         """
         Register a child
+        ### Arguments
+        child_scss_class: Self -> the child scss class
+        ### Returns
+        value: Self
         """
 
         if isinstance(child_scss_class, SCSSClass):
@@ -166,7 +170,7 @@ class SCSSClass:
     def __str__(self) -> str:
         return f'{self._style_data}'
 
-    #Todo: Configure
+    #Todo: Extend the iter with children
     def __iter__(self) -> Generator[Type[dict], None, None]:
         start = 0
         stop = len(self.style_data)

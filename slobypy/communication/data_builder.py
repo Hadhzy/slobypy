@@ -14,7 +14,7 @@ class DataBuilder:
     """
     This class is build the data for the frontend.
     """
-    # Todo: Type hint here
+
     __JSON_DATA: str = ""  # pylint: disable=invalid-name
 
     def make_scss_data(self) -> Self:
@@ -23,7 +23,7 @@ class DataBuilder:
         """
 
         for scss_data in Design.USED_CLASSES:
-            self.__JSON_DATA += json.dumps(scss_data)  # add the scss data to the json.
+            self.__JSON_DATA += json.dumps(scss_data.render())  # add the scss data to the json.
 
         return self
 
