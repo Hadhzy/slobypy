@@ -5,7 +5,7 @@ from typing import Union, Any, Callable, Type, Tuple
 
 # This Project
 from .react import Component, Reactive
-from .rpc import Event
+from .rpc import Event, RPC
 from .react.tools import uri_checker
 from .communication.data_builder import DataBuilder
 
@@ -23,9 +23,12 @@ class SlApp:
     """
     # Use list to prevent name conflicts
     _components = []
+    rpc = None
+    instance = None
 
     def __init__(self):
         Reactive.app = self
+        SlApp.instance = self
 
     def component(self, uri: str) -> Callable:
         """
@@ -86,10 +89,7 @@ class SlApp:
         ### Returns
         - None
         """
-        data_builder = DataBuilder()  # Todo: pass out the data via websockets
-        data = data_builder.make_scss_data().make_app_component_data(
-            self._render(route='/')).get_json()  # json-data
-        print(data)
+        self.rpc = RPC(self)
 
     def _check_props(self):
         pass

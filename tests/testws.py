@@ -56,6 +56,3 @@ class FakeComponent(Component):
 
     def mount(self):
         print("bad run")
-
-
-r = RPC(app)

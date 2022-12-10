@@ -54,4 +54,4 @@ class Component(ABC):
         return self.name
 
     def __repr__(self) -> str:
-        return f"Component({self.name})"
+        return f"Component('{self.name}')"
