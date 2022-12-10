@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from websockets import serve  # pylint: disable=no-name-in-module
 from websockets.legacy.server import WebSocketServerProtocol
 
+from .react import Design
+
 
 class RPC:
     CURRENT_VERSION = '0.A1'
@@ -91,6 +93,12 @@ class RPC:
             await self._heartbeat(conn)
         elif data["type"] == "new_shard":
             await self._new_shard(conn, data["data"])
+        elif data["type"] == "remove_shard":
+            self.conn[conn.id - 1]["shards"].pop(str(data["data"]["id"]))
+        elif data["type"] == "shard_event":
+            await self._shard_event(conn, data["data"])
+        elif data["type"] == "get_route":
+            await self._render_shard(conn, data["id"])
 
     async def send(self, conn, data: dict):
         """
@@ -178,17 +186,25 @@ class RPC:
     async def _new_shard(self, conn, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])] = data
         # Serve initial route
-        await self._update_shard_data(conn, data["id"], await self._get_route(data["route"]))
+        await self._render_shard(conn, data)
 
-    async def _update_shard_data(self, conn, shard_id, html: str):
+    async def _render_shard(self, conn, data: dict):
+        await self._update_shard_data(conn, data["id"], await self._get_route(data["route"]),
+                                      "\n".join([scss_data.render() for scss_data in Design.USED_CLASSES]))
+
+    async def _update_shard_data(self, conn, shard_id, html: str, css: str = None):
         await self.send(conn, {
             "type": "update_shard_data",
             "data": {
                 "id": shard_id,
                 "html": html,
+                "css": css,
             },
             "sequence": random.randint(1000, 9999),
         })
+
+    async def _shard_event(self, conn, data: dict):
+        pass
 
     async def _get_route(self, route):
         return self.app._render(route=route)

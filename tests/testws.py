@@ -5,15 +5,30 @@ from slobypy.rpc import *
 
 app = SlApp()
 
+css = SCSSClass(
+    name="parent",
+    register=True
+).child(
+    SCSSClass(
+        name="child1"
+    ).child(SCSSClass(
+        name="child1-child"
+    ))
+).child(SCSSClass(
+    name="child2"
+))
+
 
 @app.component("/route1")
 class MyComponent1(Component):
-
     def name(self):
         return "test"
 
+    def on_click(self):
+        print("click")
+
     def body(self):
-        yield P("test")
+        yield P("test", className="parent", onClick=self.on_click)
         yield MyComponent2(props={"test_prop_value": "the test value"})
 
     def mount(self):
