@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "slopy"
+name = "slobypy"
 version = "0.1.0"
 description = ""
 authors = ["Hadházy Tamás <helsgithub15@gmail.com>"]
