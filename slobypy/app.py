@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 # Third-Party
-from typing import Union, Any, Callable, Type
+from typing import Union, Any, Callable, Type, Tuple
 
 # This Project
 from .react import Component, Reactive
@@ -87,13 +87,15 @@ class SlApp:
         - None
         """
         data_builder = DataBuilder()  # Todo: pass out the data via websockets
-        data = data_builder.make_scss_data().make_app_component_data(self._render()).get_json()  # json-data
+        data = data_builder.make_scss_data().make_app_component_data(
+            self._render(route='/')).get_json()  # json-data
+        print(data)
 
     def _check_props(self):
         pass
 
     # Todo: Extend the render with more informal component data.
-    def _render(self, obj=None, route: str = False) -> str:
+    def _render(self, obj=None, route: str = False) -> tuple[Any, Any] | str | Any:
         """
         This method is used to render the app to HTML.
 

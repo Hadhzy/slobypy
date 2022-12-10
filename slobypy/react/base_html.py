@@ -186,7 +186,7 @@ class BaseElement:
             # TODO: Add js code to emit event over the socket
             # Using __hash__ to create a unique function name to prevent name collisions
             rendered_js.append(
-                f'function {"".join(self.int_to_str[n] for n in str(value.__hash__()))}(e) {{\n  console.log("TBD")\n}}')
+                'function {processEvent}(e) {{\n  console.log("TBD")\n}}')
         return "\n".join(rendered_js)
 
     # Todo: Extend this with kwargs

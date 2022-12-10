@@ -6,6 +6,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generator, Type
 
+from slobypy.react.scss import SCSS
+
 if TYPE_CHECKING:
     from slobypy.react import BaseElement
 
@@ -17,10 +19,8 @@ __all__ = (
 class Component(ABC):
 
     def __init__(self, props=None) -> None:
-        if props is None:
-            self.props = {}
-        else:
-            self.props = props
+        self.props = {} if props is None else props
+        self.style = SCSS()
 
     @property
     @abstractmethod
