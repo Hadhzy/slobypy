@@ -4,6 +4,7 @@ import typer
 import importlib.util
 
 from pathlib import Path
+# This project
 from slobypy.app import SlApp
 
 app = typer.Typer()
@@ -31,6 +32,9 @@ def run(file: str):
     # Attempt to run the app
     user_app = SlApp.instance
     user_app.run()
+
+
+
 
 
 if __name__ == "__main__":
