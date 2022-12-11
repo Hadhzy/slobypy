@@ -6,14 +6,21 @@ import importlib.util
 from pathlib import Path
 # This project
 from slobypy.app import SlApp
+import slobypy.react.design as design
 
 app = typer.Typer()
 
 
+#Todo: Add design, run the files !not working
 @app.command()
-def components():
+def components(registered: bool = False):
     # Used to return the components
-    pass
+    if registered:
+        print(design.Design.USED_CLASSES)
+    else:
+        print(design.Design.get_registered_classes())
+
+
 
 
 @app.command()
@@ -32,8 +39,6 @@ def run(file: str):
     # Attempt to run the app
     user_app = SlApp.instance
     user_app.run()
-
-
 
 
 
