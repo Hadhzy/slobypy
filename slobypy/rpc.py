@@ -24,13 +24,16 @@ class RPC:
     - None
     """
 
-    def __init__(self, app):
+    def __init__(self, app, block=False):
         self.app = app
         self.event_loop = asyncio.get_event_loop()
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
 
-        self.event_loop.run_until_complete(self.create_ws(self._handle_ws))
+        if block:
+            self.event_loop.run_until_complete(self.create_ws(self._handle_ws))
+        else:
+            asyncio.ensure_future(self.create_ws(self._handle_ws))
 
     async def create_ws(self,
                         ws_handler: Callable[[WebSocketServerProtocol], Awaitable[Any]],
@@ -181,7 +184,7 @@ class RPC:
         })
 
         # Create task to watch for heartbeat
-        self.event_loop.create_task(self._wait_for_hearbeat(conn))
+        self._internal_heartbeat = asyncio.ensure_future(self._wait_for_hearbeat(conn))
 
     async def _new_shard(self, conn, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])] = data

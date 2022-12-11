@@ -24,13 +24,9 @@ class SlApp:
     # Use list to prevent name conflicts
     _components = []
     rpc = None
-    instance = None
 
-    def __init__(self):
-        Reactive.app = self
-        SlApp.instance = self
-
-    def component(self, uri: str) -> Callable:
+    @classmethod
+    def component(cls, uri: str) -> Callable:
         """
         This decorator is used to register a component to the app.
 
@@ -44,7 +40,7 @@ class SlApp:
         def wrap(component):
             instance = component()  # get the instance of it
             instance.meta_data = {"uri": uri, "hash_instance": hash(instance)}  # add the meta_data
-            self.add(uri, instance)  # add the uri
+            cls.add(uri, instance)  # add the uri
             return component
 
         return wrap
@@ -62,7 +58,8 @@ class SlApp:
         # TODO: Add URI checking regex
         cls._components.append({"uri": uri_checker(uri), "component": component})
 
-    def dispatch(self, event: Union[Event, Any]) -> None:
+    @classmethod
+    def dispatch(cls, event: Union[Event, Any]) -> None:
         """
         This method is used to emit an event to the targeted component.
 
@@ -72,14 +69,15 @@ class SlApp:
         ### Returns
         - None
         """
-        for component in self._components:
+        for component in cls._components:
             if component.name() == event.name:
                 try:
                     getattr(component, "on_" + event.type)(event)
                 except AttributeError:
                     pass
 
-    def run(self):
+    @classmethod
+    def run(cls, *args, **kwargs):
         """
         This method is used to run the app.
 
@@ -89,13 +87,14 @@ class SlApp:
         ### Returns
         - None
         """
-        self.rpc = RPC(self)
+        cls.rpc = RPC(cls, *args, **kwargs)
 
     def _check_props(self):
         pass
 
     # Todo: Extend the render with more informal component data.
-    def _render(self, obj=None, route: str = False) -> tuple[Any, Any] | str | Any:
+    @classmethod
+    def _render(cls, obj=None, route: str = False) -> tuple[Any, Any] | str | Any:
         """
         This method is used to render the app to HTML.
 
@@ -111,13 +110,13 @@ class SlApp:
             return obj.render()
 
         if route:
-            for component in self._components:
+            for component in cls._components:
                 if component["uri"] == route:
                     component["component"].mount()
                     return component["component"].render()
 
         result = ""
-        for component in self._components:
+        for component in cls._components:
             component["component"].mount()
             component["component"].render()
             result += component["component"].render()

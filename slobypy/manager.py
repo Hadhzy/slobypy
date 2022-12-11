@@ -8,10 +8,14 @@ from pathlib import Path
 from slobypy.app import SlApp
 import slobypy.react.design as design
 
+# Rich
+from rich import print
+from rich.columns import Columns
+
 app = typer.Typer()
 
 
-#Todo: Add design, run the files !not working
+# Todo: Add design, run the files !not working
 @app.command()
 def components(registered: bool = False):
     # Used to return the components
@@ -19,8 +23,6 @@ def components(registered: bool = False):
         print(design.Design.USED_CLASSES)
     else:
         print(design.Design.get_registered_classes())
-
-
 
 
 @app.command()
@@ -37,9 +39,14 @@ def run(file: str):
         return
 
     # Attempt to run the app
-    user_app = SlApp.instance
-    user_app.run()
+    SlApp.run()  # Don't block as we need to run the dash
 
+    dash = Slodash(SlApp.rpc)
+
+
+class Slodash:
+    def __init__(self, rpc):
+        self.rpc = rpc
 
 
 if __name__ == "__main__":
