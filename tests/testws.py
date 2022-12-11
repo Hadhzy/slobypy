@@ -1,9 +1,6 @@
-from slobypy.app import SlApp
+from slobypy.app import SlApp as app
 from slobypy.react import *
 from slobypy.react.component import *
-from slobypy.rpc import *
-
-app = SlApp()
 
 css = SCSSClass(
     name="parent",
@@ -21,6 +18,7 @@ css = SCSSClass(
 
 @app.component("/route1")
 class MyComponent1(Component):
+    @property
     def name(self):
         return "test"
 
@@ -36,6 +34,7 @@ class MyComponent1(Component):
 
 
 class MyComponent2(Component):
+    @property
     def name(self):
         return "test"
 
@@ -48,6 +47,7 @@ class MyComponent2(Component):
 
 @app.component("secondcomponent/fake")
 class FakeComponent(Component):
+    @property
     def name(self):
         return "im a fake"
 
