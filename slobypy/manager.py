@@ -39,12 +39,12 @@ def run(file: str):
         return
 
     # Attempt to run the app
-    SlApp.run()  # Don't block as we need to run the dash
+    SlApp.run(block=True)  # Don't block as we need to run the dash
 
-    dash = Slodash(SlApp.rpc)
+    dash = SloDash(SlApp.rpc)
 
 
-class Slodash:
+class SloDash:
     def __init__(self, rpc):
         self.rpc = rpc
 

@@ -7,7 +7,6 @@ from typing import Union, Any, Callable, Type, Tuple
 from .react import Component, Reactive
 from .rpc import Event, RPC
 from .react.tools import uri_checker
-from .communication.data_builder import DataBuilder
 
 
 class SlApp:
