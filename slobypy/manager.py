@@ -2,6 +2,9 @@
 import sys
 import typer
 import importlib.util
+import socket
+import urllib.request
+import urllib.error
 
 from pathlib import Path
 
@@ -13,8 +16,12 @@ from slobypy._templates import *
 # Rich
 from rich import print
 from rich.columns import Columns
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
 
 app = typer.Typer()
+console = Console()
 
 
 # Todo: Add design, run the files !not working
@@ -66,14 +73,35 @@ def run(file: str):
         return
 
     # Attempt to run the app
-    SlApp.run(block=True)  # Don't block as we need to run the dash
+    dash = SloDash()
 
-    dash = SloDash(SlApp.rpc)
+    # Pash dash hook so that RPC updates can trigger UI changes
+    SlApp.run(block=True, hooks=[dash], console=console)  # Don't block as we need to run the dash
 
 
 class SloDash:
-    def __init__(self, rpc):
-        self.rpc = rpc
+    def __init__(self):
+        console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
+
+    async def on_start(self, host, port):
+        grid = Table.grid(padding=(0, 3))
+        grid.add_column()
+        grid.add_column(justify="left")
+        grid.add_row("> Local RPC:", f"http://localhost:{port}")
+        grid.add_row("> Network RPC:", f"http://{socket.gethostbyname(socket.gethostname())}:{port}")
+        try:
+            external_ip = urllib.request.urlopen('https://v4.ident.me').read().decode('utf8')
+        except urllib.error.URLError:
+            external_ip = "Unknown"
+        grid.add_row("> Network RPC:", f"http://{external_ip}:{port} :warning:")
+
+        console.print(Panel(
+            grid,
+            expand=False,
+            border_style="blue")
+        )
+
+        console.print("Waiting for connection from Sloby...\n", style="yellow")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,9 @@ import asyncio
 import json
 
 from dataclasses import dataclass
+
+import websockets.exceptions
+from rich.console import Console
 from websockets import serve  # pylint: disable=no-name-in-module
 from websockets.legacy.server import WebSocketServerProtocol
 
@@ -24,16 +27,56 @@ class RPC:
     - None
     """
 
-    def __init__(self, app, block=False):
+    def __init__(self, app,
+                 host: str = "localhost",
+                 port: int = 8765,
+                 block: bool = False,
+                 hooks: list = None,
+                 console: Console = None):
+        if hooks is None:
+            hooks = []
         self.app = app
+        self.hooks = hooks
+        self.console = console
         self.event_loop = asyncio.get_event_loop()
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
 
         if block:
-            self.event_loop.run_until_complete(self.create_ws(self._handle_ws))
+            self.event_loop.run_until_complete(self.create_ws(self._handle_ws, host, port))
         else:
             asyncio.ensure_future(self.create_ws(self._handle_ws))
+
+    async def send_hook(self, name, *args, **kwargs):
+        """
+        Calls any hooks that are registered with the RPC (e.g. SloDash)
+
+        ### Arguments
+        - name (str): The name of the hook to call
+        - *args: The arguments to pass to the hook
+        - **kwargs: The keyword arguments to pass to the hook
+
+        ### Returns
+        - None
+        """
+        for hook in self.hooks:
+            try:
+                await getattr(hook, name)(*args, **kwargs)
+            except AttributeError:
+                continue
+
+    async def log(self, data):
+        """
+        Logs data to the console
+
+        ### Arguments
+        - data (dict): The data to log to the console
+
+        ### Returns
+        - None
+        """
+        if self.console:
+            self.console.log(data)
 
     async def create_ws(self,
                         ws_handler: Callable[[WebSocketServerProtocol], Awaitable[Any]],
@@ -50,6 +93,7 @@ class RPC:
         ### Returns
         - None
         """
+        await self.send_hook("on_start", host, port)
         self.ws = await serve(ws_handler, host, port)
         await self.ws.serve_forever()
 
@@ -63,6 +107,8 @@ class RPC:
         ### Returns
         - None
         """
+        await self.send_hook("on_connect", conn)
+        await self.log(f"Received Sloby connection from {':'.join(map(str, conn.remote_address))}")
         await self.listen(conn)
 
     async def listen(self, conn):
@@ -75,10 +121,18 @@ class RPC:
         ### Returns
         - None
         """
-        async for msg in conn:
-            data = json.loads(msg)
-            print(data)
-            await self._handle_event(conn, data)
+        try:
+            async for msg in conn:
+                data = json.loads(msg)
+                await self._handle_event(conn, data)
+        except websockets.exceptions.ConnectionClosedError:
+            await self.send_hook("on_disconnect", conn)
+            try:
+                conn_id = conn.id
+                self.conn[conn.id - 1]["_internal_heartbeat"].cancel()
+            except AttributeError:
+                conn_id = "Unknown"
+            await self.log(f"Lost Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn_id}")
 
     async def _handle_event(self, conn, data: dict):
         """
@@ -167,7 +221,7 @@ class RPC:
         """
         conn.id = data["id"]
 
-        self.append = self.conn.append({
+        self.conn.append({
             "id": data["id"],  # Integer used to identify the connection, is used if a connection is lost,
             "conn": conn,  # The websocket connection
             "client": data["client"],  # String used to identify the client incase it's not Sloby
@@ -177,6 +231,11 @@ class RPC:
             "heartbeat": asyncio.Event(),  # Event to acknowledge heartbeat
         })
 
+        await self.send_hook("on_identify", conn, data)
+        await self.log(
+            f"Identified Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn.id}, "
+            f"client: [cyan]{data['client']}[/cyan], max_shards: {data['max_shards']}")
+
         await self.send(conn, {
             "type": "ready",
             "data": None,
@@ -184,7 +243,7 @@ class RPC:
         })
 
         # Create task to watch for heartbeat
-        self._internal_heartbeat = asyncio.ensure_future(self._wait_for_hearbeat(conn))
+        self.conn[conn.id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self._wait_for_hearbeat(conn))
 
     async def _new_shard(self, conn, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])] = data
