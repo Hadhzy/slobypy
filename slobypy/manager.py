@@ -93,6 +93,10 @@ class SloDash:
 
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
+        """
+        This method is used to draw the base information.
+        """
+
         grid = Table.grid(padding=(0, 3))
         grid.add_column()
         grid.add_column(justify="left")
