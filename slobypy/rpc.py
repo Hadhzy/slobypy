@@ -76,7 +76,33 @@ class RPC:
         - None
         """
         if self.console:
-            self.console.log(data)
+            self.console.log("[black on grey37] INFO [/]", data)
+
+    async def warn(self, data):
+        """
+        Logs a warning to the console
+
+        ### Arguments
+        - data (dict): The data to log to the console
+
+        ### Returns
+        - None
+        """
+        if self.console:
+            self.console.log("[black on yellow] WARN [/]", data)
+
+    async def error(self, data):
+        """
+        Logs an error to the console
+
+        ### Arguments
+        - data (dict): The data to log to the console
+
+        ### Returns
+        - None
+        """
+        if self.console:
+            self.console.log("[black on red] ERROR [/]", data)
 
     async def create_ws(self,
                         ws_handler: Callable[[WebSocketServerProtocol], Awaitable[Any]],
@@ -132,7 +158,7 @@ class RPC:
                 self.conn[conn.id - 1]["_internal_heartbeat"].cancel()
             except AttributeError:
                 conn_id = "Unknown"
-            await self.log(f"Lost Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn_id}")
+            await self.warn(f"Lost Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn_id}")
 
     async def _handle_event(self, conn, data: dict):
         """
@@ -247,12 +273,16 @@ class RPC:
 
     async def _new_shard(self, conn, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])] = data
+        await self.send_hook("on_new_shard", conn, data)
+        await self.log(f"New shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
         # Serve initial route
         await self._render_shard(conn, data)
 
     async def _render_shard(self, conn, data: dict):
         await self._update_shard_data(conn, data["id"], await self._get_route(data["route"]),
                                       "\n".join([scss_data.render() for scss_data in Design.USED_CLASSES]))
+        await self.send_hook("on_render_shard", conn, data)
+        await self.log(f"Rendered shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
 
     async def _update_shard_data(self, conn, shard_id, html: str, css: str = None):
         await self.send(conn, {
