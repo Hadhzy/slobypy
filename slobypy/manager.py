@@ -15,7 +15,6 @@ from slobypy._templates import *
 
 # Rich
 from rich import print
-from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -35,9 +34,16 @@ def components(registered: bool = False):
 
 
 @app.command()
-def generate(path: str, overwrite: bool = False):
-    # Used to generate a new project
+def generate(path: str, overwrite: bool = False) -> None:
+    """
+    Used to generate a new project
+    ### Arguments
+    - path: The path of the generate folder
+    - overwrite: Default value False, if it is True then it doesn't have to be an empty folder
+    """
+
     path = Path(path)
+
     # Check if path is empty
     if path.is_file():
         typer.echo("Path is a file, not a directory")
@@ -52,6 +58,7 @@ def generate(path: str, overwrite: bool = False):
     path.mkdir(parents=True, exist_ok=True)  # exist_ok mutes the error if the directory already exists
     (path / "components").mkdir(parents=True, exist_ok=True)
 
+    # Load the default files
     with open(path / "main.py", "w") as f:
         f.write(MAIN_FILE)
 
@@ -80,19 +87,23 @@ def run(file: str):
 
 
 class SloDash:
+
     def __init__(self):
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
+    # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
         grid = Table.grid(padding=(0, 3))
         grid.add_column()
         grid.add_column(justify="left")
         grid.add_row("> Local RPC:", f"http://localhost:{port}")
         grid.add_row("> Network RPC:", f"http://{socket.gethostbyname(socket.gethostname())}:{port}")
+
         try:
             external_ip = urllib.request.urlopen('https://v4.ident.me').read().decode('utf8')
         except urllib.error.URLError:
             external_ip = "Unknown"
+
         grid.add_row("> Network RPC:", f"http://{external_ip}:{port} :warning:")
 
         console.print(Panel(
