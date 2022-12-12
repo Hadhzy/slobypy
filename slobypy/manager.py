@@ -4,9 +4,11 @@ import typer
 import importlib.util
 
 from pathlib import Path
+
 # This project
 from slobypy.app import SlApp
 import slobypy.react.design as design
+from slobypy._templates import *
 
 # Rich
 from rich import print
@@ -23,6 +25,31 @@ def components(registered: bool = False):
         print(design.Design.USED_CLASSES)
     else:
         print(design.Design.get_registered_classes())
+
+
+@app.command()
+def generate(path: str, overwrite: bool = False):
+    # Used to generate a new project
+    path = Path(path)
+    # Check if path is empty
+    if path.is_file():
+        typer.echo("Path is a file, not a directory")
+        return
+
+    if path.exists() and not overwrite:
+        if any(path.iterdir()):
+            typer.echo("Path is not empty")
+            return
+
+    # Create directories if they don't exist
+    path.mkdir(parents=True, exist_ok=True)  # exist_ok mutes the error if the directory already exists
+    (path / "components").mkdir(parents=True, exist_ok=True)
+
+    with open(path / "main.py", "w") as f:
+        f.write(MAIN_FILE)
+
+    with open((path / "components") / "example_component.py", "w") as f:
+        f.write(COMPONENT_FILE)
 
 
 @app.command()
