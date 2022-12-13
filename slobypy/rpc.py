@@ -30,22 +30,43 @@ class RPC:
     def __init__(self, app,
                  host: str = "localhost",
                  port: int = 8765,
-                 block: bool = False,
                  hooks: list = None,
-                 console: Console = None):
+                 console: Console = None,
+                 event_loop=None,
+                 tasks: list = None):
+        if tasks is None:
+            tasks = []
         if hooks is None:
             hooks = []
         self.app = app
         self.hooks = hooks
         self.console = console
-        self.event_loop = asyncio.get_event_loop()
+        if event_loop is None:
+            event_loop = asyncio.get_event_loop()
+        self.event_loop = event_loop
+        asyncio.set_event_loop(self.event_loop)
+        self.tasks = tasks
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
 
-        if block:
-            self.event_loop.run_until_complete(self.create_ws(self._handle_ws, host, port))
-        else:
-            asyncio.ensure_future(self.create_ws(self._handle_ws))
+        for hook in hooks:
+            hook.rpc = self
+
+        asyncio.run(self.run(host, port))
+
+    async def run(self, host, port):
+        """
+        Runs the event loop
+
+        ### Arguments
+        - None
+
+        ### Returns
+        - None
+        """
+        await asyncio.gather(*self.tasks, self.create_ws(self._handle_ws, host, port))
+        pending = asyncio.all_tasks()
+        self.event_loop.run_until_complete(asyncio.gather(*pending))
 
     async def send_hook(self, name, *args, **kwargs):
         """
@@ -150,7 +171,7 @@ class RPC:
         try:
             async for msg in conn:
                 data = json.loads(msg)
-                await self._handle_event(conn, data)
+                await self.handle_event(conn, data)
         except websockets.exceptions.ConnectionClosedError:
             await self.send_hook("on_disconnect", conn)
             try:
@@ -160,7 +181,7 @@ class RPC:
                 conn_id = "Unknown"
             await self.warn(f"Lost Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn_id}")
 
-    async def _handle_event(self, conn, data: dict):
+    async def handle_event(self, conn, data: dict):
         """
         Handles the event sent from the React frontend
 
@@ -171,17 +192,17 @@ class RPC:
         - None
         """
         if data["type"] == "identify":
-            await self._identify(conn, data["data"])
+            await self.identify(conn, data["data"])
         elif data["type"] == "heartbeat":
-            await self._heartbeat(conn)
+            await self.heartbeat(conn)
         elif data["type"] == "new_shard":
-            await self._new_shard(conn, data["data"])
+            await self.new_shard(conn, data["data"])
         elif data["type"] == "remove_shard":
             self.conn[conn.id - 1]["shards"].pop(str(data["data"]["id"]))
         elif data["type"] == "shard_event":
-            await self._shard_event(conn, data["data"])
+            await self.shard_event(conn, data["data"])
         elif data["type"] == "get_route":
-            await self._render_shard(conn, data["id"])
+            await self.render_shard(conn, data["id"])
 
     async def send(self, conn, data: dict):
         """
@@ -195,7 +216,7 @@ class RPC:
         """
         await conn.send(json.dumps(data))
 
-    async def _wait_for_hearbeat(self, conn):
+    async def wait_for_hearbeat(self, conn):
         async def internal_wait(latency):
             await asyncio.wait_for(event.wait(), timeout=(interval + latency) / 1000)
             event.clear()
@@ -223,7 +244,7 @@ class RPC:
                     await conn.close()
                     break
 
-    async def _heartbeat(self, conn):
+    async def heartbeat(self, conn):
         """
         Handles the heartbeat from the React frontend
 
@@ -235,7 +256,7 @@ class RPC:
         """
         self.conn[conn.id - 1]["heartbeat"].set()
 
-    async def _identify(self, conn, data: dict):
+    async def identify(self, conn, data: dict):
         """
         Identifies the React frontend's websocket
 
@@ -269,22 +290,24 @@ class RPC:
         })
 
         # Create task to watch for heartbeat
-        self.conn[conn.id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self._wait_for_hearbeat(conn))
+        self.conn[conn.id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self.wait_for_hearbeat(conn))
 
-    async def _new_shard(self, conn, data: dict):
+    async def new_shard(self, conn, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])] = data
         await self.send_hook("on_new_shard", conn, data)
         await self.log(f"New shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
         # Serve initial route
-        await self._render_shard(conn, data)
+        await self.render_shard(conn, data)
 
-    async def _render_shard(self, conn, data: dict):
-        await self._update_shard_data(conn, data["id"], await self._get_route(data["route"]),
-                                      "\n".join([scss_data.render() for scss_data in Design.USED_CLASSES]))
+    async def render_shard(self, conn, data: dict):
+        self.conn[conn.id - 1]["shards"][str(data["id"])]["route"] = data["route"]
+        self.conn[conn.id - 1]["shards"][str(data["id"])]["last_render"] = data
+        await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]),
+                                     "\n".join([scss_data.render() for scss_data in Design.USED_CLASSES]))
         await self.send_hook("on_render_shard", conn, data)
         await self.log(f"Rendered shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
 
-    async def _update_shard_data(self, conn, shard_id, html: str, css: str = None):
+    async def update_shard_data(self, conn, shard_id, html: str, css: str = None):
         await self.send(conn, {
             "type": "update_shard_data",
             "data": {
@@ -295,11 +318,19 @@ class RPC:
             "sequence": random.randint(1000, 9999),
         })
 
-    async def _shard_event(self, conn, data: dict):
+    async def shard_event(self, conn, data: dict):
         pass
 
-    async def _get_route(self, route):
+    async def get_route(self, route):
         return self.app._render(route=route)
+
+    async def update_all_routes(self, routes: list):
+        # Re-render all RPC shards on those routes
+        for connection in self.conn:
+            for shard in connection["shards"].values():
+                if shard["route"] in list(set(routes)):
+                    # Replay last-render (same route)
+                    await self.render_shard(connection["conn"], shard["last_render"])
 
 
 @dataclass

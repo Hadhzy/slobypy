@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 # Third-Party
-from typing import Union, Any, Callable, Type, Tuple
+import inspect
+
+from typing import Union, Any, Callable, Type
+from pathlib import Path
 
 # This Project
 from .react import Component, Reactive
@@ -39,23 +42,25 @@ class SlApp:
         def wrap(component):
             instance = component()  # get the instance of it
             instance.meta_data = {"uri": uri, "hash_instance": hash(instance)}  # add the meta_data
-            cls.add(uri, instance)  # add the uri
+            cls.add(uri, instance, inspect.stack()[1].filename)  # add the uri
             return component
 
         return wrap
 
     @classmethod
-    def add(cls, uri: str, component: Type[Component]) -> None:
+    def add(cls, uri: str, component: Type[Component], source) -> None:
         """
         This method is used to add a component to the app.
         ### Arguments
         - uri (str): The uri of the component
         - component (Type[Component]): The component to add
+        - source (str): The source of the component
         ### Returns
         - None
         """
         # TODO: Add URI checking regex
-        cls._components.append({"uri": uri_checker(uri), "component": component})
+        cls._components.append(
+            {"uri": uri_checker(uri), "component": component, "source_path": Path(source)})
 
     @classmethod
     def dispatch(cls, event: Union[Event, Any]) -> None:
