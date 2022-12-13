@@ -126,10 +126,6 @@ class SloDash:
 
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
-        # Use a separate method in order to prevent the event loop from being closed
-        # as well as preventing deprecated warnings
-        # asyncio.run(self.run_tasks())
-
     # noinspection PyProtectedMember
     async def watch_files(self, path: Path):
         # Watch the files for changes
