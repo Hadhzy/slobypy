@@ -20,28 +20,15 @@ from watchfiles import awatch
 # This project
 from slobypy.app import SlApp
 from slobypy.rpc import RPC
-import slobypy.react.design as design
 from slobypy._templates import *
 
 # Rich
-from rich import print
-from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 app = typer.Typer()
 console = Console()
-
-
-# Todo: Add design, run the files !not working
-@app.command()
-def components(registered: bool = False):
-    # Used to return the components
-    if registered:
-        print(design.Design.USED_CLASSES)
-    else:
-        print(design.Design.get_registered_classes())
 
 
 @app.command()
@@ -73,7 +60,17 @@ def generate(path: str, overwrite: bool = False):
 
 
 @app.command()
-def run(config: str = "sloby.config.json"):
+def run(config: str = "sloby.config.json") -> None:
+    """
+        This function is used to run the websockets.
+
+        ### Arguments
+        - config: default value | main.py
+
+        ### Returns
+        - None
+    """
+
     # Attempt to import the file using importlib
     config_path = Path(config)
 
@@ -81,7 +78,7 @@ def run(config: str = "sloby.config.json"):
     with open(config_path, "r") as f:
         config = json.load(f)
 
-    path = Path(config["main"])
+    path = Path(config["main"])  # main.py
     runtime_tasks = config["runtime_tasks"]
 
     preprocessor = None
@@ -90,19 +87,19 @@ def run(config: str = "sloby.config.json"):
             preprocessor = import_file(Path(config["preprocessor"]))
 
     # Modules is used to keep track of ALL imported modules
-    modules = {path.resolve: import_file(path)}
+    modules = {path.resolve: import_file(path)}  # execute the main.py
 
     component_path = path.parent / config["components"]
-    component_paths = [component for component in component_path.iterdir() if component.suffix == ".py"]
+    component_paths = [component for component in component_path.iterdir() if component.suffix == ".py"]  # get python files
 
-    modules.update({component.resolve(): import_file(component) for component in component_paths})
+    modules.update({component.resolve(): import_file(component) for component in component_paths})  # execute components files
 
     # Attempt to run the app
     dash = SloDash(modules, path.parent)
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
-              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor)
+              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=None)
 
 
 class ModuleFinder(importlib.abc.MetaPathFinder):
@@ -174,6 +171,7 @@ class SloDash:
 
                 await self.rpc.hot_reload_routes(routes)
 
+    # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
         grid = Table.grid(padding=(0, 3))
         grid.add_column()
