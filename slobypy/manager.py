@@ -86,7 +86,7 @@ def run(config: str = "sloby.config.json") -> None:
         if config["preprocessor"]:
             preprocessor = import_file(Path(config["preprocessor"]))
 
-    # Modules is used to keep track of ALL imported modules
+    # Modules are used to keep track of ALL imported modules
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
     component_path = path.parent / config["components"]
