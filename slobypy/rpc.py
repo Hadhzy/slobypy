@@ -1,6 +1,8 @@
-import datetime
 import random
-from typing import Callable, Awaitable, Any
+from asyncio import AbstractEventLoop
+
+from pathlib import Path
+from typing import Callable, Awaitable, Any, List, Coroutine, Type
 
 import asyncio
 import json
@@ -32,8 +34,12 @@ class RPC:
                  port: int = 8765,
                  hooks: list = None,
                  console: Console = None,
-                 event_loop=None,
-                 tasks: list = None):
+                 event_loop: AbstractEventLoop = None,
+                 tasks: List[Coroutine] = None,
+                 external_tasks: List[str] = None,
+                 preprocessor=None):
+        self.css_preprocessor: Callable[[], Awaitable[Path]] = None
+
         if tasks is None:
             tasks = []
         if hooks is None:
@@ -46,6 +52,9 @@ class RPC:
         self.event_loop = event_loop
         asyncio.set_event_loop(self.event_loop)
         self.tasks = tasks
+        self.external_tasks = external_tasks
+        self.preprocessor = preprocessor
+
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
 
@@ -54,7 +63,7 @@ class RPC:
 
         asyncio.run(self.run(host, port))
 
-    async def run(self, host, port):
+    async def run(self, host: str, port: int):
         """
         Runs the event loop
 
@@ -64,11 +73,27 @@ class RPC:
         ### Returns
         - None
         """
-        await asyncio.gather(*self.tasks, self.create_ws(self._handle_ws, host, port))
+        if self.external_tasks:
+            await asyncio.create_subprocess_shell(*self.external_tasks)
+
+        preprocessor_tasks = []
+        if self.preprocessor:
+            processors = await self.preprocessor.init(self.event_loop)
+            self.css_preprocessor = processors.get("process_css", None)
+            preprocessor_tasks = processors.get("tasks", [])
+            # self.css_preprocessor = None
+
+        futures = []
+        for task in preprocessor_tasks:
+            await self.log("so")
+            futures.append(await asyncio.ensure_future(task))
+            await self.log("hm")
+
+        await asyncio.gather(*self.tasks, *futures, self.create_ws(self._handle_ws, host, port))
         pending = asyncio.all_tasks()
         self.event_loop.run_until_complete(asyncio.gather(*pending))
 
-    async def send_hook(self, name, *args, **kwargs):
+    async def send_hook(self, name: str, *args, **kwargs):
         """
         Calls any hooks that are registered with the RPC (e.g. SloDash)
 
@@ -86,12 +111,12 @@ class RPC:
             except AttributeError:
                 continue
 
-    async def log(self, data):
+    async def log(self, data: Any):
         """
         Logs data to the console
 
         ### Arguments
-        - data (dict): The data to log to the console
+        - data (Any): The data to log to the console
 
         ### Returns
         - None
@@ -99,12 +124,12 @@ class RPC:
         if self.console:
             self.console.log("[black on grey37] INFO [/]", data)
 
-    async def warn(self, data):
+    async def warn(self, data: Any):
         """
         Logs a warning to the console
 
         ### Arguments
-        - data (dict): The data to log to the console
+        - data (Any): The data to log to the console
 
         ### Returns
         - None
@@ -112,12 +137,12 @@ class RPC:
         if self.console:
             self.console.log("[black on yellow] WARN [/]", data)
 
-    async def error(self, data):
+    async def error(self, data: Any):
         """
         Logs an error to the console
 
         ### Arguments
-        - data (dict): The data to log to the console
+        - data (Any): The data to log to the console
 
         ### Returns
         - None
@@ -158,7 +183,7 @@ class RPC:
         await self.log(f"Received Sloby connection from {':'.join(map(str, conn.remote_address))}")
         await self.listen(conn)
 
-    async def listen(self, conn):
+    async def listen(self, conn: WebSocketServerProtocol):
         """
         Listens for messages from the React frontend
 
@@ -181,7 +206,7 @@ class RPC:
                 conn_id = "Unknown"
             await self.warn(f"Lost Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn_id}")
 
-    async def handle_event(self, conn, data: dict):
+    async def handle_event(self, conn: WebSocketServerProtocol, data: dict):
         """
         Handles the event sent from the React frontend
 
@@ -204,7 +229,7 @@ class RPC:
         elif data["type"] == "get_route":
             await self.render_shard(conn, data["id"])
 
-    async def send(self, conn, data: dict):
+    async def send(self, conn: WebSocketServerProtocol, data: dict):
         """
         Sends data to the React frontend
 
@@ -216,7 +241,7 @@ class RPC:
         """
         await conn.send(json.dumps(data))
 
-    async def wait_for_hearbeat(self, conn):
+    async def wait_for_hearbeat(self, conn: WebSocketServerProtocol):
         async def internal_wait(latency):
             await asyncio.wait_for(event.wait(), timeout=(interval + latency) / 1000)
             event.clear()
@@ -244,7 +269,7 @@ class RPC:
                     await conn.close()
                     break
 
-    async def heartbeat(self, conn):
+    async def heartbeat(self, conn: WebSocketServerProtocol):
         """
         Handles the heartbeat from the React frontend
 
@@ -256,7 +281,7 @@ class RPC:
         """
         self.conn[conn.id - 1]["heartbeat"].set()
 
-    async def identify(self, conn, data: dict):
+    async def identify(self, conn: WebSocketServerProtocol, data: dict):
         """
         Identifies the React frontend's websocket
 
@@ -292,22 +317,22 @@ class RPC:
         # Create task to watch for heartbeat
         self.conn[conn.id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self.wait_for_hearbeat(conn))
 
-    async def new_shard(self, conn, data: dict):
+    async def new_shard(self, conn: WebSocketServerProtocol, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])] = data
         await self.send_hook("on_new_shard", conn, data)
         await self.log(f"New shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
         # Serve initial route
         await self.render_shard(conn, data)
 
-    async def render_shard(self, conn, data: dict):
+    async def render_shard(self, conn: WebSocketServerProtocol, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])]["route"] = data["route"]
         self.conn[conn.id - 1]["shards"][str(data["id"])]["last_render"] = data
         await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]),
-                                     "\n".join([scss_data.render() for scss_data in Design.USED_CLASSES]))
+                                     await self.get_css())
         await self.send_hook("on_render_shard", conn, data)
         await self.log(f"Rendered shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
 
-    async def update_shard_data(self, conn, shard_id, html: str, css: str = None):
+    async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str, css: str = None):
         await self.send(conn, {
             "type": "update_shard_data",
             "data": {
@@ -318,13 +343,20 @@ class RPC:
             "sequence": random.randint(1000, 9999),
         })
 
-    async def shard_event(self, conn, data: dict):
+    async def shard_event(self, conn: WebSocketServerProtocol, data: dict):
         pass
 
     async def get_route(self, route):
         return self.app._render(route=route)
 
-    async def update_all_routes(self, routes: list):
+    async def get_css(self):
+        if self.css_preprocessor is None:
+            # When no preprocessor, fallback to default
+            return "\n".join([scss_data.render() for scss_data in Design.USED_CLASSES])
+        else:
+            return (await self.css_preprocessor()).read_text()
+
+    async def hot_reload_routes(self, routes: list):
         # Re-render all RPC shards on those routes
         for connection in self.conn:
             for shard in connection["shards"].values():

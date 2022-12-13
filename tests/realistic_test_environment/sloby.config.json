@@ -1,0 +1,9 @@
+{
+  "name": "My Project",
+  "version": "1.0.0",
+  "description": "My Project",
+  "main": "main.py",
+  "components": "components/",
+  "runtime_tasks": [],
+  "preprocessor": "preprocessor.py"
+}

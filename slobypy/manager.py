@@ -1,5 +1,6 @@
 # Built-in
 import asyncio
+import json
 import sys
 import importlib.util
 import importlib.machinery
@@ -61,7 +62,10 @@ def generate(path: str, overwrite: bool = False):
     path.mkdir(parents=True, exist_ok=True)  # exist_ok mutes the error if the directory already exists
     (path / "components").mkdir(parents=True, exist_ok=True)
 
-    with open(path / "main.py", "w") as f:
+    with open(path / "sloby.config.json", "w") as f:
+        f.write(CONFIG)
+
+    with open(path / "app.py", "w") as f:
         f.write(MAIN_FILE)
 
     with open((path / "components") / "example_component.py", "w") as f:
@@ -69,13 +73,26 @@ def generate(path: str, overwrite: bool = False):
 
 
 @app.command()
-def run(file: str):
+def run(config: str = "sloby.config.json"):
     # Attempt to import the file using importlib
-    path = Path(file)
+    config_path = Path(config)
+
+    # Read config_path with json
+    with open(config_path, "r") as f:
+        config = json.load(f)
+
+    path = Path(config["main"])
+    runtime_tasks = config["runtime_tasks"]
+
+    preprocessor = None
+    if config.get("preprocessor", None) is not None:
+        if config["preprocessor"]:
+            preprocessor = import_file(Path(config["preprocessor"]))
+
     # Modules is used to keep track of ALL imported modules
     modules = {path.resolve: import_file(path)}
 
-    component_path = path.parent / "components"
+    component_path = path.parent / config["components"]
     component_paths = [component for component in component_path.iterdir() if component.suffix == ".py"]
 
     modules.update({component.resolve(): import_file(component) for component in component_paths})
@@ -85,7 +102,7 @@ def run(file: str):
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
-              event_loop=dash.event_loop, tasks=dash.tasks)
+              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor)
 
 
 class ModuleFinder(importlib.abc.MetaPathFinder):
@@ -155,7 +172,7 @@ class SloDash:
                             SlApp._components.remove(component)
                             routes.append(component["uri"])
 
-                await self.rpc.update_all_routes(routes)
+                await self.rpc.hot_reload_routes(routes)
 
     async def on_start(self, host, port):
         grid = Table.grid(padding=(0, 3))
