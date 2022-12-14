@@ -12,7 +12,7 @@ class MyComponent1(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P("new test maybe", className="bg-red-500 font-bold", onClick=self.on_click)
+        yield P("odd8", className="bg-green-600 font-bold", onClick=self.on_click)
         yield MyComponent2(props={"important_data": "Woah, this is a prop!"})
 
     def mount(self):

@@ -1,60 +1,35 @@
 import asyncio
-import subprocess
-import sys
-from asyncio import AbstractEventLoop
-from datetime import datetime
 from pathlib import Path
-from typing import Type
 
 css_process = None
 css_event = asyncio.Event()
 
 
-def init() -> dict:
+async def init() -> dict:
     global css_process
 
-    # css_process = await asyncio.create_subprocess_shell(
-    #     "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch",
-    #     stdout=asyncio.subprocess.PIPE,
-    #     stderr=asyncio.subprocess.PIPE,
-    # )
-
-    css_process = subprocess.Popen(
+    css_process = await asyncio.create_subprocess_shell(
         "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch",
-        stdout=subprocess.PIPE,
-        shell=True
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
 
     return {
         "process_css": process_css,
-        "tasks": [_read_css_stream]
+        "tasks": [_read_css_stream(css_process.stderr)]
     }
 
 
-def _read_css_stream():
-    global css_event
-    # while True:
-    #     print("waiting")
-    #     line = await stream.readline()
-    #     print("got line")
-    #     if line:
-    #         if line.startswith(b"Rebuilding..."):
-    #             css_event.clear()
-    #         elif line.startswith(b"Done in"):
-    #             css_event.set()
-    #     else:
-    #         break
-
-    line = ''
-    for data in iter(lambda: css_process.stderr.read(1), b""):
-        line += data.decode('utf-8')
-
-        if data.decode('utf-8') == '\n':
-            if line.startswith("Rebuilding..."):
+async def _read_css_stream(stream):
+    while True:
+        line = await stream.readline()
+        if line:
+            if line.startswith(b"Rebuilding..."):
                 css_event.clear()
-            elif line.startswith("Done in"):
+            elif line.startswith(b"Done in"):
                 css_event.set()
-            line = ''
+        else:
+            break
 
 
 async def process_css() -> Path:

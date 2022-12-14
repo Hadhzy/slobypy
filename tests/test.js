@@ -3,19 +3,28 @@
 
 var WebSocket = require('ws');
 var ws = new WebSocket('ws://localhost:8765');
+var fs = require('fs');
 
-// var express = require('express');
-//
-// var app = express();
-// app.use(express.static("demo_server_static"));
-//
-// app.get('/', function (req, res) {
-//     res.send('<link type="text/css" href="css/styles.css" rel="stylesheet">\n' + html);
-// });
+var express = require('express');
+var app = express();
+var expressWs = require('express-ws')(app);
 
+app.use(express.static("demo_server_static"));
+app.set('etag', false)
+
+app.get('/', function (req, res) {
+    res.send(css_link + js_link + html);
+});
+
+app.ws('/refresh', function (ws, req) {
+});
+
+var client_ws = expressWs.getWss('/refresh');
 let last_sequence = null;
 let html = '';
 let css = '';
+let css_link = "<link type=\"text/css\" href=\"css/style.css\" rel=\"stylesheet\">";
+let js_link = "<script src=\"js/script.js\"></script>";
 
 ws.on('open', async function open() {
     ws.send(JSON.stringify({
@@ -55,13 +64,18 @@ ws.on('message', async function (data, flags) {
     }
     if (message.type === "update_shard_data") {
         console.log("Update shard data");
-        html = message.data.html;
-    //    Store the css in a style.css file
+        html = message.data.html.replace("className", "class");
+        console.log(html);
+        //    Store the css in a style.css file
         css = message.data.css;
-        // fs.writeFile('demo_server_static/css/style.css', css, function (err) {
-        //     if (err) throw err;
-        //     console.log('CSS Saved!');
-        // });
+        fs.writeFile('demo_server_static/css/style.css', css, function (err) {
+            if (err) throw err;
+            console.log('CSS Saved!');
+        });
+        client_ws.clients.forEach(function (client) {
+            console.log("Sending refresh message");
+            client.send('refresh');
+        });
     }
     if (message.type === "heartbeat") {
         console.log("Sending heartbeat FORCE");
@@ -87,8 +101,8 @@ function heartbeat() {
     setTimeout(heartbeat, 4500);
 }
 
-// app.listen(8081, function () {
-//
-// console.log('Demo Sloby Web Application is UP on port 8081');
-//
-// });
+app.listen(port = 8081, function () {
+
+    console.log('Demo Sloby Web Application is UP on port', this.address().port);
+
+});

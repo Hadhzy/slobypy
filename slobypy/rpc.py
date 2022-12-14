@@ -1,5 +1,6 @@
 import random
 from asyncio import AbstractEventLoop
+from concurrent.futures import ThreadPoolExecutor
 
 from pathlib import Path
 from typing import Callable, Awaitable, Any, List, Coroutine, Type
@@ -51,6 +52,7 @@ class RPC:
             event_loop = asyncio.get_event_loop()
         self.event_loop = event_loop
         asyncio.set_event_loop(self.event_loop)
+        self.executor = ThreadPoolExecutor(max_workers=10)
         self.tasks = tasks
         self.external_tasks = external_tasks
         self.preprocessor = preprocessor
@@ -78,16 +80,13 @@ class RPC:
 
         preprocessor_tasks = []
         if self.preprocessor:
-            processors = await self.preprocessor.init(self.event_loop)
+            processors = await self.preprocessor.init()
             self.css_preprocessor = processors.get("process_css", None)
             preprocessor_tasks = processors.get("tasks", [])
-            # self.css_preprocessor = None
 
         futures = []
         for task in preprocessor_tasks:
-            await self.log("so")
-            futures.append(await asyncio.ensure_future(task))
-            await self.log("hm")
+            futures.append(asyncio.create_task(task))
 
         await asyncio.gather(*self.tasks, *futures, self.create_ws(self._handle_ws, host, port))
         pending = asyncio.all_tasks()

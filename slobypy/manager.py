@@ -90,16 +90,18 @@ def run(config: str = "sloby.config.json") -> None:
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
     component_path = path.parent / config["components"]
-    component_paths = [component for component in component_path.iterdir() if component.suffix == ".py"]  # get python files
+    component_paths = [component for component in component_path.iterdir() if
+                       component.suffix == ".py"]  # get python files
 
-    modules.update({component.resolve(): import_file(component) for component in component_paths})  # execute components files
+    modules.update(
+        {component.resolve(): import_file(component) for component in component_paths})  # execute components files
 
     # Attempt to run the app
     dash = SloDash(modules, path.parent)
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
-              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=None)
+              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor)
 
 
 class ModuleFinder(importlib.abc.MetaPathFinder):
@@ -148,28 +150,29 @@ class SloDash:
             for change in changes:
                 path = Path(change[1])
                 routes = []
-                if change[0]._value_ == 1:  # Added
-                    self.modules.update({path.resolve(): import_file(path)})
-                    routes = [component["uri"] for component in SlApp._components if component["source_path"] == path]
-                elif change[0]._value_ == 2:  # Modified
-                    if path.suffix == ".py":
-                        for component in SlApp._components:
-                            if component["source_path"] == path:
+                if path.suffix == ".py":
+                    if change[0]._value_ == 1:  # Added
+                        self.modules.update({path.resolve(): import_file(path)})
+                        routes = [component["uri"] for component in SlApp._components if
+                                  component["source_path"] == path]
+                    elif change[0]._value_ == 2:  # Modified
+                        for component in SlApp._components.copy():
+                            if str(component["source_path"].resolve()) == str(path.resolve()):
                                 SlApp._components.remove(component)
                                 routes.append(component["uri"])
 
                         # Reload the module
                         module = self.modules[path.resolve()]
                         self.modules[path.resolve()] = reload(module)
-                else:
-                    # Deleted
-                    del self.modules[path.resolve()]
-                    for component in SlApp._components:
-                        if component["source_path"] == path:
-                            SlApp._components.remove(component)
-                            routes.append(component["uri"])
+                    else:
+                        # Deleted
+                        del self.modules[path.resolve()]
+                        for component in SlApp._components:
+                            if component["source_path"] == path:
+                                SlApp._components.remove(component)
+                                routes.append(component["uri"])
 
-                await self.rpc.hot_reload_routes(routes)
+                    await self.rpc.hot_reload_routes(routes)
 
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
