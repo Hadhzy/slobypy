@@ -5,14 +5,14 @@ css_process = None
 css_event = asyncio.Event()
 
 
-async def init(rpc) -> dict:
+async def init(rpc, cwd) -> dict:
     global css_process
 
     await rpc.log("Starting CSS watcher...")
     await rpc.log("Installing TailwindCSS...")
     # ENSURE that tailwindcss is installed, or else it blocks the program
     await asyncio.create_subprocess_shell("npm install tailwindcss", stdout=asyncio.subprocess.PIPE,
-                                          stderr=asyncio.subprocess.PIPE)
+                                          stderr=asyncio.subprocess.PIPE, cwd=cwd.resolve())
     await rpc.log("Installation complete!")
 
     css_process = await asyncio.create_subprocess_shell(
