@@ -80,7 +80,7 @@ class RPC:
 
         preprocessor_tasks = []
         if self.preprocessor:
-            processors = await self.preprocessor.init()
+            processors = await self.preprocessor.init(self)
             self.css_preprocessor = processors.get("process_css", None)
             preprocessor_tasks = processors.get("tasks", [])
 
