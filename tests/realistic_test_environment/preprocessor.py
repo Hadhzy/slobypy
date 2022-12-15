@@ -11,7 +11,7 @@ async def init(rpc) -> dict:
     await rpc.log("Starting CSS watcher...")
     await rpc.log("Installing TailwindCSS...")
     # ENSURE that tailwindcss is installed, or else it blocks the program
-    await asyncio.create_subprocess_shell("npm install -g tailwindcss", stdout=asyncio.subprocess.PIPE,
+    await asyncio.create_subprocess_shell("npm install tailwindcss", stdout=asyncio.subprocess.PIPE,
                                           stderr=asyncio.subprocess.PIPE)
     await rpc.log("Installation complete!")
 
