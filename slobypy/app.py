@@ -91,7 +91,7 @@ class SlApp:
         ### Returns
         - None
         """
-        cls.rpc = RPC(cls, *args, **kwargs)  # create sockets(slobypy communication)
+        cls.rpc = RPC(cls, *args, **kwargs)
 
     def _check_props(self):
         pass
