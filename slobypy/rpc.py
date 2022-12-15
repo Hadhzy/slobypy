@@ -38,7 +38,8 @@ class RPC:
                  event_loop: AbstractEventLoop = None,
                  tasks: List[Coroutine] = None,
                  external_tasks: List[str] = None,
-                 preprocessor=None):
+                 preprocessor=None,
+                 cwd: Path = None, ):
         self.css_preprocessor: Callable[[], Awaitable[Path]] = None
 
         if tasks is None:
@@ -56,6 +57,7 @@ class RPC:
         self.tasks = tasks
         self.external_tasks = external_tasks
         self.preprocessor = preprocessor
+        self.cwd = cwd
 
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
@@ -80,7 +82,7 @@ class RPC:
 
         preprocessor_tasks = []
         if self.preprocessor:
-            processors = await self.preprocessor.init(self)
+            processors = await self.preprocessor.init(self, self.cwd)
             self.css_preprocessor = processors.get("process_css", None)
             preprocessor_tasks = processors.get("tasks", [])
 
