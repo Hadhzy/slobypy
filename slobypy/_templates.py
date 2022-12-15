@@ -58,6 +58,7 @@ CONFIG = """\
   "description": "My Project",
   "main": "app.py",
   "components": "components/",
+  "scss": "scss/",
   "runtime_tasks": [],
   "processed_css": "",
   "processed_js": ""

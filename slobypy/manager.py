@@ -90,6 +90,7 @@ def run(config: str = "sloby.config.json") -> None:
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
     component_path = path.parent / config["components"]
+    scss_path = path.parent / config["scss"]
     component_paths = [component for component in component_path.iterdir() if
                        component.suffix == ".py"]  # get python files
 
