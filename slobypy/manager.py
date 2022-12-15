@@ -97,7 +97,7 @@ def run(config: str = "sloby.config.json") -> None:
         {component.resolve(): import_file(component) for component in component_paths})  # execute components files
 
     # Attempt to run the app
-    dash = SloDash(modules, path.parent)
+    dash = SloDash(modules, component_path)
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
@@ -196,5 +196,9 @@ class SloDash:
         console.print("Waiting for connection from Sloby...\n", style="yellow")
 
 
-if __name__ == "__main__":
+def start_typer():
     app()
+
+
+if __name__ == "__main__":
+    start_typer()

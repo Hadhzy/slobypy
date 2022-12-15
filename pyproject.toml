@@ -19,3 +19,6 @@ watchfiles = "^0.18.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry.scripts]
+slobypy = "slobypy.manager:start_typer"
+
