@@ -32,7 +32,7 @@ console = Console()
 
 
 @app.command()
-def generate(path: str, overwrite: bool = False):
+def generate(path: str, preprocessor: bool = False, overwrite: bool = False):
     # Used to generate a new project
     path = Path(path)
     # Check if path is empty
@@ -48,7 +48,9 @@ def generate(path: str, overwrite: bool = False):
     # Create directories if they don't exist
     path.mkdir(parents=True, exist_ok=True)  # exist_ok mutes the error if the directory already exists
     (path / "components").mkdir(parents=True, exist_ok=True)
+    (path / "scss").mkdir(parents=True, exist_ok=True)
 
+    #Todo: handle preprocessor
     with open(path / "sloby.config.json", "w") as f:
         f.write(CONFIG)
 
@@ -89,16 +91,15 @@ def run(config: str = "sloby.config.json") -> None:
     # Modules are used to keep track of ALL imported modules
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
-    component_path = path.parent / config["components"]
-    scss_path = path.parent / config["scss"]
-    component_paths = [component for component in component_path.iterdir() if
+    path = path.parent  # the root folder
+    component_paths = [component for component in path.iterdir() if
                        component.suffix == ".py"]  # get python files
 
     modules.update(
         {component.resolve(): import_file(component) for component in component_paths})  # execute components files
 
     # Attempt to run the app
-    dash = SloDash(modules, component_path)
+    dash = SloDash(modules, path)
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
@@ -133,11 +134,13 @@ def import_file(path: Path):
 
 
 class SloDash:
-    def __init__(self, modules, source_path):
+    def __init__(self, modules, path):
         self.rpc: RPC = SlApp.rpc  # Will be `None` until RPC started
         self.modules = modules
-        self.source_path = source_path
-        self.tasks = [self.watch_files(self.source_path)]
+
+        self.path = path
+
+        self.tasks = [self.watch_files(self.path)]
         self.event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.event_loop)
 
@@ -145,6 +148,7 @@ class SloDash:
 
     # noinspection PyProtectedMember
     async def watch_files(self, path: Path):
+
         # Watch the files for changes
         console.log(f"Watching files at {str(path.resolve())}...")
         async for changes in awatch(str(path.resolve())):
