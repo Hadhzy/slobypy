@@ -84,20 +84,21 @@ def run(config: str = "sloby.config.json") -> None:
     preprocessor = None
     if config.get("preprocessor", None) is not None:
         if config["preprocessor"]:
-            preprocessor = import_file(Path(config["preprocessor"]))
+            preprocessor = import_file(Path(config["preprocessor"]))  # execute the preprocessor
 
     # Modules are used to keep track of ALL imported modules
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
-    component_path = path.parent / config["components"]
+    component_path = path.parent / config["components"]  # get the user root folder
+
     component_paths = [component for component in component_path.iterdir() if
-                       component.suffix == ".py"]  # get python files
+                       component.suffix == ".py"]  # get component_python files
 
     modules.update(
-        {component.resolve(): import_file(component) for component in component_paths})  # execute components files
+        {component.resolve(): import_file(component) for component in component_paths})  # execute component_python files
 
     # Attempt to run the app
-    dash = SloDash(modules, component_path)
+    dash = SloDash(modules, component_path)  # call the SloDash
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
@@ -124,7 +125,7 @@ def import_file(path: Path):
         module = importlib.util.module_from_spec(spec)
         sys.meta_path.append(ModuleFinder({path.stem: str(path.resolve())}))
         sys.modules[path.stem] = module
-        spec.loader.exec_module(module)
+        spec.loader.exec_module(module)  # execute the module
         return module
     except AttributeError:
         typer.echo("File not found")
@@ -136,11 +137,11 @@ class SloDash:
         self.rpc: RPC = SlApp.rpc  # Will be `None` until RPC started
         self.modules = modules
         self.source_path = source_path
-        self.tasks = [self.watch_files(self.source_path)]
-        self.event_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.event_loop)
+        self.tasks = [self.watch_files(self.source_path)]  # call the file watcher with source_path
+        self.event_loop = asyncio.new_event_loop()  # create asyncio event loop
+        asyncio.set_event_loop(self.event_loop)  # set the event loop
 
-        console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
+        console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")  # SlobyPy CLI title
 
     # noinspection PyProtectedMember
     async def watch_files(self, path: Path):
@@ -196,7 +197,7 @@ class SloDash:
         console.print("Waiting for connection from Sloby...\n", style="yellow")
 
 
-def start_typer():
+def start_typer():  # call the typer app in this file
     app()
 
 

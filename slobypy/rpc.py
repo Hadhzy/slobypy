@@ -39,23 +39,24 @@ class RPC:
                  tasks: List[Coroutine] = None,
                  external_tasks: List[str] = None,
                  preprocessor=None):
-        self.css_preprocessor: Callable[[], Awaitable[Path]] = None
+        self.css_preprocessor: Callable[[], Awaitable[Path]] = None  # process_css(in preprocessor.py)
 
-        if tasks is None:
-            tasks = []
-        if hooks is None:
-            hooks = []
+        tasks = tasks or []
+        hooks = hooks or []
+
         self.app = app
         self.hooks = hooks
         self.console = console
+
         if event_loop is None:
             event_loop = asyncio.get_event_loop()
         self.event_loop = event_loop
         asyncio.set_event_loop(self.event_loop)
+
         self.executor = ThreadPoolExecutor(max_workers=10)
         self.tasks = tasks
         self.external_tasks = external_tasks
-        self.preprocessor = preprocessor
+        self.preprocessor = preprocessor  # preprocessor module
 
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
@@ -79,9 +80,10 @@ class RPC:
             await asyncio.create_subprocess_shell(*self.external_tasks)
 
         preprocessor_tasks = []
+
         if self.preprocessor:
-            processors = await self.preprocessor.init(self)
-            self.css_preprocessor = processors.get("process_css", None)
+            processors = await self.preprocessor.init(self)  # process_css & tasks
+            self.css_preprocessor = processors.get("process_css", None)  # set the css_processor value
             preprocessor_tasks = processors.get("tasks", [])
 
         futures = []
