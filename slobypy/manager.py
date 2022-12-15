@@ -101,7 +101,7 @@ def run(config: str = "sloby.config.json") -> None:
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
-              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor)
+              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor, cwd=path.parent)
 
 
 class ModuleFinder(importlib.abc.MetaPathFinder):
