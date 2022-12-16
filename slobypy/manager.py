@@ -92,7 +92,7 @@ def run(config: str = "sloby.config.json") -> None:
     # Modules are used to keep track of ALL imported modules
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
-    path = path.parent / "components"  # the root folder
+    path = path.parent   # the root folder
     component_paths = [component for component in path.iterdir() if
                        component.suffix == ".py"]  # get python files
 
@@ -141,7 +141,7 @@ class SloDash:
 
         self.path = path
 
-        self.tasks = [self.watch_component_folder(self.path)]
+        self.tasks = [self.watch_component_folder(self.path / "components"), self.watch_scss_folder(self.path / "scss")]
         self.event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.event_loop)
 
@@ -181,6 +181,22 @@ class SloDash:
 
                     await self.rpc.hot_reload_routes(routes)
 
+    # noinspection PyProtectedMember
+    async def watch_scss_folder(self, path: Path):
+        console.log(f"Watching files at {str(path.resolve())}...")
+        async for changes in awatch(str(path.resolve())):
+            for change in changes:
+                if path.suffix == ".py":
+                    if change[0]._value_ == 1:  # Added
+                        self.modules.update({path.resolve(): import_file(path)})
+                    if change[0]._value_ == 2:  # Modified
+                        self.modules.update({path.resolve(): import_file(path)})
+
+                    if change[0]._value_ == 3:  # Deleted
+                        self.modules.update({path.resolve(): import_file(path)})
+
+                module = self.modules[path.resolve()]
+                self.modules[path.resolve()] = reload(module)
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
         grid = Table.grid(padding=(0, 3))
