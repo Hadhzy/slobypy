@@ -32,7 +32,7 @@ console = Console()
 
 
 @app.command()
-def generate(path: str, preprocessor: bool = False, overwrite: bool = False):
+def generate(path: str, overwrite: bool = False):
     # Used to generate a new project
     path = Path(path)
     # Check if path is empty
@@ -86,12 +86,13 @@ def run(config: str = "sloby.config.json") -> None:
     preprocessor = None
     if config.get("preprocessor", None) is not None:
         if config["preprocessor"]:
+            print("preprocess is alive")
             preprocessor = import_file(Path(config["preprocessor"]))
 
     # Modules are used to keep track of ALL imported modules
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
-    path = path.parent  # the root folder
+    path = path.parent / "components"  # the root folder
     component_paths = [component for component in path.iterdir() if
                        component.suffix == ".py"]  # get python files
 
@@ -140,16 +141,17 @@ class SloDash:
 
         self.path = path
 
-        self.tasks = [self.watch_files(self.path)]
+        self.tasks = [self.watch_component_folder(self.path)]
         self.event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.event_loop)
 
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
     # noinspection PyProtectedMember
-    async def watch_files(self, path: Path):
+    async def watch_component_folder(self, path: Path):
 
-        # Watch the files for changes
+        # Watch the files for change
+
         console.log(f"Watching files at {str(path.resolve())}...")
         async for changes in awatch(str(path.resolve())):
             for change in changes:
