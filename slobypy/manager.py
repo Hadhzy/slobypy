@@ -50,7 +50,7 @@ def generate(path: str, overwrite: bool = False):
     (path / "components").mkdir(parents=True, exist_ok=True)
     (path / "scss").mkdir(parents=True, exist_ok=True)
 
-    #Todo: handle preprocessor
+    # Todo: handle preprocessor
     with open(path / "sloby.config.json", "w") as f:
         f.write(CONFIG)
 
@@ -104,7 +104,8 @@ def run(config: str = "sloby.config.json") -> None:
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
-              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor, cwd=path.parent)
+              event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor,
+              cwd=path.parent)
 
 
 class ModuleFinder(importlib.abc.MetaPathFinder):
@@ -142,72 +143,68 @@ class SloDash:
 
         self.path = path
 
-        self.tasks = [self.watch_component_folder(self.path / "components"), self.watch_scss_folder(self.path / "scss")]  # asyncio tasks
+        self.watch_callbacks = [
+            {
+                "added": self.watch_component_added,
+                "modified": self.watch_component_modified,
+                "removed": self.watch_component_modified
+            }
+        ]
+
+        self.tasks = [self.watch_root(path)]  # asyncio tasks
         self.event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.event_loop)
 
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
     # noinspection PyProtectedMember
-    async def watch_component_folder(self, path: Path):
 
-        # Watch the files for change
+    async def watch_component_added(self, path: Path):
+        if (self.path / 'components').resolve() in path.parents:
+            return [component["uri"] for component in SlApp._components if
+                    component["source_path"] == path]
+        return []
 
-        console.log(f"Watching files at {str(path.resolve())}...")
+    async def watch_component_modified(self, path: Path):
+        routes = []
+        if (self.path / 'components').resolve() in path.parents:
+            for component in SlApp._components.copy():
+                if str(component["source_path"].resolve()) == str(path.resolve()):
+                    SlApp._components.remove(component)
+                    routes.append(component["uri"])
+
+        return routes
+
+    @staticmethod
+    async def empty_list_callback(*args, **kwargs):
+        return []
+
+    async def watch_root(self, path):
+        console.log(f"Watching {str(path.resolve())} for changes")
         async for changes in awatch(str(path.resolve())):
             for change in changes:
                 path = Path(change[1])
-                self.routes = []
+                routes = []
                 if path.suffix == ".py":
                     if change[0]._value_ == 1:  # Added
-                        print("component added")
                         self.modules.update({path.resolve(): import_file(path)})
-                        self.routes = [component["uri"] for component in SlApp._components if
-                                  component["source_path"] == path]
+
+                        for callback in self.watch_callbacks:
+                            routes.extend(await (callback.get("added", self.empty_list_callback))(path))
                     elif change[0]._value_ == 2:  # Modified
-                        print("component modified")
-                        for component in SlApp._components.copy():
-                            if str(component["source_path"].resolve()) == str(path.resolve()):
-                                SlApp._components.remove(component)
-                                self.routes.append(component["uri"])
+                        for callback in self.watch_callbacks:
+                            routes.extend(await (callback.get("modified", self.empty_list_callback))(path))
 
                         # Reload the module
                         module = self.modules[path.resolve()]
                         self.modules[path.resolve()] = reload(module)
                     else:
                         # Deleted
-                        print("component deleted")
+                        for callback in self.watch_callbacks:
+                            routes.extend(await (callback.get("deleted", self.empty_list_callback))(path))
                         del self.modules[path.resolve()]
-                        for component in SlApp._components:
-                            if component["source_path"] == path:
-                                SlApp._components.remove(component)
-                                self.routes.append(component["uri"])
 
-                    await self.rpc.hot_reload_routes(self.routes)
-
-    # noinspection PyProtectedMember
-    async def watch_scss_folder(self, path: Path):
-        console.log(f"Watching files at {str(path.resolve())}...")
-        async for changes in awatch(str(path.resolve())):
-            print("after changes")
-            for change in changes:
-                print("after change")
-                path = Path(change[1])
-                if path.suffix == ".py":
-                    print("scss change", change)
-                    if change[0]._value_ == 1:  # Added
-                        print("scss added")
-                        self.modules.update({path.resolve(): import_file(path)})
-                    elif change[0]._value_ == 2:  # Modified
-                        print("scss modified")
-                        module = self.modules[path.resolve()]
-                        self.modules[path.resolve()] = reload(module)
-                        print("after scss modified")
-                    else:  # Deleted
-                        print("scss deleted")
-                        self.modules.upddate({path.resolve(): import_file(path)})
-
-                        await self.rpc.hot_reload_routes(routes=self.routes)
+                    await self.rpc.hot_reload_routes(routes)
 
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
