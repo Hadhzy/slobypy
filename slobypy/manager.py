@@ -92,15 +92,15 @@ def run(config: str = "sloby.config.json") -> None:
     # Modules are used to keep track of ALL imported modules
     modules = {path.resolve: import_file(path)}  # execute the main.py
 
-    path = path.parent   # the root folder
-    component_paths = [component for component in path.iterdir() if
-                       component.suffix == ".py"]  # get python files
+    component_base_path = Path(config["components"])  # the component folder
+    component_paths = [component for component in component_base_path.iterdir() if
+                       component.suffix == ".py"]  # get python files(inside components)
 
     modules.update(
         {component.resolve(): import_file(component) for component in component_paths})  # execute components files
 
     # Attempt to run the app
-    dash = SloDash(modules, path)
+    dash = SloDash(modules, config_path.parent)  # root folder(config parent)
 
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
@@ -136,12 +136,13 @@ def import_file(path: Path):
 
 class SloDash:
     def __init__(self, modules, path):
+        self.routes = None
         self.rpc: RPC = SlApp.rpc  # Will be `None` until RPC started
         self.modules = modules
 
         self.path = path
 
-        self.tasks = [self.watch_component_folder(self.path / "components"), self.watch_scss_folder(self.path / "scss")]
+        self.tasks = [self.watch_component_folder(self.path / "components"), self.watch_scss_folder(self.path / "scss")]  # asyncio tasks
         self.event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.event_loop)
 
@@ -156,47 +157,58 @@ class SloDash:
         async for changes in awatch(str(path.resolve())):
             for change in changes:
                 path = Path(change[1])
-                routes = []
+                self.routes = []
                 if path.suffix == ".py":
                     if change[0]._value_ == 1:  # Added
+                        print("component added")
                         self.modules.update({path.resolve(): import_file(path)})
-                        routes = [component["uri"] for component in SlApp._components if
+                        self.routes = [component["uri"] for component in SlApp._components if
                                   component["source_path"] == path]
                     elif change[0]._value_ == 2:  # Modified
+                        print("component modified")
                         for component in SlApp._components.copy():
                             if str(component["source_path"].resolve()) == str(path.resolve()):
                                 SlApp._components.remove(component)
-                                routes.append(component["uri"])
+                                self.routes.append(component["uri"])
 
                         # Reload the module
                         module = self.modules[path.resolve()]
                         self.modules[path.resolve()] = reload(module)
                     else:
                         # Deleted
+                        print("component deleted")
                         del self.modules[path.resolve()]
                         for component in SlApp._components:
                             if component["source_path"] == path:
                                 SlApp._components.remove(component)
-                                routes.append(component["uri"])
+                                self.routes.append(component["uri"])
 
-                    await self.rpc.hot_reload_routes(routes)
+                    await self.rpc.hot_reload_routes(self.routes)
 
     # noinspection PyProtectedMember
     async def watch_scss_folder(self, path: Path):
         console.log(f"Watching files at {str(path.resolve())}...")
         async for changes in awatch(str(path.resolve())):
+            print("after changes")
             for change in changes:
+                print("after change")
+                path = Path(change[1])
                 if path.suffix == ".py":
+                    print("scss change", change)
                     if change[0]._value_ == 1:  # Added
+                        print("scss added")
                         self.modules.update({path.resolve(): import_file(path)})
-                    if change[0]._value_ == 2:  # Modified
-                        self.modules.update({path.resolve(): import_file(path)})
+                    elif change[0]._value_ == 2:  # Modified
+                        print("scss modified")
+                        module = self.modules[path.resolve()]
+                        self.modules[path.resolve()] = reload(module)
+                        print("after scss modified")
+                    else:  # Deleted
+                        print("scss deleted")
+                        self.modules.upddate({path.resolve(): import_file(path)})
 
-                    if change[0]._value_ == 3:  # Deleted
-                        self.modules.update({path.resolve(): import_file(path)})
+                        await self.rpc.hot_reload_routes(routes=self.routes)
 
-                module = self.modules[path.resolve()]
-                self.modules[path.resolve()] = reload(module)
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
         grid = Table.grid(padding=(0, 3))

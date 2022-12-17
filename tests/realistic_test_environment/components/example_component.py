@@ -3,8 +3,8 @@ from slobypy.react import *
 
 my_test_scss_class = SCSSClass(
     register=True,
-    name="test1",
-    color="green",
+    name="test2",
+    color="blue",
 ).child(SCSSClass(
     name="test1",
     color="blue"
@@ -21,7 +21,7 @@ class MyComponent1(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P("test2", className="test1", onClick=self.on_click)
+        yield P("test2", className="localtest", onClick=self.on_click)
         yield MyComponent2(props={"important_data": "Woah1, this is a prop!"})
 
     def mount(self):

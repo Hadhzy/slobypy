@@ -357,8 +357,9 @@ class RPC:
         else:
             return (await self.css_preprocessor()).read_text()
 
-    async def hot_reload_routes(self, routes: list):
+    async def hot_reload_routes(self, routes: list = None):
         # Re-render all RPC shards on those routes
+        routes = routes or []
         for connection in self.conn:
             for shard in connection["shards"].values():
                 if shard["route"] in list(set(routes)):
