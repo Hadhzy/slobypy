@@ -3,11 +3,11 @@ from slobypy.react.scss_classes import SCSSClass
 
 
 class Design:
-    _REGISTERED_CLASSES: list[SCSSClass] = []
-    USED_CLASSES: list[SCSSClass] = []  # Used scss class and scss group
+    _REGISTERED_CLASSES: list[dict[str, str | SCSSClass]] = []
+    USED_CLASSES: list[dict[str, str | SCSSClass]] = []  # Used scss class and scss group
 
     @classmethod
-    def register(cls, scss_class: list[SCSSClass] | SCSSClass):
+    def register(cls, scss_class: list[SCSSClass] | SCSSClass, source_path):
         """
         This method is used to register the scss class.
 
@@ -17,15 +17,16 @@ class Design:
         ### Returns
         - None
         """
+
         if isinstance(scss_class, list):
             for scss_class_item in scss_class:
-                cls._REGISTERED_CLASSES.append(scss_class_item)
+                cls._REGISTERED_CLASSES.append({"scss_class": scss_class_item, "source_path": source_path})
 
         if isinstance(scss_class, SCSSClass):
             if scss_class not in cls._REGISTERED_CLASSES:
-                cls._REGISTERED_CLASSES.append(scss_class)
+                cls._REGISTERED_CLASSES.append({"scss_class": scss_class, "source_path": source_path})
 
     @classmethod
-    def get_registered_classes(cls) -> list[SCSSClass]:
+    def get_registered_classes(cls) -> list[dict[str, str | SCSSClass]]:
         """Get the currently registered classes."""
         return cls._REGISTERED_CLASSES

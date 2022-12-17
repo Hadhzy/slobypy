@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+# Third-Party
+import inspect
+
 # Built-in
 from typing import Generator, Type, Self
 
@@ -20,7 +23,7 @@ class SCSSClass:
         self.register = False  # Register the parent
 
         if register:  # register it automatically
-            react.Design.register(self)
+            react.Design.register(self, inspect.stack()[1].filename)
             self.register = True
 
         self.properties = kwargs

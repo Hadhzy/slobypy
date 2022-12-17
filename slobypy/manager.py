@@ -19,6 +19,7 @@ from watchfiles import awatch
 
 # This project
 from slobypy.app import SlApp
+from slobypy.react.design import Design
 from slobypy.rpc import RPC
 from slobypy._templates import *
 
@@ -148,6 +149,11 @@ class SloDash:
                 "added": self.watch_component_added,
                 "modified": self.watch_component_modified,
                 "removed": self.watch_component_modified
+            },
+            {
+                "added": self.watch_scss_added,
+                "modified": self.watch_scss_modified,
+                "removed": self.watch_scss_modified
             }
         ]
 
@@ -158,13 +164,26 @@ class SloDash:
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
     # noinspection PyProtectedMember
+    async def watch_scss_added(self, path: Path):
 
+        if (self.path / 'scss').resolve() in path.parents:
+            return [scss_class["source_path"] for scss_class in Design.get_registered_classes() if scss_class["source_path"] == path]
+
+    # noinspection PyProtectedMember
+    async def watch_scss_modified(self, path: Path):
+        if (self.path / "scss").resolve() in path.parents:
+            for scss_class in Design.get_registered_classes():
+                if scss_class["source_path"] == path:
+                    Design._REGISTERED_CLASSES.remove(scss_class)
+
+    # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path):
         if (self.path / 'components').resolve() in path.parents:
             return [component["uri"] for component in SlApp._components if
                     component["source_path"] == path]
         return []
 
+    # noinspection PyProtectedMember
     async def watch_component_modified(self, path: Path):
         routes = []
         if (self.path / 'components').resolve() in path.parents:
@@ -179,6 +198,7 @@ class SloDash:
     async def empty_list_callback(*args, **kwargs):
         return []
 
+    # noinspection PyProtectedMember
     async def watch_root(self, path):
         console.log(f"Watching {str(path.resolve())} for changes")
         async for changes in awatch(str(path.resolve())):
@@ -188,10 +208,11 @@ class SloDash:
                 if path.suffix == ".py":
                     if change[0]._value_ == 1:  # Added
                         self.modules.update({path.resolve(): import_file(path)})
-
+                        print("added")
                         for callback in self.watch_callbacks:
                             routes.extend(await (callback.get("added", self.empty_list_callback))(path))
                     elif change[0]._value_ == 2:  # Modified
+                        print("modified")
                         for callback in self.watch_callbacks:
                             routes.extend(await (callback.get("modified", self.empty_list_callback))(path))
 
@@ -201,7 +222,7 @@ class SloDash:
                     else:
                         # Deleted
                         for callback in self.watch_callbacks:
-                            routes.extend(await (callback.get("deleted", self.empty_list_callback))(path))
+                            routes.extend(await (callback.get("removed", self.empty_list_callback))(path))
                         del self.modules[path.resolve()]
 
                     await self.rpc.hot_reload_routes(routes)
