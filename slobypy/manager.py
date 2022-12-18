@@ -87,7 +87,6 @@ def run(config: str = "sloby.config.json") -> None:
     preprocessor = None
     if config.get("preprocessor", None) is not None:
         if config["preprocessor"]:
-            print("preprocess is alive")
             preprocessor = import_file(Path(config["preprocessor"]))
 
     # Modules are used to keep track of ALL imported modules
@@ -172,7 +171,7 @@ class SloDash:
     async def watch_scss_added(self, path: Path):
 
         if (self.path / 'scss').resolve() in path.parents:
-            return [scss_class["source_path"] for scss_class in Design.get_registered_classes() if scss_class["source_path"] == path]
+            return await self.rpc.reload_all_css()
 
     # noinspection PyProtectedMember
     async def watch_scss_modified(self, path: Path):
@@ -181,7 +180,8 @@ class SloDash:
                 if scss_class["source_path"] == path:
                     Design._REGISTERED_CLASSES.remove(scss_class)
 
-        return []
+        return await self.rpc.reload_all_css()
+
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path):
         if (self.path / 'components').resolve() in path.parents:
@@ -214,13 +214,10 @@ class SloDash:
                 if path.suffix == ".py":
                     if change[0]._value_ == 1:  # Added
                         self.modules.update({path.resolve(): import_file(path)})
-                        print("added")
                         for callback in self.watch_callbacks:
                             routes.extend(await (callback.get("added", self.empty_list_callback))(path))
                     elif change[0]._value_ == 2:  # Modified
-                        print("modified")
                         for callback in self.watch_callbacks:
-                            print(callback)
                             routes.extend(await (callback.get("modified", self.empty_list_callback))(path))
 
                         # Reload the module

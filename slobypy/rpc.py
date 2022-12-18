@@ -201,8 +201,8 @@ class RPC:
         except websockets.exceptions.ConnectionClosedError:
             await self.send_hook("on_disconnect", conn)
             try:
-                conn_id = conn.id
-                self.conn[conn.id - 1]["_internal_heartbeat"].cancel()
+                conn_id = conn._sloby_id
+                self.conn[conn._sloby_id - 1]["_internal_heartbeat"].cancel()
             except AttributeError:
                 conn_id = "Unknown"
             await self.warn(f"Lost Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn_id}")
@@ -224,7 +224,7 @@ class RPC:
         elif data["type"] == "new_shard":
             await self.new_shard(conn, data["data"])
         elif data["type"] == "remove_shard":
-            self.conn[conn.id - 1]["shards"].pop(str(data["data"]["id"]))
+            self.conn[conn._sloby_id - 1]["shards"].pop(str(data["data"]["id"]))
         elif data["type"] == "shard_event":
             await self.shard_event(conn, data["data"])
         elif data["type"] == "get_route":
@@ -252,8 +252,8 @@ class RPC:
                 "sequence": None,
             })
 
-        event = self.conn[conn.id - 1]["heartbeat"]
-        interval = self.conn[conn.id - 1]["heartbeat_interval"]
+        event = self.conn[conn._sloby_id - 1]["heartbeat"]
+        interval = self.conn[conn._sloby_id - 1]["heartbeat_interval"]
 
         while True:
             try:
@@ -280,7 +280,7 @@ class RPC:
         ### Returns
         - None
         """
-        self.conn[conn.id - 1]["heartbeat"].set()
+        self.conn[conn._sloby_id - 1]["heartbeat"].set()
 
     async def identify(self, conn: WebSocketServerProtocol, data: dict):
         """
@@ -292,7 +292,8 @@ class RPC:
         ### Returns
         - None
         """
-        conn.id = data["id"]
+        conn._sloby_id = data["id"]
+        conn._sloby_loaded_initial_css = False
 
         self.conn.append({
             "id": data["id"],  # Integer used to identify the connection, is used if a connection is lost,
@@ -306,7 +307,7 @@ class RPC:
 
         await self.send_hook("on_identify", conn, data)
         await self.log(
-            f"Identified Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn.id}, "
+            f"Identified Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn._sloby_id}, "
             f"client: [cyan]{data['client']}[/cyan], max_shards: {data['max_shards']}")
 
         await self.send(conn, {
@@ -316,21 +317,23 @@ class RPC:
         })
 
         # Create task to watch for heartbeat
-        self.conn[conn.id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self.wait_for_hearbeat(conn))
+        self.conn[conn._sloby_id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self.wait_for_hearbeat(conn))
 
     async def new_shard(self, conn: WebSocketServerProtocol, data: dict):
-        self.conn[conn.id - 1]["shards"][str(data["id"])] = data
+        self.conn[conn._sloby_id - 1]["shards"][str(data["id"])] = data
         await self.send_hook("on_new_shard", conn, data)
-        await self.log(f"New shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
+        await self.log(f"New shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']}")
         # Serve initial route
+        if conn._sloby_loaded_initial_css:
+            await self.reload_css(conn)
         await self.render_shard(conn, data)
 
     async def render_shard(self, conn: WebSocketServerProtocol, data: dict):
-        self.conn[conn.id - 1]["shards"][str(data["id"])]["route"] = data["route"]
-        self.conn[conn.id - 1]["shards"][str(data["id"])]["last_render"] = data
+        self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["route"] = data["route"]
+        self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["last_render"] = data
         await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]))
         await self.send_hook("on_render_shard", conn, data)
-        await self.log(f"Rendered shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
+        await self.log(f"Rendered shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']}")
 
     async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str):
         await self.send(conn, {
@@ -345,16 +348,20 @@ class RPC:
     async def shard_event(self, conn: WebSocketServerProtocol, data: dict):
         pass
 
-
     async def get_route(self, route):
         return self.app._render(route=route)
 
-    async def reload_css(self, conn, shard_id):
+    async def reload_all_css(self):
+        for connection in self.conn:
+            await self.reload_css(connection["conn"])
+
+        return []
+    
+    async def reload_css(self, conn: WebSocketServerProtocol):
         await self.send(conn, {
             "type": "reload_css",
             "data": {
-                "id": shard_id,
-                 "css": await self.get_css(),
+                "css": await self.get_css(),
             },
             "sequence": random.randint(1000, 9999),
         })
@@ -374,6 +381,7 @@ class RPC:
                 if shard["route"] in list(set(routes)):
                     # Replay last-render (same route)
                     await self.render_shard(connection["conn"], shard["last_render"])
+
 
 @dataclass
 class Event:

@@ -67,6 +67,18 @@ ws.on('message', async function (data, flags) {
         html = message.data.html.replace("className", "class");
         console.log(html);
         //    Store the css in a style.css file
+        // css = message.data.css;
+        // fs.writeFile('demo_server_static/css/style.css', css, function (err) {
+        //     if (err) throw err;
+        //     console.log('CSS Saved!');
+        // });
+        client_ws.clients.forEach(function (client) {
+            console.log("Sending refresh message");
+            client.send('refresh');
+        });
+    }
+    if (message.type === "reload_css") {
+                //    Store the css in a style.css file
         css = message.data.css;
         fs.writeFile('demo_server_static/css/style.css', css, function (err) {
             if (err) throw err;
