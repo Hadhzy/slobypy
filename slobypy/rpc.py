@@ -328,8 +328,7 @@ class RPC:
     async def render_shard(self, conn: WebSocketServerProtocol, data: dict):
         self.conn[conn.id - 1]["shards"][str(data["id"])]["route"] = data["route"]
         self.conn[conn.id - 1]["shards"][str(data["id"])]["last_render"] = data
-        await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]),
-                                     await self.get_css())
+        await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]))
         await self.send_hook("on_render_shard", conn, data)
         await self.log(f"Rendered shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
 
