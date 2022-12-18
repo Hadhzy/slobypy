@@ -97,8 +97,14 @@ def run(config: str = "sloby.config.json") -> None:
     component_paths = [component for component in component_base_path.iterdir() if
                        component.suffix == ".py"]  # get python files(inside components)
 
+    scss_base_path = Path(config["scss"])
+    scss_paths = [scss_file for scss_file in scss_base_path.iterdir() if scss_file.suffix == ".py"]
+
     modules.update(
         {component.resolve(): import_file(component) for component in component_paths})  # execute components files
+
+    modules.update(
+        {scss_path.resolve(): import_file(scss_path) for scss_path in scss_paths})
 
     # Attempt to run the app
     dash = SloDash(modules, config_path.parent)  # root folder(config parent)
@@ -138,7 +144,6 @@ def import_file(path: Path):
 
 class SloDash:
     def __init__(self, modules, path):
-        self.routes = None
         self.rpc: RPC = SlApp.rpc  # Will be `None` until RPC started
         self.modules = modules
 
@@ -176,6 +181,7 @@ class SloDash:
                 if scss_class["source_path"] == path:
                     Design._REGISTERED_CLASSES.remove(scss_class)
 
+        return []
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path):
         if (self.path / 'components').resolve() in path.parents:
@@ -214,6 +220,7 @@ class SloDash:
                     elif change[0]._value_ == 2:  # Modified
                         print("modified")
                         for callback in self.watch_callbacks:
+                            print(callback)
                             routes.extend(await (callback.get("modified", self.empty_list_callback))(path))
 
                         # Reload the module

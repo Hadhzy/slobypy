@@ -353,11 +353,11 @@ class RPC:
     async def get_css(self):
         if self.css_preprocessor is None:
             # When no preprocessor, fallback to default
-            return "\n".join([scss_data.render() for scss_data in Design.USED_CLASSES])
+            return "\n".join([scss_data["scss_class"].render() for scss_data in Design.USED_CLASSES])
         else:
             return (await self.css_preprocessor()).read_text()
 
-    async def hot_reload_routes(self, routes: list = None):
+    async def hot_reload_routes(self, routes: list):
         # Re-render all RPC shards on those routes
         routes = routes or []
         for connection in self.conn:
