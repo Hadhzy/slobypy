@@ -6,6 +6,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generator, Type
 
+from slobypy import SlApp
 from slobypy.react.scss import SCSS
 
 if TYPE_CHECKING:
@@ -18,9 +19,17 @@ __all__ = (
 
 class Component(ABC):
 
-    def __init__(self, props=None) -> None:
-        self.props = {} if props is None else props
-        self.style = SCSS()
+    def __new__(cls, props=None, *args, **kwargs):
+        # noinspection PyTypeChecker
+        component = super().__new__(cls, *args, **kwargs)
+        for registered_component in SlApp._components:
+            if registered_component["component"] == cls:
+                component.meta_data = registered_component["metadata"]
+
+        component.props = {} if props is None else props
+        component.style = SCSS()
+
+        return component
 
     @property
     @abstractmethod

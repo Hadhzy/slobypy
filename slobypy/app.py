@@ -3,13 +3,16 @@ from __future__ import annotations
 # Third-Party
 import inspect
 
-from typing import Union, Any, Callable, Type
+# Built-in
+from typing import TYPE_CHECKING, Union, Any, Callable, Type
 from pathlib import Path
 
 # This Project
-from .react import Component, Reactive
 from .rpc import Event, RPC
 from .react.tools import uri_checker
+
+if TYPE_CHECKING:
+    from .react import Component
 
 
 class SlApp:
@@ -40,15 +43,13 @@ class SlApp:
         """
 
         def wrap(component):
-            instance = component()  # get the instance of it
-            instance.meta_data = {"uri": uri, "hash_instance": hash(instance)}  # add the meta_data
-            cls.add(uri, instance, inspect.stack()[1].filename)  # add the uri
+            cls.add(uri, component, inspect.stack()[1].filename, {"uri": uri})  # add the uri
             return component
 
         return wrap
 
     @classmethod
-    def add(cls, uri: str, component: Type[Component], source) -> None:
+    def add(cls, uri: str, component: Type[Component], source, metadata) -> None:
         """
         This method is used to add a component to the app.
         ### Arguments
@@ -60,7 +61,7 @@ class SlApp:
         """
         # TODO: Add URI checking regex
         cls._components.append(
-            {"uri": uri_checker(uri), "component": component, "source_path": Path(source)})
+            {"uri": uri_checker(uri), "component": component, "source_path": Path(source), "metadata": metadata})
 
     @classmethod
     def dispatch(cls, event: Union[Event, Any]) -> None:
@@ -116,12 +117,6 @@ class SlApp:
         if route:
             for component in cls._components:
                 if component["uri"] == route:
-                    component["component"].mount()
-                    return component["component"].render()
+                    return component["component"]().render()
 
-        result = ""
-        for component in cls._components:
-            component["component"].mount()
-            component["component"].render()
-            result += component["component"].render()
-        return result
+        return "".join(component["component"]().render() for component in cls._components)
