@@ -333,13 +333,12 @@ class RPC:
         await self.send_hook("on_render_shard", conn, data)
         await self.log(f"Rendered shard #{data['id']} on connection #{conn.id}, route: {data['route']}")
 
-    async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str, css: str = None):
+    async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str):
         await self.send(conn, {
             "type": "update_shard_data",
             "data": {
                 "id": shard_id,
-                "html": html,
-                "css": css,
+                "html": html
             },
             "sequence": random.randint(1000, 9999),
         })
@@ -347,8 +346,19 @@ class RPC:
     async def shard_event(self, conn: WebSocketServerProtocol, data: dict):
         pass
 
+
     async def get_route(self, route):
         return self.app._render(route=route)
+
+    async def reload_css(self, conn, shard_id):
+        await self.send(conn, {
+            "type": "reload_css",
+            "data": {
+                "id": shard_id,
+                 "css": await self.get_css(),
+            },
+            "sequence": random.randint(1000, 9999),
+        })
 
     async def get_css(self):
         if self.css_preprocessor is None:
@@ -365,7 +375,6 @@ class RPC:
                 if shard["route"] in list(set(routes)):
                     # Replay last-render (same route)
                     await self.render_shard(connection["conn"], shard["last_render"])
-
 
 @dataclass
 class Event:
