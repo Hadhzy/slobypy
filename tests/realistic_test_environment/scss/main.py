@@ -6,5 +6,5 @@ my_test_scss_class = SCSSClass(
     color="green",
 ).child(SCSSClass(
     name="test1",
-    color="green"
+    color="yellow"
 ))

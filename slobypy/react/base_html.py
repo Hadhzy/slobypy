@@ -10,7 +10,7 @@ from typing import Generator, Type
 
 # This Project
 from slobypy import react
-from slobypy.react import Component
+from slobypy.react.component import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
 from .scss_classes import SCSSClass

@@ -15,7 +15,7 @@ from rich.console import Console
 from websockets import serve  # pylint: disable=no-name-in-module
 from websockets.legacy.server import WebSocketServerProtocol
 
-from .react import Design
+from .react.design import Design
 
 
 class RPC:

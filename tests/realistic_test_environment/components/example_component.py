@@ -1,5 +1,4 @@
-from slobypy import SlApp
-from slobypy.react import *
+from slobypy import *
 
 
 @SlApp.component("/route1")
@@ -13,7 +12,7 @@ class MyComponent1(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P("bro", className="test2", onClick=self.on_click)
+        yield P("woo sloby is great", className="test1", onClick=self.on_click)
         yield MyComponent2(props={"important_data": "Woah1, this is a prop!"})
 
 
