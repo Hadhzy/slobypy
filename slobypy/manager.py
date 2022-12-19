@@ -148,18 +148,7 @@ class SloDash:
 
         self.path = path
 
-        self.watch_callbacks = [
-            {
-                "added": self.watch_component_added,
-                "modified": self.watch_component_modified,
-                "removed": self.watch_component_modified
-            },
-            {
-                "added": self.watch_scss_added,
-                "modified": self.watch_scss_modified,
-                "removed": self.watch_scss_modified
-            }
-        ]
+        self.watch_callbacks = []
 
         self.tasks = [self.watch_root(path)]  # asyncio tasks
         self.event_loop = asyncio.new_event_loop()
@@ -171,16 +160,16 @@ class SloDash:
     async def watch_scss_added(self, path: Path):
 
         if (self.path / 'scss').resolve() in path.parents:
-            return await self.rpc.reload_all_css()
+            return []
 
     # noinspection PyProtectedMember
     async def watch_scss_modified(self, path: Path):
         if (self.path / "scss").resolve() in path.parents:
             for scss_class in Design.get_registered_classes():
-                if scss_class["source_path"] == path:
+                if Path(scss_class["source_path"]) == path:
                     Design._REGISTERED_CLASSES.remove(scss_class)
 
-        return await self.rpc.reload_all_css()
+        return []
 
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path):
@@ -200,10 +189,6 @@ class SloDash:
 
         return routes
 
-    @staticmethod
-    async def empty_list_callback(*args, **kwargs):
-        return []
-
     # noinspection PyProtectedMember
     async def watch_root(self, path):
         console.log(f"Watching {str(path.resolve())} for changes")
@@ -215,24 +200,42 @@ class SloDash:
                     if change[0]._value_ == 1:  # Added
                         self.modules.update({path.resolve(): import_file(path)})
                         for callback in self.watch_callbacks:
-                            routes.extend(await (callback.get("added", self.empty_list_callback))(path))
+                            routes.extend(await callback["added"](path))
                     elif change[0]._value_ == 2:  # Modified
                         for callback in self.watch_callbacks:
-                            routes.extend(await (callback.get("modified", self.empty_list_callback))(path))
+                            routes.extend(await callback["modified"](path))
 
                         # Reload the module
-                        module = self.modules[path.resolve()]
-                        self.modules[path.resolve()] = reload(module)
+                        self.modules[path.resolve()] = reload(self.modules[path.resolve()])
                     else:
                         # Deleted
                         for callback in self.watch_callbacks:
-                            routes.extend(await (callback.get("removed", self.empty_list_callback))(path))
+                            routes.extend(await callback["removed"](path))
                         del self.modules[path.resolve()]
+
+                    for callback in self.watch_callbacks:
+                        if callback["changes_done"] is not None:
+                            await callback["changes_done"](path)
 
                     await self.rpc.hot_reload_routes(routes)
 
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
+        self.watch_callbacks = [
+            {
+                "added": self.watch_component_added,
+                "modified": self.watch_component_modified,
+                "removed": self.watch_component_modified,
+                "changes_done": None
+            },
+            {
+                "added": self.watch_scss_added,
+                "modified": self.watch_scss_modified,
+                "removed": self.watch_scss_modified,
+                "changes_done": self.rpc.reload_all_css,
+            }
+        ]
+
         grid = Table.grid(padding=(0, 3))
         grid.add_column()
         grid.add_column(justify="left")

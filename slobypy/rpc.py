@@ -351,7 +351,7 @@ class RPC:
     async def get_route(self, route):
         return self.app._render(route=route)
 
-    async def reload_all_css(self):
+    async def reload_all_css(self, *args, **kwargs):
         for connection in self.conn:
             await self.reload_css(connection["conn"])
 
@@ -369,7 +369,7 @@ class RPC:
     async def get_css(self):
         if self.css_preprocessor is None:
             # When no preprocessor, fallback to default
-            return "\n".join([scss_data["scss_class"].render() for scss_data in Design.USED_CLASSES])
+            return "\n".join([scss_data["scss_class"].render() for scss_data in Design._REGISTERED_CLASSES])
         else:
             return (await self.css_preprocessor()).read_text()
 
