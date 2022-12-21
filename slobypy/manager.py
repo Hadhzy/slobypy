@@ -31,10 +31,9 @@ from rich.table import Table
 # Textual
 from textual.app import App, ComposeResult
 from textual.containers import Container
-from textual.widgets import Button
-from textual import events
-from textual.css.query import NoMatches
+from textual.widgets import Button, Footer
 from textual.color import Color
+from textual.binding import Binding
 
 app = typer.Typer()
 console = Console()
@@ -42,7 +41,7 @@ console = Console()
 
 # noinspection PyArgumentList
 @app.command()
-def generate(path: str, overwrite: bool = False):
+def generate(path: str, overwrite: bool = False, no_preprocessor=False):
     # Used to generate a new project
     path = Path(path)
     # Check if path is empty
@@ -60,7 +59,7 @@ def generate(path: str, overwrite: bool = False):
     (path / "components").mkdir(parents=True, exist_ok=True)
     (path / "scss").mkdir(parents=True, exist_ok=True)
 
-    # Todo: handle preprocessor
+
     # with open(path / "sloby.config.json", "w") as f:
     #     f.write(CONFIG)
     #
@@ -70,7 +69,11 @@ def generate(path: str, overwrite: bool = False):
     # with open((path / "components") / "example_component.py", "w") as f:
     #     f.write(COMPONENT_FILE)
 
-    SloText().run()
+    slo_text = SloText(path, no_preprocessor)
+    slo_text.run()
+
+    print(slo_text.get_selected_preprocessor())
+
     # with open((path / "preprocessor.py"), "w") as f:
     #     if no_preprocessor is not True:
     #         f.write(PREPROCESSOR)
@@ -276,30 +279,42 @@ class SloDash:
 
 
 class SloText(App):
-    CSS_PATH = "css/button.css"
+
+    CSS_PATH = "css/SloTextDesign.css"
+    BINDINGS = [
+        Binding(
+            key="q", action="quit", description="Quit the app"),
+    ]
+    def __init__(self, path: Path, no_preprocessor) -> None:
+        self.path = path
+        self.no_preprocessor = no_preprocessor
+        self.selected_preprocessor = None
+
+        super().__init__()
 
     def compose(self) -> ComposeResult:
+        """The body"""
         yield Container(
-            Button("None", variant="primary"),
-            Button("Tailwind", variant="primary"),
-            Button("Sass", variant="primary")
+            Button("None", variant="primary", id="None"),
+            Button("Tailwind", variant="primary", id="Tailwind"),
+            Button("Sass", variant="primary", id="Sass")
         )
 
+        yield Footer()
+
     def on_mount(self) -> None:
+        """Set the background and the border"""
         self.screen.styles.background = Color(57, 57, 183)
         self.screen.styles.border = ("heavy", "white")
 
-    def on_key(self, event: events.Key) -> None:
+    def on_button_pressed(self, event: Button.Pressed):
+        """Run when the button pressed"""
+        button_id = event.button.id
+        self.selected_preprocessor = button_id
 
-        def press(button_id: str):
-            try:
-                self.query_one(f"#{button_id}", Button).press()
-            except NoMatches:
-                pass
-
-        key = event.key
-        if key == "up":
-            press("up")
+    def get_selected_preprocessor(self) -> str | None:
+        """Return the selected_preprocessor as a string"""
+        return self.selected_preprocessor
 
 
 def start_typer():

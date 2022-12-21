@@ -5,6 +5,10 @@ css_process = None
 css_event = asyncio.Event()
 
 
+async def create_subprocess(css_library: ""):
+    pass
+
+
 async def init(rpc, cwd) -> dict:
     global css_process
 
