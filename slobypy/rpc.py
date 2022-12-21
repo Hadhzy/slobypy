@@ -293,11 +293,11 @@ class RPC:
         ### Returns
         - None
         """
-        conn._sloby_id = data["id"]
+        conn._sloby_id = len(self.conn) + 1
         conn._sloby_loaded_initial_css = False
 
         self.conn.append({
-            "id": data["id"],  # Integer used to identify the connection, is used if a connection is lost,
+            "id": conn._sloby_id,  # Integer used to identify the connection, is used if a connection is lost,
             "conn": conn,  # The websocket connection
             "client": data["client"],  # String used to identify the client incase it's not Sloby
             "max_shards": data["max_shards"],  # Maximum number of requests the socket can handle
@@ -313,7 +313,9 @@ class RPC:
 
         await self.send(conn, {
             "type": "ready",
-            "data": None,
+            "data": {
+                "id": conn._sloby_id,
+            },
             "sequence": random.randint(1000, 9999),  # Sequence number used to identify lost packets
         })
 

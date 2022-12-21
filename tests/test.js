@@ -30,7 +30,6 @@ ws.on('open', async function open() {
     ws.send(JSON.stringify({
         "type": "identify",
         "data": {
-            "id": 1,
             "client": "sloby A034",
             "max_shards": 10,
             "shards": {},
