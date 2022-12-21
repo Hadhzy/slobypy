@@ -28,10 +28,19 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+# Textual
+from textual.app import App, ComposeResult
+from textual.containers import Container
+from textual.widgets import Button
+from textual import events
+from textual.css.query import NoMatches
+from textual.color import Color
+
 app = typer.Typer()
 console = Console()
 
 
+# noinspection PyArgumentList
 @app.command()
 def generate(path: str, overwrite: bool = False):
     # Used to generate a new project
@@ -52,14 +61,19 @@ def generate(path: str, overwrite: bool = False):
     (path / "scss").mkdir(parents=True, exist_ok=True)
 
     # Todo: handle preprocessor
-    with open(path / "sloby.config.json", "w") as f:
-        f.write(CONFIG)
+    # with open(path / "sloby.config.json", "w") as f:
+    #     f.write(CONFIG)
+    #
+    # with open(path / "app.py", "w") as f:
+    #     f.write(MAIN_FILE)
+    #
+    # with open((path / "components") / "example_component.py", "w") as f:
+    #     f.write(COMPONENT_FILE)
 
-    with open(path / "app.py", "w") as f:
-        f.write(MAIN_FILE)
-
-    with open((path / "components") / "example_component.py", "w") as f:
-        f.write(COMPONENT_FILE)
+    SloText().run()
+    # with open((path / "preprocessor.py"), "w") as f:
+    #     if no_preprocessor is not True:
+    #         f.write(PREPROCESSOR)
 
 
 @app.command()
@@ -156,6 +170,11 @@ class SloDash:
 
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
+    async def preprocessor_exist(self):
+        if (self.path / "preprocessor.py").exists():
+            return True
+        return False
+
     # noinspection PyProtectedMember
     async def watch_scss_added(self, path: Path):
 
@@ -215,7 +234,7 @@ class SloDash:
 
                     for callback in self.watch_callbacks:
                         if callback["changes_done"] is not None:
-                            await callback["changes_done"](path)
+                            await callback["changes_done"](path)  # call the reload_all_css with parameter: path
 
                     await self.rpc.hot_reload_routes(routes)
 
@@ -237,6 +256,7 @@ class SloDash:
         ]
 
         grid = Table.grid(padding=(0, 3))
+
         grid.add_column()
         grid.add_column(justify="left")
         grid.add_row("> Local RPC:", f"http://localhost:{port}")
@@ -252,8 +272,34 @@ class SloDash:
             expand=False,
             border_style="blue")
         )
-
         console.print("Waiting for connection from Sloby...\n", style="yellow")
+
+
+class SloText(App):
+    CSS_PATH = "css/button.css"
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Button("None", variant="primary"),
+            Button("Tailwind", variant="primary"),
+            Button("Sass", variant="primary")
+        )
+
+    def on_mount(self) -> None:
+        self.screen.styles.background = Color(57, 57, 183)
+        self.screen.styles.border = ("heavy", "white")
+
+    def on_key(self, event: events.Key) -> None:
+
+        def press(button_id: str):
+            try:
+                self.query_one(f"#{button_id}", Button).press()
+            except NoMatches:
+                pass
+
+        key = event.key
+        if key == "up":
+            press("up")
 
 
 def start_typer():
