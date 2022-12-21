@@ -1,6 +1,7 @@
 import random
 from asyncio import AbstractEventLoop
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 
 from pathlib import Path
 from typing import Callable, Awaitable, Any, List, Coroutine, Type
@@ -329,11 +330,13 @@ class RPC:
         await self.render_shard(conn, data)
 
     async def render_shard(self, conn: WebSocketServerProtocol, data: dict):
+        start_time = datetime.now()
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["route"] = data["route"]
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["last_render"] = data
         await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]))
         await self.send_hook("on_render_shard", conn, data)
-        await self.log(f"Rendered shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']}")
+        await self.log(f"Rendered shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']} in "
+                       f"{int(round((datetime.now() - start_time).total_seconds(), 3) * 1000)}ms")
 
     async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str):
         await self.send(conn, {
@@ -356,7 +359,7 @@ class RPC:
             await self.reload_css(connection["conn"])
 
         return []
-    
+
     async def reload_css(self, conn: WebSocketServerProtocol):
         await self.send(conn, {
             "type": "reload_css",
