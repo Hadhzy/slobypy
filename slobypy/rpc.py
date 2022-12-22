@@ -1,3 +1,5 @@
+# pylint: disable=protected-access
+
 import random
 from asyncio import AbstractEventLoop
 from concurrent.futures import ThreadPoolExecutor

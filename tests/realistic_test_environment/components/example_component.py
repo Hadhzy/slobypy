@@ -27,7 +27,7 @@ class MyMainComponent(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P("burp", className="bg-red-700", onClick=self.on_click)
+        yield P(f"burp {Span('example span', className='bg-yellow-400')}", className="bg-red-700", onClick=self.on_click)
         yield MyComponent2(props={"important_data": "Woah1, this is a prop!"})
 
 

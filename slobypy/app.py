@@ -12,7 +12,7 @@ from .rpc import Event, RPC
 from .react.tools import uri_checker
 
 if TYPE_CHECKING:
-    from .react import Component
+    from .react.component import Component
 
 
 class SlApp:

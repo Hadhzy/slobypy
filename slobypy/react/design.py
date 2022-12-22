@@ -1,8 +1,13 @@
+"""Used to organize the overall design produce of th SCSS system"""
+
 # This project
 from slobypy.react.scss_classes import SCSSClass
 
 
 class Design:
+    """
+    Used to organize the overall design produce of th SCSS system
+    """
     _REGISTERED_CLASSES: list[dict[str, str | SCSSClass]] = []
     USED_CLASSES: list[dict[str, str | SCSSClass]] = []  # Used scss class and scss group
 

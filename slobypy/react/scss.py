@@ -1,3 +1,5 @@
+"""Used to build anything related to SCSS"""
+
 from slobypy.react.scss_properties import POSSIBLE_ATTRIBUTES
 
 

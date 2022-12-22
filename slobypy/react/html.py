@@ -1,3 +1,5 @@
+"""A collection of all HTML elements (scraped from MDN Docs)"""
+
 # pylint: disable=too-many-lines
 # pylint: disable=invalid-name
 

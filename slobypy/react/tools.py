@@ -1,3 +1,5 @@
+"""General utilities used throughout the react sub-package"""
+
 # Third-Party
 from urllib.parse import urlparse
 
