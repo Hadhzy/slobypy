@@ -57,7 +57,7 @@ class RPC:
         self.executor = ThreadPoolExecutor(max_workers=10)
         self.tasks = tasks
         self.external_tasks = external_tasks
-        self.preprocessor = preprocessor
+        self.preprocessor = preprocessor  # the module
         self.cwd = cwd
 
         self.ws = None  # pylint: disable=invalid-name

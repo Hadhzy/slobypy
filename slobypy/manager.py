@@ -86,7 +86,7 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
     slo_text = SloText(path, no_preprocessor)
     slo_text.run()
 
-    print(slo_text.get_selected_preprocessor())  # after run
+    console.print(f"Selected css library: {slo_text.get_selected_preprocessor()}", style="white on blue")  # after run
 
     # with open((path / "preprocessor.py"), "w") as f:
     #     if no_preprocessor is not True:
@@ -313,7 +313,7 @@ class Name(Widget):
     selected_preprocessor_name = reactive("")
 
     def render(self):
-        return f"Selected css library: {self.selected_preprocessor_name}"
+        return f"Selected css library: {self.selected_preprocessor_name}" if self.selected_preprocessor_name != "" else ""
 
 
 class SloText(App):
@@ -329,16 +329,15 @@ class SloText(App):
         self.selected_preprocessor = ""
         super().__init__()
 
-    def render(self):
-        return Label(self.selected_preprocessor)
-
     def compose(self) -> ComposeResult:
         """The body"""
         yield Container(
             Button("None", variant="primary", id="None"),
             Button("Tailwind", variant="primary", id="Tailwind"),
+            Button("Bootstrap", variant="primary", id="Bootstrap"),
+            Button("Animate", variant="primary", id="Animate"),
             Button("Sass", variant="primary", id="Sass"),
-            Name()
+            Name(classes="name")
         )
 
         yield Footer()
@@ -350,6 +349,7 @@ class SloText(App):
     def on_button_pressed(self, event: Button.Pressed):
         """Run when the button pressed"""
         button_id = event.button.id
+        self.screen.styles.height = 20
         self.query_one(Name).selected_preprocessor_name = button_id
         self.selected_preprocessor = self.query_one(Name).selected_preprocessor_name
 
