@@ -113,7 +113,7 @@ ws.on('message', async function (data, flags) {
     }
     if (message.type === "update_shard_data") {
         console.log("Update shard data");
-        html[message.data.id].data = message.data.html.replace("className", "class");
+        html[message.data.id].data = message.data.html.replaceAll("className", "class");
         console.log(html);
         //    Store the css in a style.css file
         // css = message.data.css;
