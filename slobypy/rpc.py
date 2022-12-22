@@ -229,7 +229,7 @@ class RPC:
         elif data["type"] == "shard_event":
             await self.shard_event(conn, data["data"])
         elif data["type"] == "get_route":
-            await self.render_shard(conn, data["id"])
+            await self.render_shard(conn, data["data"])
 
     async def send(self, conn: WebSocketServerProtocol, data: dict):
         """
@@ -323,6 +323,7 @@ class RPC:
         self.conn[conn._sloby_id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self.wait_for_hearbeat(conn))
 
     async def new_shard(self, conn: WebSocketServerProtocol, data: dict):
+        await self.log(data)
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])] = data
         await self.send_hook("on_new_shard", conn, data)
         await self.log(f"New shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']}")

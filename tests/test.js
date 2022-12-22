@@ -8,20 +8,83 @@ var fs = require('fs');
 var express = require('express');
 var app = express();
 var expressWs = require('express-ws')(app);
+var ips = [];
+var html_hooks = [];
 
 app.use(express.static("demo_server_static"));
 app.set('etag', false)
 
-app.get('/', function (req, res) {
-    res.send(css_link + js_link + html);
-});
+// app.get('/', function (req, res) {
+//     res.send(css_link + js_link + html);
+// });
 
 app.ws('/refresh', function (ws, req) {
 });
 
+app.get('*', async (req, res) => {
+    if (req.originalUrl === "/favicon.ico") {
+        res.send("");
+        return;
+    }
+    if (!ips.includes(req.ip)) {
+        let current_len = ips.length;
+        ips.push(req.ip);
+        html[ips.length] = {}
+        html[ips.length].route = req.url
+        html_hooks.push(function hook(message) {
+            if (message.type === "update_shard_data") {
+                console.log("hook")
+                if (message.data.id === current_len + 1) {
+                    res.send(css_link + js_link + message.data.html.replace("className", "class"));
+                }
+                //    Remove hook
+                html_hooks.splice(html_hooks.indexOf(this.hook), 1);
+            }
+        })
+        console.log("New IP: " + req.ip);
+        ws.send(JSON.stringify({
+            "type": "new_shard",
+            "data": {
+                "id": ips.length,
+                "route": req.url,
+                "metadata": {
+                    "agent": req.userAgent,
+                    "cookies": req.cookies,
+                    "ip_address": req.ip
+                },
+            }
+        }));
+    } else {
+        let html_data = html[ips.indexOf(req.ip) + 1]
+        if (html_data.route !== req.url) {
+            html_data.route = req.url;
+            html_hooks.push(function hook(message) {
+                if (message.type === "update_shard_data") {
+                    console.log("hook")
+                    if (message.data.id === ips.indexOf(req.ip) + 1) {
+                        res.send(css_link + js_link + message.data.html.replace("className", "class"));
+                    }
+                    //    Remove hook
+                    html_hooks.splice(html_hooks.indexOf(this.hook), 1);
+                }
+            })
+            ws.send(JSON.stringify({
+                "type": "get_route",
+                "data": {
+                    "id": ips.indexOf(req.ip) + 1,
+                    "route": req.url,
+                },
+                "sequence": last_sequence
+            }));
+        } else {
+            res.send(css_link + js_link + html_data.data);
+        }
+    }
+});
+
 var client_ws = expressWs.getWss('/refresh');
 let last_sequence = null;
-let html = '';
+let html = {};
 let css = '';
 let css_link = "<link type=\"text/css\" href=\"css/style.css\" rel=\"stylesheet\">";
 let js_link = "<script src=\"js/script.js\"></script>";
@@ -37,19 +100,6 @@ ws.on('open', async function open() {
         }
     }));
     await new Promise(r => setTimeout(r, 2000));
-//    Simulate a new request
-    ws.send(JSON.stringify({
-        "type": "new_shard",
-        "data": {
-            "id": 1,
-            "route": "/route1",
-            "metadata": {
-                "agent": "Chrome/108.0.0.0",
-                "cookies": ["cookie1", "cookie2"],
-                "ip_address": "192.168.1.1"
-            },
-        }
-    }));
 });
 
 ws.on('message', async function (data, flags) {
@@ -63,7 +113,7 @@ ws.on('message', async function (data, flags) {
     }
     if (message.type === "update_shard_data") {
         console.log("Update shard data");
-        html = message.data.html.replace("className", "class");
+        html[message.data.id].data = message.data.html.replace("className", "class");
         console.log(html);
         //    Store the css in a style.css file
         // css = message.data.css;
@@ -75,9 +125,12 @@ ws.on('message', async function (data, flags) {
             console.log("Sending refresh message");
             client.send('refresh');
         });
+        for (let hook of html_hooks) {
+            hook(message);
+        }
     }
     if (message.type === "reload_css") {
-                //    Store the css in a style.css file
+        //    Store the css in a style.css file
         css = message.data.css;
         fs.writeFile('demo_server_static/css/style.css', css, function (err) {
             if (err) throw err;
