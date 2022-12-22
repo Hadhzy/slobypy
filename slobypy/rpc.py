@@ -236,6 +236,7 @@ class RPC:
         Sends data to the React frontend
 
         ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
         - data (dict): The data to send to the React frontend
 
         ### Returns
@@ -244,6 +245,15 @@ class RPC:
         await conn.send(json.dumps(data))
 
     async def wait_for_hearbeat(self, conn: WebSocketServerProtocol):
+        """
+        Waits for a heartbeat from the React frontend
+
+        ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
+
+        ### Returns
+        - None
+        """
         async def internal_wait(latency):
             await asyncio.wait_for(event.wait(), timeout=(interval + latency) / 1000)
             event.clear()
@@ -276,7 +286,7 @@ class RPC:
         Handles the heartbeat from the React frontend
 
         ### Arguments
-        - None
+        - conn (WebSocketServerProtocol): The websocket connection
 
         ### Returns
         - None
@@ -288,6 +298,7 @@ class RPC:
         Identifies the React frontend's websocket
 
         ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
         - data (dict): The data sent from the React frontend
 
         ### Returns
@@ -323,6 +334,16 @@ class RPC:
         self.conn[conn._sloby_id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self.wait_for_hearbeat(conn))
 
     async def new_shard(self, conn: WebSocketServerProtocol, data: dict):
+        """
+        Handles a new shard request from the React frontend
+
+        ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
+        - data (dict): The data sent from the React frontend
+
+        ### Returns
+        - None
+        """
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])] = data
         await self.send_hook("on_new_shard", conn, data)
         await self.log(f"New shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']}")
@@ -332,6 +353,16 @@ class RPC:
         await self.render_shard(conn, data)
 
     async def render_shard(self, conn: WebSocketServerProtocol, data: dict):
+        """
+        Renders a shard to the React frontend
+
+        ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
+        - data (dict): The data sent from the React frontend
+
+        ### Returns
+        - None
+        """
         start_time = datetime.now()
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["route"] = data["route"]
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["last_render"] = data
@@ -341,6 +372,17 @@ class RPC:
                        f"{int(round((datetime.now() - start_time).total_seconds(), 3) * 1000)}ms")
 
     async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str):
+        """
+        Updates the html data of a shard
+
+        ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
+        - shard_id (int): The id of the shard to update
+        - html (str): The html to update the shard with
+
+        ### Returns
+        - None
+        """
         await self.send(conn, {
             "type": "update_shard_data",
             "data": {
@@ -351,18 +393,55 @@ class RPC:
         })
 
     async def shard_event(self, conn: WebSocketServerProtocol, data: dict):
+        """
+        Handles a shard event from the React frontend
+
+        ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
+        - data (dict): The data sent from the React frontend
+
+        ### Returns
+        - None
+        """
         pass
 
     async def get_route(self, route):
+        """
+        Gets the html of a route
+
+        ### Arguments
+        - route (str): The route to get the html of
+
+        ### Returns
+        - str: The full html data of the route
+        """
         return self.app._render(route=route)
 
     async def reload_all_css(self, *args, **kwargs):
+        """
+        Reloads all css on all connections
+
+        ### Arguments
+        - None
+
+        ### Returns
+        - list: An empty list (Used for SloDash purposes)
+        """
         for connection in self.conn:
             await self.reload_css(connection["conn"])
 
         return []
 
     async def reload_css(self, conn: WebSocketServerProtocol):
+        """
+        Reloads the css on a connection
+
+        ### Arguments
+        - conn (WebSocketServerProtocol): The websocket connection
+
+        ### Returns
+        - None
+        """
         await self.send(conn, {
             "type": "reload_css",
             "data": {
@@ -372,6 +451,15 @@ class RPC:
         })
 
     async def get_css(self):
+        """
+        Renders the CSS in the application
+
+        ### Arguments
+        - None
+
+        ### Returns
+        - str: The full css data of the application
+        """
         if self.css_preprocessor is None:
             # When no preprocessor, fallback to default
             return "\n".join([scss_data["scss_class"].render() for scss_data in Design._REGISTERED_CLASSES])
@@ -379,6 +467,15 @@ class RPC:
             return (await self.css_preprocessor()).read_text()
 
     async def hot_reload_routes(self, routes: list):
+        """
+        Hot reloads routes on all connections
+
+        ### Arguments
+        - routes (list): The routes to hot reload
+
+        ### Returns
+        - None
+        """
         # Re-render all RPC shards on those routes
         routes = routes or []
         for connection in self.conn:
