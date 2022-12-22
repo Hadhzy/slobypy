@@ -31,15 +31,19 @@ from rich.table import Table
 # Textual
 from textual.app import App, ComposeResult
 from textual.containers import Container
-from textual.widgets import Button, Footer
-from textual.color import Color
+from textual.widgets import Button, Footer, Label
+from textual.widget import Widget
+from textual.reactive import reactive
 from textual.binding import Binding
+
+
 
 app = typer.Typer()
 console = Console()
 
 
-# noinspection PyArgumentList
+# noinspection PyArgum
+# entList
 @app.command()
 def generate(path: str, overwrite: bool = False, no_preprocessor=False):
     # Used to generate a new project
@@ -72,7 +76,7 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
     slo_text = SloText(path, no_preprocessor)
     slo_text.run()
 
-    print(slo_text.get_selected_preprocessor())
+    print(slo_text.get_selected_preprocessor())  # after run
 
     # with open((path / "preprocessor.py"), "w") as f:
     #     if no_preprocessor is not True:
@@ -278,6 +282,13 @@ class SloDash:
         console.print("Waiting for connection from Sloby...\n", style="yellow")
 
 
+class Name(Widget):
+    selected_preprocessor_name = reactive("")
+
+    def render(self):
+        return f"Selected css library: {self.selected_preprocessor_name}"
+
+
 class SloText(App):
 
     CSS_PATH = "css/SloTextDesign.css"
@@ -288,31 +299,35 @@ class SloText(App):
     def __init__(self, path: Path, no_preprocessor) -> None:
         self.path = path
         self.no_preprocessor = no_preprocessor
-        self.selected_preprocessor = None
-
+        self.selected_preprocessor = ""
         super().__init__()
+
+    def render(self):
+        return Label(self.selected_preprocessor)
 
     def compose(self) -> ComposeResult:
         """The body"""
         yield Container(
             Button("None", variant="primary", id="None"),
             Button("Tailwind", variant="primary", id="Tailwind"),
-            Button("Sass", variant="primary", id="Sass")
+            Button("Sass", variant="primary", id="Sass"),
+            Name()
         )
 
         yield Footer()
 
     def on_mount(self) -> None:
         """Set the background and the border"""
-        self.screen.styles.background = Color(57, 57, 183)
         self.screen.styles.border = ("heavy", "white")
 
     def on_button_pressed(self, event: Button.Pressed):
         """Run when the button pressed"""
         button_id = event.button.id
-        self.selected_preprocessor = button_id
+        self.query_one(Name).selected_preprocessor_name = button_id
+        self.selected_preprocessor = self.query_one(Name).selected_preprocessor_name
 
-    def get_selected_preprocessor(self) -> str | None:
+
+    def get_selected_preprocessor(self) -> str:
         """Return the selected_preprocessor as a string"""
         return self.selected_preprocessor
 
