@@ -46,6 +46,17 @@ console = Console()
 # entList
 @app.command()
 def generate(path: str, overwrite: bool = False, no_preprocessor=False):
+    """
+    Generate a new project.
+
+    ### Arguments
+    - path (str): The path to the project.
+    - overwrite (bool): Overwrite the project if it already exists.
+    - no_preprocessor (bool): Don't use a preprocessor.
+
+    ### Returns
+    - None
+    """
     # Used to generate a new project
     path = Path(path)
     # Check if path is empty
@@ -62,7 +73,6 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
     path.mkdir(parents=True, exist_ok=True)  # exist_ok mutes the error if the directory already exists
     (path / "components").mkdir(parents=True, exist_ok=True)
     (path / "scss").mkdir(parents=True, exist_ok=True)
-
 
     # with open(path / "sloby.config.json", "w") as f:
     #     f.write(CONFIG)
@@ -86,13 +96,13 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
 @app.command()
 def run(config: str = "sloby.config.json") -> None:
     """
-        This function is used to run the websockets.
+    This function is used to run the websockets.
 
-        ### Arguments
-        - config: default value | main.py
+    ### Arguments
+    - config: default value | main.py
 
-        ### Returns
-        - None
+    ### Returns
+    - None
     """
 
     # Attempt to import the file using importlib
@@ -141,15 +151,26 @@ class ModuleFinder(importlib.abc.MetaPathFinder):
         self.path_map = path_map
 
     def find_spec(self, fullname, path, target=None):
+        """Find the module spec for a module."""
         if not fullname in self.path_map:
             return None
         return importlib.util.spec_from_file_location(fullname, self.path_map[fullname])
 
     def find_module(self, fullname, path):
+        """Find the module given the fullname and path, only for backwards compatibility"""
         return None  # No need to implement, backward compatibility only
 
 
 def import_file(path: Path):
+    """
+    Import a file using importlib.
+
+    ### Arguments
+    - path (Path): The path to the file.
+
+    ### Returns
+    - module (Module): The imported module.
+    """
     try:
         spec = importlib.util.spec_from_file_location(path.stem, path.resolve())
         module = importlib.util.module_from_spec(spec)
@@ -177,19 +198,21 @@ class SloDash:
 
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
-    async def preprocessor_exist(self):
+    async def preprocessor_exist(self) -> bool:
+        """Check if preprocessor exists"""
         if (self.path / "preprocessor.py").exists():
             return True
         return False
 
     # noinspection PyProtectedMember
     async def watch_scss_added(self, path: Path):
-
+        """Hook that is called when a scss file is added"""
         if (self.path / 'scss').resolve() in path.parents:
             return []
 
     # noinspection PyProtectedMember
     async def watch_scss_modified(self, path: Path):
+        """Hook that is called when a scss file is modified"""
         if (self.path / "scss").resolve() in path.parents:
             for scss_class in Design.get_registered_classes():
                 if Path(scss_class["source_path"]) == path:
@@ -199,6 +222,7 @@ class SloDash:
 
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path):
+        """Hook that is called when a component file is added"""
         if (self.path / 'components').resolve() in path.parents:
             return [component["uri"] for component in SlApp._components if
                     component["source_path"] == path]
@@ -206,6 +230,7 @@ class SloDash:
 
     # noinspection PyProtectedMember
     async def watch_component_modified(self, path: Path):
+        """Hook that is called when a component file is modified"""
         routes = []
         if (self.path / 'components').resolve() in path.parents:
             for component in SlApp._components.copy():
@@ -217,6 +242,7 @@ class SloDash:
 
     # noinspection PyProtectedMember
     async def watch_root(self, path):
+        """Watch the root folder for changes"""
         console.log(f"Watching {str(path.resolve())} for changes")
         async for changes in awatch(str(path.resolve())):
             for change in changes:
@@ -247,6 +273,7 @@ class SloDash:
 
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
+        """Hook that is called when the app starts"""
         self.watch_callbacks = [
             {
                 "added": self.watch_component_added,
@@ -290,12 +317,12 @@ class Name(Widget):
 
 
 class SloText(App):
-
     CSS_PATH = "css/SloTextDesign.css"
     BINDINGS = [
         Binding(
             key="q", action="quit", description="Quit the app"),
     ]
+
     def __init__(self, path: Path, no_preprocessor) -> None:
         self.path = path
         self.no_preprocessor = no_preprocessor
@@ -333,6 +360,7 @@ class SloText(App):
 
 
 def start_typer():
+    """Start the typer app"""
     app()
 
 

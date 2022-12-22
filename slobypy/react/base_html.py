@@ -203,4 +203,4 @@ class BaseElement:
         return f'{self.__class__.__name__}({self.attrs})'
 
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return self.render()

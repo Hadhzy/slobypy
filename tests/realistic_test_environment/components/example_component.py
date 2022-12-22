@@ -12,7 +12,22 @@ class MyComponent1(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P("woo sloby is great", className="test1", onClick=self.on_click)
+        yield P("wow new route, amazing, truly", className="bg-red-400", onClick=self.on_click)
+        yield MyComponent2(props={"important_data": "Woah1, this is a prop!"})
+
+
+@SlApp.component("/")
+class MyMainComponent(Component):
+
+    @property
+    def name(self):
+        return "MyMainComponent"
+
+    def on_click(self):
+        print(self.name, "has been clicked!")
+
+    def body(self):
+        yield P("burp", className="bg-red-700", onClick=self.on_click)
         yield MyComponent2(props={"important_data": "Woah1, this is a prop!"})
 
 
