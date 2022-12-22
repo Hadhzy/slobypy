@@ -28,12 +28,20 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+# Textual
+from textual.app import App, ComposeResult
+from textual.containers import Container
+from textual.widgets import Button, Footer
+from textual.color import Color
+from textual.binding import Binding
+
 app = typer.Typer()
 console = Console()
 
 
+# noinspection PyArgumentList
 @app.command()
-def generate(path: str, overwrite: bool = False):
+def generate(path: str, overwrite: bool = False, no_preprocessor=False):
     # Used to generate a new project
     path = Path(path)
     # Check if path is empty
@@ -51,15 +59,24 @@ def generate(path: str, overwrite: bool = False):
     (path / "components").mkdir(parents=True, exist_ok=True)
     (path / "scss").mkdir(parents=True, exist_ok=True)
 
-    # Todo: handle preprocessor
-    with open(path / "sloby.config.json", "w") as f:
-        f.write(CONFIG)
 
-    with open(path / "app.py", "w") as f:
-        f.write(MAIN_FILE)
+    # with open(path / "sloby.config.json", "w") as f:
+    #     f.write(CONFIG)
+    #
+    # with open(path / "app.py", "w") as f:
+    #     f.write(MAIN_FILE)
+    #
+    # with open((path / "components") / "example_component.py", "w") as f:
+    #     f.write(COMPONENT_FILE)
 
-    with open((path / "components") / "example_component.py", "w") as f:
-        f.write(COMPONENT_FILE)
+    slo_text = SloText(path, no_preprocessor)
+    slo_text.run()
+
+    print(slo_text.get_selected_preprocessor())
+
+    # with open((path / "preprocessor.py"), "w") as f:
+    #     if no_preprocessor is not True:
+    #         f.write(PREPROCESSOR)
 
 
 @app.command()
@@ -156,6 +173,11 @@ class SloDash:
 
         console.print("[blue]SlobyPy CLI v[cyan]1.0.0[/cyan] SloDash v[cyan]1.0.0[/cyan][/]\n")
 
+    async def preprocessor_exist(self):
+        if (self.path / "preprocessor.py").exists():
+            return True
+        return False
+
     # noinspection PyProtectedMember
     async def watch_scss_added(self, path: Path):
 
@@ -215,7 +237,7 @@ class SloDash:
 
                     for callback in self.watch_callbacks:
                         if callback["changes_done"] is not None:
-                            await callback["changes_done"](path)
+                            await callback["changes_done"](path)  # call the reload_all_css with parameter: path
 
                     await self.rpc.hot_reload_routes(routes)
 
@@ -237,6 +259,7 @@ class SloDash:
         ]
 
         grid = Table.grid(padding=(0, 3))
+
         grid.add_column()
         grid.add_column(justify="left")
         grid.add_row("> Local RPC:", f"http://localhost:{port}")
@@ -252,8 +275,46 @@ class SloDash:
             expand=False,
             border_style="blue")
         )
-
         console.print("Waiting for connection from Sloby...\n", style="yellow")
+
+
+class SloText(App):
+
+    CSS_PATH = "css/SloTextDesign.css"
+    BINDINGS = [
+        Binding(
+            key="q", action="quit", description="Quit the app"),
+    ]
+    def __init__(self, path: Path, no_preprocessor) -> None:
+        self.path = path
+        self.no_preprocessor = no_preprocessor
+        self.selected_preprocessor = None
+
+        super().__init__()
+
+    def compose(self) -> ComposeResult:
+        """The body"""
+        yield Container(
+            Button("None", variant="primary", id="None"),
+            Button("Tailwind", variant="primary", id="Tailwind"),
+            Button("Sass", variant="primary", id="Sass")
+        )
+
+        yield Footer()
+
+    def on_mount(self) -> None:
+        """Set the background and the border"""
+        self.screen.styles.background = Color(57, 57, 183)
+        self.screen.styles.border = ("heavy", "white")
+
+    def on_button_pressed(self, event: Button.Pressed):
+        """Run when the button pressed"""
+        button_id = event.button.id
+        self.selected_preprocessor = button_id
+
+    def get_selected_preprocessor(self) -> str | None:
+        """Return the selected_preprocessor as a string"""
+        return self.selected_preprocessor
 
 
 def start_typer():
