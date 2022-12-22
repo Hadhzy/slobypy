@@ -1,7 +1,10 @@
+"""Used to create Reactive variables that automatically update the DOM"""
+
 import slobypy  # DO NOT import the SlApp using from slobypy.app import SlApp as this will cause a circular import
 
 
 class NotSet:  # pylint: disable=too-few-public-methods
+    """Used to represent a variable that has not been set"""
     pass
 
 
@@ -9,6 +12,10 @@ NOT_SET = NotSet()
 
 
 class Reactive:
+    """
+    By creating a Reactive variable, you can create a variable that will automatically update the DOM when it is changed.
+    """
+
     def __init__(self, value) -> None:
         """
         Slobypy React init is used to re-render the component with the new data(like useEffect in react).

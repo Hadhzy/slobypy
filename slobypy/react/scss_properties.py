@@ -1,3 +1,5 @@
+"""A list of all the possible CSS properties that can be used in a SCSSClass (scraped from MDN Docs)"""
+
 POSSIBLE_ATTRIBUTES = ["_webkit_line_clamp", "name", "scss_group", "className", "_webkit_text_fill_color", "_webkit_text_stroke",
                        "_webkit_text_stroke_color", "_webkit_text_stroke_width", "accent_color", "align_content",
                        "align_items", "align_self", "align_tracks", "all", "animation", "animation_composition",
