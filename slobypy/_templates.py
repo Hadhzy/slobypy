@@ -53,7 +53,7 @@ class MyComponent2(Component):
 
 """
 
-CONFIG = """\
+CONFIG = Template("""\
 {
   "name": "My Project",
   "version": "1.0.0",
@@ -63,9 +63,10 @@ CONFIG = """\
   "scss": "scss/",
   "runtime_tasks": [],
   "processed_css": "",
+  $preprocessor
   "processed_js": ""
 }
-"""
+""")
 
 PREPROCESSOR = Template("""
 import asyncio
