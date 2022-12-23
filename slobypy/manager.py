@@ -88,6 +88,7 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
 
     console.print(f"Selected css library: {slo_text.get_selected_preprocessor()}", style="white on blue")  # after run
 
+    PREPROCESSOR.substitute(library=slo_text.get_selected_preprocessor(), library_start=)
     # with open((path / "preprocessor.py"), "w") as f:
     #     if no_preprocessor is not True:
     #         f.write(PREPROCESSOR)
@@ -323,6 +324,12 @@ class SloText(App):
             key="q", action="quit", description="Quit the app"),
     ]
 
+    PREPROCESSOR_INFORMATION: dict[str, list] = {
+        "tailwind": ["npm install tailwindcss",  "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch"],
+        "boostrap": ["npm install bootstrap", ""],
+        "sass": ["npm install node-sass --save", ""]
+    }
+
     def __init__(self, path: Path, no_preprocessor) -> None:
         self.path = path
         self.no_preprocessor = no_preprocessor
@@ -333,10 +340,9 @@ class SloText(App):
         """The body"""
         yield Container(
             Button("None", variant="primary", id="None"),
-            Button("Tailwind", variant="primary", id="Tailwind"),
-            Button("Bootstrap", variant="primary", id="Bootstrap"),
-            Button("Animate", variant="primary", id="Animate"),
-            Button("Sass", variant="primary", id="Sass"),
+            Button("Tailwind", variant="primary", id="tailwind"),
+            Button("Bootstrap", variant="primary", id="bootstrap"),
+            Button("Sass", variant="primary", id="sass"),
             Name(classes="name")
         )
 
@@ -354,9 +360,11 @@ class SloText(App):
         self.selected_preprocessor = self.query_one(Name).selected_preprocessor_name
 
 
-    def get_selected_preprocessor(self) -> str:
+    def get_selected_preprocessor(self) -> list:
         """Return the selected_preprocessor as a string"""
-        return self.selected_preprocessor
+
+        return self.PREPROCESSOR_INFORMATION[self.selected_preprocessor.lower()]
+
 
 
 def start_typer():

@@ -1,3 +1,5 @@
+from string import Template
+
 MAIN_FILE = """\
 from slobypy.react import *
 
@@ -65,7 +67,7 @@ CONFIG = """\
 }
 """
 
-PREPROCESSOR = """
+PREPROCESSOR = Template("""
 import asyncio
 from pathlib import Path
 
@@ -77,14 +79,14 @@ async def init(rpc, cwd) -> dict:
     global css_process
 
     await rpc.log("Starting CSS watcher...")
-    await rpc.log("Installing TailwindCSS...")
+    await rpc.log("Installing $library ...")
     # ENSURE that tailwindcss is installed, or else it blocks the program
-    await asyncio.create_subprocess_shell("npm install tailwindcss", stdout=asyncio.subprocess.PIPE,
+    await asyncio.create_subprocess_shell("npm install $library", stdout=asyncio.subprocess.PIPE,
                                           stderr=asyncio.subprocess.PIPE, cwd=cwd.resolve())
     await rpc.log("Installation complete!")
 
     css_process = await asyncio.create_subprocess_shell(
-        "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch",
+        "$library_start",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
@@ -113,4 +115,4 @@ async def process_css() -> Path:
     return Path("css/output.css")
 
 
-"""
+""")
