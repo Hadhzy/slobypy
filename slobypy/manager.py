@@ -405,11 +405,26 @@ class SloText(App):
                 self.current_header.text_input(event)
         elif self.stage == "version":
             if event.key == "enter":
-                self.stage = "preprocessor"
+                self.stage = "description"
                 if self.current_header.input == "":
                     self.current_header.input = "1.0.0"
                 self.data["version"] = self.current_header.input
                 self.buffer.buffer += f"[green]?[/green] Version: [cyan]{self.data['version']}[/cyan]\n"
+                self.current_header.input = ""
+                self.current_header.original_text = f"[green]?[/green] Description [white](A Sloby project)[/white]: " \
+                                                    f"[cyan] "
+                self.current_header.text = f"[green]?[/green] Description [white](A Sloby project)[/white]: "
+            else:
+                self.current_header.text_input(event)
+        elif self.stage == "description":
+            if event.key == "enter":
+                self.stage = "preprocessor"
+                if self.current_header.input == "":
+                    self.current_header.input = "A Sloby project"
+                self.data["description"] = self.current_header.input
+                self.buffer.buffer += f"[green]?[/green] Description: [cyan]{self.data['description']}[/cyan]\n"
+                self.current_header.text = f"[green]?[/green] Author [white](None)[/white]: [cyan]"
+                self.current_header.input = ""
                 self.current_header.text = f"[green]?[/green] Pick a UI framework preset: "
                 new_selection = ["None", "Tailwind", "Bootstrap", "Animate", "Sass"]
                 for old, new in zip(self.selection, new_selection):
