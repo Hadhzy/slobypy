@@ -12,8 +12,10 @@ import urllib.error
 from pathlib import Path
 from importlib import reload
 
+import textual
 # Third-Party
 import typer
+from textual.events import Key
 
 from watchfiles import awatch
 
@@ -86,8 +88,8 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
         slo_text = SloText(path)
         slo_text.run()
 
-
-        NEW_PREPROCESSOR = PREPROCESSOR.substitute(library=slo_text.get_selected_preprocessor()[0], library_start=slo_text.get_selected_preprocessor()[1])
+        NEW_PREPROCESSOR = PREPROCESSOR.substitute(library=slo_text.get_selected_preprocessor()[0],
+                                                   library_start=slo_text.get_selected_preprocessor()[1])
 
         with open((path / "preprocessor.py"), "w") as f:
             if no_preprocessor is not True:
@@ -324,15 +326,25 @@ class GenerateOption(Static):
         super().__init__()
         self.original_text = text
         self.text = text
+        self.input = ""
 
     def render(self):
         return self.text
+
+    def text_input(self, key: Key):
+        if key.key == "backspace":
+            self.input = self.input[:-1]
+        else:
+            self.input += key.char
+
+        self.text = self.original_text + self.input
 
 
 class BufferWidget(Static):
     buffer = reactive("")
 
     def render(self):
+        self.styles.height = len(self.buffer.split("\n"))
         return self.buffer
 
 
@@ -343,20 +355,21 @@ class SloText(App):
             key="q", action="quit", description="Quit the app"),
     ]
     selected_preprocessor: int = 0
-    selection = [GenerateOption("None"), GenerateOption("Tailwind"), GenerateOption("Bootstrap"),
-                 GenerateOption("Animate"),
-                 GenerateOption("Sass")]
-    current_header = GenerateOption("Pick a UI framework preset:")
+    selection = reactive([GenerateOption("") for _ in range(5)])
+    # current_header = GenerateOption("Pick a UI framework preset:")
+    current_header = GenerateOption("")
     buffer = BufferWidget()
 
     PREPROCESSOR_INFORMATION: dict[str, list] = {
-        "tailwind": ["npm install tailwindcss",  "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch"],
+        "tailwind": ["npm install tailwindcss", "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch"],
         "boostrap": ["npm install bootstrap", "npm run"],
         "sass": ["npm install node-sass --save", "npm run"]
     }
 
     def __init__(self, path: Path) -> None:
         self.path = path
+        self.data = {}
+        self.stage = "projName"
         super().__init__()
 
     def compose(self) -> ComposeResult:
@@ -364,35 +377,68 @@ class SloText(App):
 
         yield self.buffer
         yield self.current_header
-        yield Container(*self.selection)
+        for x in self.selection:
+            yield x
         yield Footer()
+
     def on_mount(self):
         """Hook that is called when the app is mounted"""
-        self.selection[
-            self.selected_preprocessor].text = f"[cyan]> {self.selection[self.selected_preprocessor].original_text}[/cyan]"
+        # self.selection[ self.selected_preprocessor].text = f"[cyan]> {self.selection[
+        # self.selected_preprocessor].original_text}[/cyan]"
+        # White here is actually grey
+        initial_text = f"[green]?[/green] Project Name [white]({self.path.name})[/white]: [cyan]"
+        self.current_header.original_text, self.current_header.text = initial_text, initial_text
 
-    def on_key(self, event) -> None:
+    def on_key(self, event: Key) -> None:
         """Handle key presses"""
-        if event.key in ("down", "up"):
-            if event.key == "down":
-                previous_selected = self.selected_preprocessor
-                if self.selected_preprocessor == len(self.selection) - 1:
-                    self.selected_preprocessor = -1
-                modifier = 1
+        if self.stage == "projName":
+            if event.key == "enter":
+                self.stage = "version"
+                if self.current_header.input == "":
+                    self.current_header.input = self.path.name
+                self.data["name"] = self.current_header.input
+                self.buffer.buffer += f"[green]?[/green] Project name: [cyan]{self.data['name']}[/cyan]\n"
+                self.current_header.input = ""
+                self.current_header.original_text = f"[green]?[/green] Version [white](1.0.0)[/white]: [cyan]"
+                self.current_header.text = f"[green]?[/green] Version [white](1.0.0)[/white]: [cyan]"
             else:
-                previous_selected = self.selected_preprocessor
-                if self.selected_preprocessor == 0:
-                    self.selected_preprocessor = len(self.selection)
-                modifier = -1
-            current_text = self.selection[self.selected_preprocessor + modifier]
-            current_text.text = f"[cyan]> {current_text.text}[/cyan]"
-            previous_text = self.selection[previous_selected]
-            previous_text.text = previous_text.original_text
-            self.selected_preprocessor += modifier
+                self.current_header.text_input(event)
+        elif self.stage == "version":
+            if event.key == "enter":
+                self.stage = "preprocessor"
+                if self.current_header.input == "":
+                    self.current_header.input = "1.0.0"
+                self.data["version"] = self.current_header.input
+                self.buffer.buffer += f"[green]?[/green] Version: [cyan]{self.data['version']}[/cyan]\n"
+                self.current_header.text = f"[green]?[/green] Pick a UI framework preset: "
+                new_selection = ["None", "Tailwind", "Bootstrap", "Animate", "Sass"]
+                for old, new in zip(self.selection, new_selection):
+                    old.original_text = new
+                    old.text = new
+                self.selection[0].text = f"[cyan]> {self.selection[0].original_text}[/cyan]"
+            else:
+                self.current_header.text_input(event)
+        elif self.stage == "preprocessor":
+            if event.key in ("down", "up"):
+                if event.key == "down":
+                    previous_selected = self.selected_preprocessor
+                    if self.selected_preprocessor == len(self.selection) - 1:
+                        self.selected_preprocessor = -1
+                    modifier = 1
+                else:
+                    previous_selected = self.selected_preprocessor
+                    if self.selected_preprocessor == 0:
+                        self.selected_preprocessor = len(self.selection)
+                    modifier = -1
+                current_text = self.selection[self.selected_preprocessor + modifier]
+                current_text.text = f"[cyan]> {current_text.text}[/cyan]"
+                previous_text = self.selection[previous_selected]
+                previous_text.text = previous_text.original_text
+                self.selected_preprocessor += modifier
 
-        if event.key == "enter":
-            self.buffer.buffer = f"[blue]UI Framework:[/blue] {self.selection[self.selected_preprocessor].original_text}\n"
-            self.current_header.text = "Example header"
+            if event.key == "enter":
+                self.buffer.buffer += f"[green]?[/green] UI Framework: [cyan]{self.selection[self.selected_preprocessor].original_text}[/cyan]\n"
+                self.current_header.text = "Example header"
 
     def get_selected_preprocessor(self) -> list[str, list[str, str]]:
         selected_preprocessor_text = self.selection[self.selected_preprocessor].original_text.lower()
