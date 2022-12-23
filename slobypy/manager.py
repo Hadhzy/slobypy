@@ -31,12 +31,10 @@ from rich.table import Table
 # Textual
 from textual.app import App, ComposeResult
 from textual.containers import Container
-from textual.widgets import Button, Footer, Label
+from textual.widgets import Button, Footer, Label, Static
 from textual.widget import Widget
 from textual.reactive import reactive
 from textual.binding import Binding
-
-
 
 app = typer.Typer()
 console = Console()
@@ -85,8 +83,6 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
 
     slo_text = SloText(path, no_preprocessor)
     slo_text.run()
-
-    console.print(f"Selected css library: {slo_text.get_selected_preprocessor()}", style="white on blue")  # after run
 
     # with open((path / "preprocessor.py"), "w") as f:
     #     if no_preprocessor is not True:
@@ -316,47 +312,76 @@ class Name(Widget):
         return f"Selected css library: {self.selected_preprocessor_name}" if self.selected_preprocessor_name != "" else ""
 
 
+class GenerateOption(Static):
+    text = reactive("")
+
+    def __init__(self, text):
+        super().__init__()
+        self.original_text = text
+        self.text = text
+
+    def render(self):
+        return self.text
+
+
+class BufferWidget(Static):
+    buffer = reactive("")
+
+    def render(self):
+        return self.buffer
+
+
 class SloText(App):
     CSS_PATH = "css/SloTextDesign.css"
     BINDINGS = [
         Binding(
             key="q", action="quit", description="Quit the app"),
     ]
+    selected_preprocessor = 0
+    selection = [GenerateOption("None"), GenerateOption("Tailwind"), GenerateOption("Bootstrap"),
+                 GenerateOption("Animate"),
+                 GenerateOption("Sass")]
+    current_header = GenerateOption("Pick a UI framework preset:")
+    buffer = BufferWidget()
 
     def __init__(self, path: Path, no_preprocessor) -> None:
         self.path = path
         self.no_preprocessor = no_preprocessor
-        self.selected_preprocessor = ""
         super().__init__()
 
     def compose(self) -> ComposeResult:
         """The body"""
-        yield Container(
-            Button("None", variant="primary", id="None"),
-            Button("Tailwind", variant="primary", id="Tailwind"),
-            Button("Bootstrap", variant="primary", id="Bootstrap"),
-            Button("Animate", variant="primary", id="Animate"),
-            Button("Sass", variant="primary", id="Sass"),
-            Name(classes="name")
-        )
+        yield self.buffer
+        yield self.current_header
+        yield Container(*self.selection)
 
-        yield Footer()
+    def on_mount(self):
+        """Hook that is called when the app is mounted"""
+        self.selection[
+            self.selected_preprocessor].text = f"[cyan]> {self.selection[self.selected_preprocessor].original_text}[/cyan]"
 
-    def on_mount(self) -> None:
-        """Set the background and the border"""
-        self.screen.styles.border = ("heavy", "white")
+    def on_key(self, event) -> None:
+        """Handle key presses"""
+        if event.key in ("down", "up"):
+            if event.key == "down":
+                previous_selected = self.selected_preprocessor
+                if self.selected_preprocessor == len(self.selection) - 1:
+                    self.selected_preprocessor = -1
+                modifier = 1
+            else:
+                previous_selected = self.selected_preprocessor
+                if self.selected_preprocessor == 0:
+                    self.selected_preprocessor = len(self.selection)
+                modifier = -1
+            current_text = self.selection[self.selected_preprocessor + modifier]
+            current_text.text = f"[cyan]> {current_text.text}[/cyan]"
+            previous_text = self.selection[previous_selected]
+            previous_text.text = previous_text.original_text
+            self.selected_preprocessor += modifier
 
-    def on_button_pressed(self, event: Button.Pressed):
-        """Run when the button pressed"""
-        button_id = event.button.id
-        self.screen.styles.height = 20
-        self.query_one(Name).selected_preprocessor_name = button_id
-        self.selected_preprocessor = self.query_one(Name).selected_preprocessor_name
-
-
-    def get_selected_preprocessor(self) -> str:
-        """Return the selected_preprocessor as a string"""
-        return self.selected_preprocessor
+        if event.key == "enter":
+            self.buffer.buffer += f"[blue]UI Framework:[/blue] {self.selection[self.selected_preprocessor].original_text}\n"
+            self.current_header.text = "Example header"
 
 
 def start_typer():
