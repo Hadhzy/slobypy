@@ -160,7 +160,7 @@ def run(config: str = "sloby.config.json") -> None:
     # Pash dash hook so that RPC updates can trigger UI changes
     SlApp.run(hooks=[dash], console=console,
               event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor,
-              cwd=path.parent)
+              cwd=path.parent, pre_rendered=dash.pre_rendered)
 
 
 class ModuleFinder(importlib.abc.MetaPathFinder):
@@ -209,6 +209,7 @@ class SloDash:
         self.path = path
 
         self.watch_callbacks = []
+        self.pre_rendered: list = []
 
         self.tasks = [self.watch_root(path)]  # asyncio tasks
         self.event_loop = asyncio.new_event_loop()
@@ -238,11 +239,17 @@ class SloDash:
 
         return []
 
+    def check_pre_rendered(self, component) -> str | None:
+        if component["static"] is True:
+            self.pre_rendered.append(component)
+            return
+
+        return component["uri"]
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path):
         """Hook that is called when a component file is added"""
         if (self.path / 'components').resolve() in path.parents:
-            return [component["uri"] for component in SlApp._components if
+            return [self.check_pre_rendered(component) for component in SlApp._components if
                     component["source_path"] == path]
         return []
 

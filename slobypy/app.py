@@ -31,13 +31,13 @@ class SlApp:
     rpc = None
 
     @classmethod
-    def component(cls, uri: str) -> Callable:
+    def component(cls, uri: str, static: bool = False) -> Callable:
         """
         This decorator is used to register a component to the app.
 
         ### Arguments
         - uri (str): The uri of the component
-
+        - static (bool): Used to define whether the component should be pre-rendered by SlobyPy(static).
         ### Returns
         - Callable: The decorator's wrapped callable
         """
@@ -49,7 +49,7 @@ class SlApp:
         return wrap
 
     @classmethod
-    def add(cls, uri: str, component: Type[Component], source, metadata) -> None:
+    def add(cls, uri: str, component: Type[Component], source, metadata, static: bool = False) -> None:
         """
         This method is used to add a component to the app.
         ### Arguments
@@ -61,7 +61,7 @@ class SlApp:
         """
         # TODO: Add URI checking regex
         cls._components.append(
-            {"uri": uri_checker(uri), "component": component, "source_path": Path(source), "metadata": metadata})
+            {"uri": uri_checker(uri), "component": component, "source_path": Path(source), "metadata": metadata, "static": static})
 
     @classmethod
     def dispatch(cls, event: Union[Event, Any]) -> None:

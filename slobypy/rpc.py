@@ -42,7 +42,8 @@ class RPC:
                  tasks: List[Coroutine] = None,
                  external_tasks: List[str] = None,
                  preprocessor=None,
-                 cwd: Path = None, ):
+                 cwd: Path = None,
+                 pre_rendered=None):
         self.css_preprocessor: Callable[[], Awaitable[Path]] = None
 
         if tasks is None:
@@ -52,6 +53,7 @@ class RPC:
         self.app = app
         self.hooks = hooks
         self.console = console
+        self.pre_rendered = pre_rendered or []
         if event_loop is None:
             event_loop = asyncio.get_event_loop()
         self.event_loop = event_loop
@@ -295,6 +297,11 @@ class RPC:
         """
         self.conn[conn._sloby_id - 1]["heartbeat"].set()
 
+    async def pre_rendered_send(self, conn):
+        for component in self.pre_rendered:
+            await self.send(conn, {"route": component["uri"], "html": await self.get_route(component["uri"])})
+
+
     async def identify(self, conn: WebSocketServerProtocol, data: dict):
         """
         Identifies the React frontend's websocket
@@ -319,6 +326,7 @@ class RPC:
             "heartbeat": asyncio.Event(),  # Event to acknowledge heartbeat
         })
 
+        await self.pre_rendered_send(conn)
         await self.send_hook("on_identify", conn, data)
         await self.log(
             f"Identified Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn._sloby_id}, "
