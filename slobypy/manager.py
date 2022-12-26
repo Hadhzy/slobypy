@@ -88,8 +88,23 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
         slo_text = SloText(path)
         slo_text.run()
 
-        NEW_PREPROCESSOR = PREPROCESSOR.substitute(library=slo_text.get_selected_preprocessor()[0],
-                                                   library_start=slo_text.get_selected_preprocessor()[1])
+        selected_preprocessor = slo_text.get_selected_preprocessor()[0]
+        library_start = slo_text.get_selected_preprocessor()[1]
+
+        NEW_PREPROCESSOR = PREPROCESSOR.substitute(library=selected_preprocessor,
+                                                   library_start=library_start)
+
+        if selected_preprocessor == "tailwind":
+            # Create tailwind dependencies here
+            pass
+        elif selected_preprocessor == "sass":
+            # Create sass dependencies here
+            pass
+
+        elif selected_preprocessor == "boostrap":
+            # Create boostrap dependencies here
+            pass
+
 
         with open((path / "preprocessor.py"), "w") as f:
             if no_preprocessor is not True:
@@ -452,7 +467,7 @@ class SloText(App):
                 self.selected_preprocessor += modifier
 
             if event.key == "enter":
-                self.buffer.buffer += f"[green]?[/green] UI Framework: [cyan]{self.selection[self.selected_preprocessor].original_text}[/cyan]\n"
+                self.buffer.buffer = f"[green]?[/green] UI Framework: [cyan]{self.selection[self.selected_preprocessor].original_text}[/cyan]\n"
                 self.current_header.text = "Example header"
 
     def get_selected_preprocessor(self) -> list[str, list[str, str]]:
