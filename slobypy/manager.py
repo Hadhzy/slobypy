@@ -32,8 +32,7 @@ from rich.table import Table
 
 # Textual
 from textual.app import App, ComposeResult
-from textual.containers import Container
-from textual.widgets import Button, Footer, Label, Static
+from textual.widgets import Footer,Static
 from textual.widget import Widget
 from textual.reactive import reactive
 from textual.binding import Binding
@@ -243,8 +242,8 @@ class SloDash:
         if component["static"] is True:
             self.pre_rendered.append(component)
             return
-
-        return component["uri"]
+        uri = component["uri"]
+        return uri
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path):
         """Hook that is called when a component file is added"""

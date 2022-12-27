@@ -14,7 +14,20 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Component",
-)
+    "SloContext")
+
+
+class SloContext:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+
+    def __getattribute__(self, item):
+        return super().__getattribute__(item)
+
 
 
 class Component(ABC):
@@ -22,6 +35,7 @@ class Component(ABC):
     def __new__(cls, props=None, *args, **kwargs):
         # noinspection PyTypeChecker
         component = super().__new__(cls, *args, **kwargs)
+        # noinspection PyProtectedMember
         for registered_component in SlApp._components:
             if registered_component["component"] == cls:
                 component.meta_data = registered_component["metadata"]
