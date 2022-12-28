@@ -89,7 +89,6 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
 
         selected_preprocessor = slo_text.get_selected_preprocessor()[0]
         library_start = slo_text.get_selected_preprocessor()[1]
-
         NEW_PREPROCESSOR = PREPROCESSOR.substitute(library=selected_preprocessor,
                                                    library_start=library_start)
 
@@ -108,6 +107,30 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
         with open((path / "preprocessor.py"), "w") as f:
             if no_preprocessor is not True:
                 f.write(NEW_PREPROCESSOR)
+
+
+@app.command()
+def generate_delete(path: Path):
+    if path.exists():
+        if any(path.iterdir()) is False:
+            typer.echo("The path is empty")
+
+    config_file = Path(path / "sloby.config.json")
+    app_file = Path(path / "app.py")
+    example_component = Path(path / "components" / "example_component.py")
+    preprocessor = Path(path / "preprocessor.py")
+
+    deleted_files = [config_file, app_file, example_component, preprocessor]
+
+    for file in deleted_files:
+        try:
+            file.resolve().unlink()
+            console.print(f"Deleted file:{file}", style="red")
+        except:
+            console.print(f"Can't remove:{file}", style="yellow")
+
+    console.print("Successfully delete!", style="magenta")
+
 
 
 @app.command()
@@ -383,7 +406,7 @@ class SloText(App):
 
     PREPROCESSOR_INFORMATION: dict[str, list] = {
         "tailwind": ["npm install tailwindcss", "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch"],
-        "boostrap": ["npm install bootstrap", "npm run"],
+        "bootstrap": ["npm install bootstrap", "npm run"],
         "sass": ["npm install node-sass --save", "npm run"]
     }
 
