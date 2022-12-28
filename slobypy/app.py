@@ -10,7 +10,7 @@ from pathlib import Path
 # This Project
 from .rpc import Event, RPC
 from .react.tools import uri_checker
-
+from .react.router import SloRouter
 if TYPE_CHECKING:
     from .react.component import Component
 
@@ -31,7 +31,7 @@ class SlApp:
     rpc = None
 
     @classmethod
-    def component(cls, uri: str, static: bool = False) -> Callable:
+    def component(cls, uri: str | SloRouter, static: bool = False) -> Callable:
         """
         This decorator is used to register a component to the app.
 
@@ -49,7 +49,7 @@ class SlApp:
         return wrap
 
     @classmethod
-    def add(cls, uri: str, component: Type[Component], source, metadata, static: bool = False) -> None:
+    def add(cls, uri: str | SloRouter, component: Type[Component], source, metadata, static: bool = False) -> None:
         """
         This method is used to add a component to the app.
         ### Arguments

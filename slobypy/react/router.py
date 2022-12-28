@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import Generator, Self
 
+# This project
+from slobypy.react._react_types import UriType
+from slobypy.rpc import RPC
 
 class SloRouter:
     """Used to define the route"""
@@ -54,6 +57,12 @@ class SloRouter:
 
     def _endpoints_as_list(self) -> list[str]:
         return self.route.split("/")
+
+    @classmethod
+    def redirect(cls, url: UriType):
+        cls.rpc = RPC(cls)
+        cls.rpc.handle_event({"type": "url_redirect"})
+
 
     def __iter__(self) -> Generator[int, None, None]:
         start = 0
