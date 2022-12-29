@@ -28,6 +28,7 @@ class SlApp:
     """
     # Use list to prevent name conflicts
     _components = []
+    only_components = []  # registered components(only)
     rpc = None
 
 
@@ -63,7 +64,7 @@ class SlApp:
         # TODO: Add URI checking regex
         cls._components.append(
             {"uri": uri_checker(uri), "component": component, "source_path": Path(source), "metadata": metadata, "static": static})
-
+        cls.only_components.append(component)
     @classmethod
     def dispatch(cls, event: Union[Event, Any]) -> None:
         """

@@ -6,26 +6,19 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generator, Type
 
+# This project
 from slobypy import SlApp
 from slobypy.react.scss import SCSS
+from slobypy.errors.react_errors import NotRegistered
+import slobypy.react.context as context
 
 if TYPE_CHECKING:
     from slobypy.react import BaseElement
 
+
 __all__ = (
-    "Component")
-
-class SloContext:
-
-    def __init__(self, name):
-        self.name = name
-
-    def __setattr__(self, key, value):
-        super().__setattr__(key, value)
-
-    def __getattribute__(self, item):
-        return super().__getattribute__(item)
-
+    "Component",
+    "AppComponent")
 
 
 class Component(ABC):
@@ -76,3 +69,17 @@ class Component(ABC):
 
     def __repr__(self) -> str:
         return f"Component('{self.name}')"
+
+
+class AppComponent(ABC):
+    """Used to handle the registered components"""
+
+    @abstractmethod
+    def body(self) -> Generator[Type[BaseElement] | Type[Component] | Type[context.Context], None, None]:
+        """Used to define the components"""
+        pass
+
+    def render(self):
+        """Used to render the components"""
+        return ''.join([component.render() for component in self.body()])
+
