@@ -30,6 +30,7 @@ class SlApp:
     _components = []
     rpc = None
 
+
     @classmethod
     def component(cls, uri: str | SloRouter, static: bool = False) -> Callable:
         """
