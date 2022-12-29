@@ -17,7 +17,7 @@ css = SCSSClass(
 COMPONENT_FILE = """\
 from slobypy import SlApp
 from slobypy.react import *
-
+from slobypy import *
 
 @SlApp.component("/route1")
 class MyComponent1(Component):
