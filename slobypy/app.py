@@ -30,8 +30,9 @@ class SlApp:
     _components = []
     rpc = None
 
-    @classmethod
-    def component(cls, uri: str) -> Callable:
+
+    def component(cls, uri: str, static: bool = False) -> Callable:
+
         """
         This decorator is used to register a component to the app.
 
@@ -49,7 +50,9 @@ class SlApp:
         return wrap
 
     @classmethod
-    def add(cls, uri: str, component: Type[Component], source, metadata) -> None:
+    def add(cls, uri: str, component: Type[Component], source, metadata, static: bool = False) -> None:
+
+
         """
         This method is used to add a component to the app.
         ### Arguments

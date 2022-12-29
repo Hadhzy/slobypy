@@ -14,7 +14,21 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Component",
+
 )
+
+
+class SloContext:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+
+    def __getattribute__(self, item):
+        return super().__getattribute__(item)
+
 
 
 class Component(ABC):
