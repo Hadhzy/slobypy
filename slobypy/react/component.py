@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Generator, Type
 from slobypy import SlApp
 from slobypy.react.scss import SCSS
 from slobypy.errors.react_errors import NotRegistered
+import slobypy.react.context as ctx
 import slobypy.react.context as context
 
 if TYPE_CHECKING:
@@ -73,13 +74,25 @@ class Component(ABC):
 
 class AppComponent(ABC):
     """Used to handle the registered components"""
+    _components: list = [Component]  # Used to define the components in the app body
 
     @abstractmethod
     def body(self) -> Generator[Type[BaseElement] | Type[Component] | Type[context.Context], None, None]:
         """Used to define the components"""
         pass
 
-    def render(self):
+    def render(self) -> str:
         """Used to render the components"""
-        return ''.join([component.render() for component in self.body()])
+        returned_value = ""
+        for element in self.body():
+
+            if isinstance(element, Component):
+                self._components.append(element)
+
+            elif isinstance(element, ctx.Context):
+                self._components.append(element._components)
+
+            returned_value += element.render()
+
+        return returned_value
 

@@ -96,9 +96,6 @@ class SlApp:
         """
         cls.rpc = RPC(cls, *args, **kwargs)
 
-    def _check_props(self):
-        pass
-
     # Todo: Extend the render with more informal component data.
     @classmethod
     def _render(cls, obj=None, route: str = False) -> tuple[Any, Any] | str | Any:

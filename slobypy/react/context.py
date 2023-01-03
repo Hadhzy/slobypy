@@ -14,28 +14,33 @@ __all__ = (
 
 class Context:
     DATA: list = []
+    _components: list = []  # Used to define the components in the context.
     def __init__(self, *components: Component) -> None:
         self.components = components
-        self.add_data()
-        self.pass_data_to_component()
 
     # noinspection PyMethodMayBeStatic
     def create_data(self) -> Generator[Any, None, None]:
         """Used to create the data by yielding it"""
         pass
+    def render(self) -> str:
+        """Used to render the components inside the context"""
+        returned_value = ""
+        for component in self.components:
 
-    def add_data(self):
+            self._components.append(component)
+
+            component.context = self.get_data()
+            if hasattr(component, "in_context"):
+                component.in_context()
+
+            returned_value += component.render()
+
+        return returned_value
+
+    def get_data(self) -> list:
+        """Used to load the data from the create_data"""
+        context_data = []
         for data in self.create_data():
-            self.DATA.append(data)
+            context_data.append(data)
 
-    def pass_data_to_component(self):
-        for component in self.components:
-            component.context = self.DATA
-            yield component
-
-    def get_components(self) -> list[Component]:
-        components = []
-        for component in self.components:
-            components.append(component)
-
-        return components
+        return context_data
