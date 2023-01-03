@@ -75,6 +75,7 @@ class Component(ABC):
 class AppComponent(ABC):
     """Used to handle the registered components"""
     _components: list = [Component]  # Used to define the components in the app body
+    __slots__ = ()  # in order to make only one subclass(child)
 
     @abstractmethod
     def body(self) -> Generator[Type[BaseElement] | Type[Component] | Type[context.Context], None, None]:

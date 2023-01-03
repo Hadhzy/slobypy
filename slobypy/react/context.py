@@ -1,8 +1,6 @@
 from __future__ import annotations
 # Built-in
-from abc import ABC, abstractmethod
-
-from typing import Generator, Any, Type, TYPE_CHECKING
+from typing import Generator, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from slobypy.react.component import Component
@@ -22,6 +20,7 @@ class Context:
     def create_data(self) -> Generator[Any, None, None]:
         """Used to create the data by yielding it"""
         pass
+
     def render(self) -> str:
         """Used to render the components inside the context"""
         returned_value = ""
@@ -29,9 +28,12 @@ class Context:
 
             self._components.append(component)
 
-            component.context = self.get_data()
-            if hasattr(component, "in_context"):
-                component.in_context()
+
+            if context_data := self.get_data():
+                component.context = context_data
+
+                if hasattr(component, "in_context"):
+                    component.in_context()
 
             returned_value += component.render()
 
