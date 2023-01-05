@@ -1,9 +1,10 @@
 from __future__ import annotations
 # Built-in
-from typing import Generator, Any, TYPE_CHECKING
+from typing import Generator, Any
 
-if TYPE_CHECKING:
-    from slobypy.react.component import Component
+# This project
+from slobypy.errors.react_errors import NotValidComponent
+import slobypy.react.component as cmp
 
 __all__ = (
     "Context",
@@ -13,31 +14,26 @@ __all__ = (
 class Context:
     DATA: list = []
     _components: list = []  # Used to define the components in the context.
-    def __init__(self, *components: Component) -> None:
+
+    def __init__(self, *components: cmp.Component) -> None:
         self.components = components
+        self.run()
 
     # noinspection PyMethodMayBeStatic
     def create_data(self) -> Generator[Any, None, None]:
         """Used to create the data by yielding it"""
         pass
 
-    def render(self) -> str:
+    def run(self):
         """Used to render the components inside the context"""
-        returned_value = ""
+
         for component in self.components:
 
+            self._check_component_type(component)
+
             self._components.append(component)
-
-
             if context_data := self.get_data():
                 component.context = context_data
-
-                if hasattr(component, "in_context"):
-                    component.in_context()
-
-            returned_value += component.render()
-
-        return returned_value
 
     def get_data(self) -> list:
         """Used to load the data from the create_data"""
@@ -46,3 +42,11 @@ class Context:
             context_data.append(data)
 
         return context_data
+
+
+    #noinspection PyMethodMayBeStatic
+    def _check_component_type(self, component):
+        if isinstance(component, cmp.Component):
+            return
+        else:
+            raise NotValidComponent(f"{component} is not valid!")

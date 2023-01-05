@@ -24,7 +24,7 @@ from slobypy.app import SlApp
 from slobypy.react.design import Design
 from slobypy.rpc import RPC
 from slobypy._templates import *
-
+from slobypy.react.component import AppComponent
 # Rich
 from rich.console import Console
 from rich.panel import Panel
@@ -152,7 +152,7 @@ def run(config: str = "sloby.config.json") -> None:
     with open(config_path, "r") as f:
         config = json.load(f)
 
-    path = Path(config["main"])  # main.py
+    path = Path(config["main"])  # app.py
     runtime_tasks = config["runtime_tasks"]
 
     preprocessor = None
@@ -161,7 +161,7 @@ def run(config: str = "sloby.config.json") -> None:
             preprocessor = import_file(Path(config["preprocessor"]))
 
     # Modules are used to keep track of ALL imported modules
-    modules = {path.resolve: import_file(path)}  # execute the main.py
+    modules = {path.resolve(): import_file(path)}  # execute the app.py
 
     component_base_path = Path(config["components"])  # the component folder
     component_paths = [component for component in component_base_path.iterdir() if
@@ -174,8 +174,7 @@ def run(config: str = "sloby.config.json") -> None:
         {component.resolve(): import_file(component) for component in component_paths})  # execute components files
 
     modules.update(
-        {scss_path.resolve(): import_file(scss_path) for scss_path in scss_paths})
-
+        {scss_path.resolve(): import_file(scss_path) for scss_path in scss_paths})  # execute scss files
     # Attempt to run the app
     dash = SloDash(modules, config_path.parent)  # root folder(config parent)
 
@@ -246,13 +245,13 @@ class SloDash:
         return False
 
     # noinspection PyProtectedMember
-    async def watch_scss_added(self, path: Path):
+    async def watch_scss_added(self, path: Path) -> list:
         """Hook that is called when a scss file is added"""
         if (self.path / 'scss').resolve() in path.parents:
             return []
 
     # noinspection PyProtectedMember
-    async def watch_scss_modified(self, path: Path):
+    async def watch_scss_modified(self, path: Path) -> list | None:
         """Hook that is called when a scss file is modified"""
         if (self.path / "scss").resolve() in path.parents:
             for scss_class in Design.get_registered_classes():
@@ -267,8 +266,9 @@ class SloDash:
             return
         uri = component["uri"]
         return uri
+
     # noinspection PyProtectedMember
-    async def watch_component_added(self, path: Path):
+    async def watch_component_added(self, path: Path) -> list | list[str]:
         """Hook that is called when a component file is added"""
         if (self.path / 'components').resolve() in path.parents:
             return [self.check_pre_rendered(component) for component in SlApp._components if
@@ -276,7 +276,7 @@ class SloDash:
         return []
 
     # noinspection PyProtectedMember
-    async def watch_component_modified(self, path: Path):
+    async def watch_component_modified(self, path: Path) -> list | None:
         """Hook that is called when a component file is modified"""
         routes = []
         if (self.path / 'components').resolve() in path.parents:
@@ -288,6 +288,29 @@ class SloDash:
         return routes
 
     # noinspection PyProtectedMember
+    async def watch_app_added(self, path: Path) -> list | list[str]:
+        routes = []
+        if self.path.resolve() == path.resolve():
+            for component in AppComponent._components:
+                if component["component"] in SlApp.only_components:
+                    routes.append(component)
+                else:
+                    raise Exception("Error")
+
+        return ["app_route", routes] if routes else []
+
+
+    # noinspection PyProtectedMember
+    async def watch_app_modified(self, path: Path) -> list | None:
+        routes = []
+        if (self.path / "app.py").resolve() == path.resolve():
+            for component in AppComponent._components.copy():
+                AppComponent._components.remove(component)
+                routes.append(component["uri"])
+
+        return ["app_route", routes] if routes else []
+
+    # noinspection PyProtectedMember
     async def watch_root(self, path):
         """Watch the root folder for changes"""
         console.log(f"Watching {str(path.resolve())} for changes")
@@ -295,14 +318,25 @@ class SloDash:
             for change in changes:
                 path = Path(change[1])
                 routes = []
+                app_route = []
                 if path.suffix == ".py":
                     if change[0]._value_ == 1:  # Added
                         self.modules.update({path.resolve(): import_file(path)})
+
                         for callback in self.watch_callbacks:
-                            routes.extend(await callback["added"](path))
+                            try:
+                                app_route_type, app_routes = await callback["added"](path)
+                                app_route.extend(app_routes)
+                            except:
+                                routes.extend(await callback["added"](path))
+
                     elif change[0]._value_ == 2:  # Modified
                         for callback in self.watch_callbacks:
-                            routes.extend(await callback["modified"](path))
+                            try:
+                                app_route_type, app_routes = await callback["added"](path)
+                                app_route.extend(app_routes)
+                            except:
+                                routes.extend(await callback["modified"](path))
 
                         # Reload the module
                         self.modules[path.resolve()] = reload(self.modules[path.resolve()])
@@ -316,7 +350,7 @@ class SloDash:
                         if callback["changes_done"] is not None:
                             await callback["changes_done"](path)  # call the reload_all_css with parameter: path
 
-                    await self.rpc.hot_reload_routes(routes)
+                    await self.rpc.hot_reload_routes(app_route if app_route else routes)
 
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
@@ -333,7 +367,14 @@ class SloDash:
                 "modified": self.watch_scss_modified,
                 "removed": self.watch_scss_modified,
                 "changes_done": self.rpc.reload_all_css,
-            }
+            },
+            {
+                "added": self.watch_app_added,
+                "modified": self.watch_app_modified,
+                "removed": self.watch_app_modified,
+                "changes_done": None
+            },
+
         ]
 
         grid = Table.grid(padding=(0, 3))

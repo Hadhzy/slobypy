@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING, Generator, Type
 # This project
 from slobypy import SlApp
 from slobypy.react.scss import SCSS
-from slobypy.errors.react_errors import NotRegistered
+from slobypy.errors.react_errors import NotValidComponent
+
 import slobypy.react.context as ctx
-import slobypy.react.context as context
 
 if TYPE_CHECKING:
     from slobypy.react import BaseElement
@@ -73,27 +73,36 @@ class Component(ABC):
 
 
 class AppComponent(ABC):
-    """Used to handle the registered components"""
-    _components: list = [Component]  # Used to define the components in the app body
+    """App based slobypy"""
+    _components: list = []  # Used to define the components in the app body
     __slots__ = ()  # in order to make only one subclass(child)
 
+    def __init__(self) -> None:
+        self.add_components()
+
     @abstractmethod
-    def body(self) -> Generator[Type[BaseElement] | Type[Component] | Type[context.Context], None, None]:
+    def body(self) -> Generator[Type[BaseElement] | Type[Component] | Type[ctx.Context], None, None]:
         """Used to define the components"""
         pass
 
-    def render(self) -> str:
-        """Used to render the components"""
-        returned_value = ""
-        for element in self.body():
+    # noinspection PyProtectedMember
+    def _find_component(self, element):
+        for registered_component in SlApp._components:
+            if isinstance(element, registered_component["component"]):
+                self._components.append(registered_component)
 
+    # noinspection PyProtectedMember
+    def add_components(self) -> None:
+        """Used to add the components to the App"""
+        for element in self.body():
             if isinstance(element, Component):
-                self._components.append(element)
+                self._find_component(element)
 
             elif isinstance(element, ctx.Context):
-                self._components.append(element._components)
 
-            returned_value += element.render()
+                for component_element in element._components:
+                    self._find_component(component_element)
 
-        return returned_value
+            else:
+                raise NotValidComponent(f"{element} is not a valid component or context!")
 
