@@ -75,10 +75,15 @@ class Component(ABC):
 class AppComponent(ABC):
     """App based slobypy"""
     _components: list = []  # Used to define the components in the app body
-    __slots__ = ()  # in order to make only one subclass(child)
+    _initialized: bool = False  # In order to make only one child class
 
     def __init__(self) -> None:
+
+        if AppComponent._initialized:
+            raise Exception("AppComponent can only be inherited by one child class")
         self.add_components()
+
+        AppComponent._initialized = True
 
     @abstractmethod
     def body(self) -> Generator[Type[BaseElement] | Type[Component] | Type[ctx.Context], None, None]:
