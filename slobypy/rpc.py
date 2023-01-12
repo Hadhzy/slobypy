@@ -298,6 +298,7 @@ class RPC:
         self.conn[conn._sloby_id - 1]["heartbeat"].set()
 
     async def pre_rendered_send(self, conn):
+        """Used to render the static components"""
         for component in self.pre_rendered:
             await self.send(conn, {"route": component["uri"], "html": await self.get_route(component["uri"])})
 

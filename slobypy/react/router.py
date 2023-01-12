@@ -5,6 +5,7 @@ from typing import Generator, Self
 from slobypy.react._react_types import UriType
 from slobypy.rpc import RPC
 
+
 class SloRouter:
     """Used to define the route"""
 
@@ -53,6 +54,7 @@ class SloRouter:
         return endpoints_count
 
     def dynamic_routes_iter(self) -> list:
+        """Used to return the dynamic routes"""
         return self._dynamic_routes
 
     def _endpoints_as_list(self) -> list[str]:
@@ -60,6 +62,7 @@ class SloRouter:
 
     @classmethod
     def redirect(cls, url: UriType):
+        """Used to redirect the url"""
         cls.rpc = RPC(cls)
         cls.rpc.handle_event({"type": "url_redirect"})
 

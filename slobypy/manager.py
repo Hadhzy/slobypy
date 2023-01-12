@@ -111,6 +111,7 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
 
 @app.command()
 def generate_delete(path: Path):
+    """Used to remove the generated files"""
     if path.exists():
         if any(path.iterdir()) is False:
             typer.echo("The path is empty")
@@ -261,6 +262,7 @@ class SloDash:
         return []
 
     def check_pre_rendered(self, component) -> str | None:
+        """Used to check if the component is pre-rendered or not"""
         if component["static"] is True:
             self.pre_rendered.append(component)
             return
@@ -289,6 +291,7 @@ class SloDash:
 
     # noinspection PyProtectedMember
     async def watch_app_added(self, path: Path) -> list | list[str]:
+        """Hook that is called when the app file is created"""
         routes = []
         if self.path.resolve() == path.resolve():
             for component in AppComponent._components:
@@ -302,6 +305,7 @@ class SloDash:
 
     # noinspection PyProtectedMember
     async def watch_app_modified(self, path: Path) -> list | None:
+        """Hook that is called when the app file is modified"""
         routes = []
         if (self.path / "app.py").resolve() == path.resolve():
             for component in AppComponent._components.copy():
@@ -414,6 +418,7 @@ class GenerateOption(Static):
         self.input = ""
 
     def render(self):
+        """Used to render the text"""
         return self.text
 
     def text_input(self, key: Key):
@@ -434,7 +439,6 @@ class BufferWidget(Static):
 
 
 class SloText(App):
-    CSS_PATH = "css/SloTextDesign.css"
     BINDINGS = [
         Binding(
             key="q", action="quit", description="Quit the app"),
@@ -541,6 +545,7 @@ class SloText(App):
                 self.current_header.text = "Example header"
 
     def get_selected_preprocessor(self) -> list[str, list[str, str]]:
+        """Used to return the selected preprocessor"""
         selected_preprocessor_text = self.selection[self.selected_preprocessor].original_text.lower()
         return [selected_preprocessor_text, self.PREPROCESSOR_INFORMATION[selected_preprocessor_text][1]]
 
