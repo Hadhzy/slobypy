@@ -488,7 +488,9 @@ class RPC:
         - None
         """
         # Re-render all RPC shards on those routes
+        print("hot reload routes", routes)
         routes = routes or []
+        print(set(routes))
         for connection in self.conn:
             for shard in connection["shards"].values():
                 if shard["route"] in list(set(routes)):

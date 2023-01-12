@@ -272,6 +272,10 @@ class SloDash:
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path) -> list | list[str]:
         """Hook that is called when a component file is added"""
+        print("component added")
+        if AppComponent._components:  # if the app have components
+            return []
+
         if (self.path / 'components').resolve() in path.parents:
             return [self.check_pre_rendered(component) for component in SlApp._components if
                     component["source_path"] == path]
@@ -280,27 +284,34 @@ class SloDash:
     # noinspection PyProtectedMember
     async def watch_component_modified(self, path: Path) -> list | None:
         """Hook that is called when a component file is modified"""
+
         routes = []
         if (self.path / 'components').resolve() in path.parents:
+            print("component modified")
             for component in SlApp._components.copy():
                 if str(component["source_path"].resolve()) == str(path.resolve()):
                     SlApp._components.remove(component)
                     routes.append(component["uri"])
-
+        print("component routes", routes)
         return routes
 
     # noinspection PyProtectedMember
-    async def watch_app_added(self, path: Path) -> list | list[str]:
+    async def watch_app_added(self, path: Path) -> list | list[str] | None:
         """Hook that is called when the app file is created"""
+        print("app added")
+        if not AppComponent._components:  # if there is no component inside the app
+            return []
+
+        print("app routes")
         routes = []
-        if self.path.resolve() == path.resolve():
+        if (self.path / "app.py").resolve() == path.resolve():
             for component in AppComponent._components:
                 if component["component"] in SlApp.only_components:
-                    routes.append(component)
+                    routes.append(component["uri"])
                 else:
                     raise Exception("Error")
 
-        return ["app_route", routes] if routes else []
+        return routes
 
 
     # noinspection PyProtectedMember
@@ -308,11 +319,12 @@ class SloDash:
         """Hook that is called when the app file is modified"""
         routes = []
         if (self.path / "app.py").resolve() == path.resolve():
+            print("app modified")
             for component in AppComponent._components.copy():
                 AppComponent._components.remove(component)
                 routes.append(component["uri"])
 
-        return ["app_route", routes] if routes else []
+        return routes
 
     # noinspection PyProtectedMember
     async def watch_root(self, path):
@@ -322,25 +334,18 @@ class SloDash:
             for change in changes:
                 path = Path(change[1])
                 routes = []
-                app_route = []
                 if path.suffix == ".py":
                     if change[0]._value_ == 1:  # Added
+
                         self.modules.update({path.resolve(): import_file(path)})
 
                         for callback in self.watch_callbacks:
-                            try:
-                                app_route_type, app_routes = await callback["added"](path)
-                                app_route.extend(app_routes)
-                            except:
-                                routes.extend(await callback["added"](path))
+                            routes.extend(await callback["added"](path))
 
                     elif change[0]._value_ == 2:  # Modified
+
                         for callback in self.watch_callbacks:
-                            try:
-                                app_route_type, app_routes = await callback["modified"](path)
-                                app_route.extend(app_routes)
-                            except:
-                                routes.extend(await callback["modified"](path))
+                            routes.extend(await callback["modified"](path))
 
                         # Reload the module
                         self.modules[path.resolve()] = reload(self.modules[path.resolve()])
@@ -353,13 +358,20 @@ class SloDash:
                     for callback in self.watch_callbacks:
                         if callback["changes_done"] is not None:
                             await callback["changes_done"](path)  # call the reload_all_css with parameter: path
+                    print("routes")
 
-                    await self.rpc.hot_reload_routes(app_route if app_route else routes)
+                    await self.rpc.hot_reload_routes(routes)
 
     # noinspection PyMethodMayBeStatic
     async def on_start(self, host, port):
         """Hook that is called when the app starts"""
         self.watch_callbacks = [
+            {
+                "added": self.watch_app_added,
+                "modified": self.watch_app_modified,
+                "removed": self.watch_app_modified,
+                "changes_done": None
+            },
             {
                 "added": self.watch_component_added,
                 "modified": self.watch_component_modified,
@@ -371,13 +383,7 @@ class SloDash:
                 "modified": self.watch_scss_modified,
                 "removed": self.watch_scss_modified,
                 "changes_done": self.rpc.reload_all_css,
-            },
-            {
-                "added": self.watch_app_added,
-                "modified": self.watch_app_modified,
-                "removed": self.watch_app_modified,
-                "changes_done": None
-            },
+            }
 
         ]
 
