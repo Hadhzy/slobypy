@@ -337,7 +337,7 @@ class SloDash:
                     elif change[0]._value_ == 2:  # Modified
                         for callback in self.watch_callbacks:
                             try:
-                                app_route_type, app_routes = await callback["added"](path)
+                                app_route_type, app_routes = await callback["modified"](path)
                                 app_route.extend(app_routes)
                             except:
                                 routes.extend(await callback["modified"](path))

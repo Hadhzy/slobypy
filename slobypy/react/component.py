@@ -75,12 +75,8 @@ class Component(ABC):
 class AppComponent(ABC):
     """App based slobypy"""
     _components: list = []  # Used to define the components in the app body
-    _initialized: bool = False  # In order to make only one child class
 
     def __init__(self) -> None:
-
-        if AppComponent._initialized:
-            raise Exception("AppComponent can only be inherited by one child class")
         self.add_components()
 
         AppComponent._initialized = True
