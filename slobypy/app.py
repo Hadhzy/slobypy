@@ -117,5 +117,7 @@ class SlApp:
             for component in cls._components:
                 if component["uri"] == route:
                     return component["component"]().render()
+            else:
+                return "404"
 
         return "".join(component["component"]().render() for component in cls._components)
