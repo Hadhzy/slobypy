@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Component",
-    "AppComponent")
+    "AppComponent",)
 
 
 class Component(ABC):
@@ -75,11 +75,10 @@ class Component(ABC):
 class AppComponent(ABC):
     """App based slobypy"""
     _components: list = []  # Used to define the components in the app body
-
+    register = False  # Used to define whenever the components is defined or not
     def __init__(self) -> None:
         self.add_components()
 
-        AppComponent._initialized = True
 
     @abstractmethod
     def body(self) -> Generator[Type[BaseElement] | Type[Component] | Type[ctx.Context], None, None]:
@@ -106,4 +105,5 @@ class AppComponent(ABC):
 
             else:
                 raise NotValidComponent(f"{element} is not a valid component or context!")
+
 

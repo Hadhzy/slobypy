@@ -11,6 +11,8 @@ from pathlib import Path
 from .rpc import Event, RPC
 from .react.tools import uri_checker
 from .react.router import SloRouter
+from .errors.pages import Page404
+
 if TYPE_CHECKING:
     from .react.component import Component
 
@@ -118,6 +120,6 @@ class SlApp:
                 if component["uri"] == route:
                     return component["component"]().render()
             else:
-                return "404"
+                return Page404(route=route).show()
 
         return "".join(component["component"]().render() for component in cls._components)
