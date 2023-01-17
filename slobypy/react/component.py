@@ -7,9 +7,9 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generator, Type
 
 # This project
-from slobypy import SlApp
 from slobypy.react.scss import SCSS
 from slobypy.errors.react_errors import NotValidComponent
+import slobypy.app as app
 
 import slobypy.react.context as ctx
 
@@ -28,7 +28,7 @@ class Component(ABC):
         # noinspection PyTypeChecker
         component = super().__new__(cls, *args, **kwargs)
         # noinspection PyProtectedMember
-        for registered_component in SlApp._components:
+        for registered_component in app.SlApp._components:
             if registered_component["component"] == cls:
                 component.meta_data = registered_component["metadata"]
 
@@ -75,7 +75,6 @@ class Component(ABC):
 class AppComponent(ABC):
     """App based slobypy"""
     _components: list = []  # Used to define the components in the app body
-    register = False  # Used to define whenever the components is defined or not
     def __init__(self) -> None:
         self.add_components()
 
@@ -87,7 +86,7 @@ class AppComponent(ABC):
 
     # noinspection PyProtectedMember
     def _find_component(self, element):
-        for registered_component in SlApp._components:
+        for registered_component in app.SlApp._components:
             if isinstance(element, registered_component["component"]):
                 self._components.append(registered_component)
 

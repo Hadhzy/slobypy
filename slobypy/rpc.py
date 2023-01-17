@@ -19,7 +19,8 @@ from websockets import serve  # pylint: disable=no-name-in-module
 from websockets.legacy.server import WebSocketServerProtocol
 
 from .react.design import Design
-
+# This project
+from .react.component import AppComponent
 
 class RPC:
     CURRENT_VERSION = '0.A1'
@@ -477,6 +478,21 @@ class RPC:
         else:
             return (await self.css_preprocessor()).read_text()
 
+    #noinspection PyProtectedMember
+    #noinspection PyMethodMayBeStatic
+    async def check_app(self, shard_route, routes):
+        if AppComponent._components:
+            for app_component in AppComponent._components:
+                if app_component["uri"] == shard_route:
+                    return True
+            else:
+                return
+        else:
+            return shard_route in routes
+
+
+
+
     async def hot_reload_routes(self, routes: list):
         """
         Hot reloads routes on all connections
@@ -493,7 +509,8 @@ class RPC:
         print(set(routes))
         for connection in self.conn:
             for shard in connection["shards"].values():
-                if shard["route"] in list(set(routes)):
+
+                if await self.check_app(shard["route"], list(set(routes))):
                     # Replay last-render (same route)
                     await self.render_shard(connection["conn"], shard["last_render"])
 
