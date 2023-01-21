@@ -150,22 +150,10 @@ class MyFirstComponent(Component):
 
     def body(self):
         yield P("inside the component body")
-
-    def mount(self):
-        print("after registration")
-
-
-component1 = MyFirstComponent()
-print(component1.render())
 ```
-
-```
-<p >inside the component body</p>
-```
-
------------
 
 **Component "registration" with the uri"**
+
 
 ```py
 app = SlApp()

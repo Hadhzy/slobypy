@@ -84,11 +84,22 @@ class AppComponent(ABC):
         """Used to define the components"""
         pass
 
+
+    #noinspection PyProtectedMember
+    #noinspection PyMethodMayBeStatic
+    def _get_as_full_component(self, component):
+        for register_component in app.SlApp._components:
+            if register_component["component"] == component:
+                return register_component
+
     # noinspection PyProtectedMember
     def _find_component(self, element):
-        for registered_component in app.SlApp._components:
-            if isinstance(element, registered_component["component"]):
-                self._components.append(registered_component)
+        for component in app.SlApp.only_components:
+            if isinstance(element, component):
+                self._components.append(self._get_as_full_component(component))
+                return
+        else:
+            raise NotValidComponent(f"{element} is not a valid component or context!")
 
     # noinspection PyProtectedMember
     def add_components(self) -> None:
@@ -98,11 +109,10 @@ class AppComponent(ABC):
                 self._find_component(element)
 
             elif isinstance(element, ctx.Context):
-
                 for component_element in element._components:
+                    print(type(component_element))
                     self._find_component(component_element)
 
-            else:
-                raise NotValidComponent(f"{element} is not a valid component or context!")
+
 
 

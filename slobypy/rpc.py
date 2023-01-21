@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 from pathlib import Path
-from typing import Callable, Awaitable, Any, List, Coroutine, Type
+from typing import Callable, Awaitable, Any, List, Coroutine
 
 import asyncio
 import json
@@ -21,6 +21,8 @@ from websockets.legacy.server import WebSocketServerProtocol
 from .react.design import Design
 # This project
 from .react.component import AppComponent
+from slobypy.errors.pages import Page404
+
 
 class RPC:
     CURRENT_VERSION = '0.A1'
@@ -235,6 +237,7 @@ class RPC:
         elif data["type"] == "get_route":
             await self.render_shard(conn, data["data"])
 
+    #noinspection PyMethodMayBeStatic
     async def send(self, conn: WebSocketServerProtocol, data: dict) -> None:
         """
         Sends data to the React frontend
@@ -361,9 +364,11 @@ class RPC:
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])] = data
         await self.send_hook("on_new_shard", conn, data)
         await self.log(f"New shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']}")
+
         # Serve initial route
         if conn._sloby_loaded_initial_css:
             await self.reload_css(conn)
+
         await self.render_shard(conn, data)
 
     async def render_shard(self, conn: WebSocketServerProtocol, data: dict) -> None:
@@ -377,15 +382,19 @@ class RPC:
         ### Returns
         - None
         """
+
         start_time = datetime.now()
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["route"] = data["route"]
         self.conn[conn._sloby_id - 1]["shards"][str(data["id"])]["last_render"] = data
-        await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]))
+
+
+        await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]), data["route"])
+
         await self.send_hook("on_render_shard", conn, data)
         await self.log(f"Rendered shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']} in "
                        f"{int(round((datetime.now() - start_time).total_seconds(), 3) * 1000)}ms")
 
-    async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str) -> None:
+    async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str, shard_route: str) -> None:
         """
         Updates the html data of a shard
 
@@ -397,18 +406,18 @@ class RPC:
         ### Returns
         - None
         """
+
         await self.send(
             conn,
             {
                 "type": "update_shard_data",
                 "data": {
                     "id": shard_id,
-                    "html": html
+                    "html": html if self._check_shard_render_alone(shard_route) else Page404(route=shard_route).show()
                 },
                 "sequence": random.randint(1000, 9999),
             }
         )
-
     async def shard_event(self, conn: WebSocketServerProtocol, data: dict):
         """
         Handles a shard event from the React frontend
@@ -422,6 +431,7 @@ class RPC:
         """
         pass
 
+    #noinspection PyProtectedMember
     async def get_route(self, route):
         """
         Gets the html of a route
@@ -432,6 +442,7 @@ class RPC:
         ### Returns
         - str: The full html data of the route
         """
+
         return self.app._render(route=route)
 
     async def reload_all_css(self, *args, **kwargs) -> list:
@@ -488,13 +499,26 @@ class RPC:
 
     #noinspection PyProtectedMember
     #noinspection PyMethodMayBeStatic
-    async def check_app(self, shard_route, routes) -> bool | None:
+    def _check_shard_render_alone(self, shard_route):
+        if AppComponent._components:
+            for app_component in AppComponent._components:
+                print(app_component)
+                if app_component["uri"] == shard_route:
+                    return True
+            else:
+                return False
+        else:
+            return True
+
+    #noinspection PyProtectedMember
+    #noinspection PyMethodMayBeStatic
+    async def _check_app_hot_reload(self, shard_route, routes):
         if AppComponent._components:
             for app_component in AppComponent._components:
                 if app_component["uri"] == shard_route:
                     return True
             else:
-                return
+                return False
         else:
             return shard_route in routes
 
@@ -512,13 +536,11 @@ class RPC:
         - None
         """
         # Re-render all RPC shards on those routes
-        print("hot reload routes", routes)
         routes = routes or []
-        print(set(routes))
         for connection in self.conn:
             for shard in connection["shards"].values():
 
-                if await self.check_app(shard["route"], list(set(routes))):
+                if await self._check_app_hot_reload(shard["route"], list(set(routes))):
                     # Replay last-render (same route)
                     await self.render_shard(connection["conn"], shard["last_render"])
 
