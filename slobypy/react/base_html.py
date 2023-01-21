@@ -5,8 +5,10 @@ from __future__ import annotations
 
 # Built-in
 import string
-from typing import Self
-from typing import Generator, Type
+from typing import Generator, Type, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Self
 
 # This Project
 from slobypy import react

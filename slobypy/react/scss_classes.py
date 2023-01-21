@@ -4,7 +4,10 @@ from __future__ import annotations
 import inspect
 
 # Built-in
-from typing import Generator, Type, Self
+from typing import Generator, Type, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Self
 
 # This project
 from slobypy.react.scss import SCSS

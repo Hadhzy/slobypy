@@ -1,5 +1,8 @@
 from __future__ import annotations
-from typing import Generator, Self
+from typing import Generator, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Self
 
 # This project
 from slobypy.react._react_types import UriType

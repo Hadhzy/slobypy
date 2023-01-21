@@ -34,33 +34,30 @@ class RPC:
     - None
     """
 
-    def __init__(self, app,
-                 host: str = "localhost",
-                 port: int = 8765,
-                 hooks: list = None,
-                 console: Console = None,
-                 event_loop: AbstractEventLoop = None,
-                 tasks: List[Coroutine] = None,
-                 external_tasks: List[str] = None,
-                 preprocessor=None,
-                 cwd: Path = None,
-                 pre_rendered=None):
-        self.css_preprocessor: Callable[[], Awaitable[Path]] = None
+    def __init__(
+        self, 
+        app,
+        host: str = "localhost",
+        port: int = 8765,
+        hooks: list | None = None,
+        console: Console | None = None,
+        event_loop: AbstractEventLoop | None = None,
+        tasks: List[Coroutine[Any, Any, None]] | None = None,
+        external_tasks: List[str] | None = None,
+        preprocessor = None,
+        cwd: Path | None = None,
+        pre_rendered = None,
+    ) -> None:
+        self.css_preprocessor: Callable[[], Awaitable[Path]] | None = None
 
-        if tasks is None:
-            tasks = []
-        if hooks is None:
-            hooks = []
         self.app = app
-        self.hooks = hooks
+        self.hooks = hooks or []
         self.console = console
         self.pre_rendered = pre_rendered or []
-        if event_loop is None:
-            event_loop = asyncio.get_event_loop()
-        self.event_loop = event_loop
+        self.event_loop = event_loop or asyncio.get_event_loop()
         asyncio.set_event_loop(self.event_loop)
         self.executor = ThreadPoolExecutor(max_workers=10)
-        self.tasks = tasks
+        self.tasks = tasks or []
         self.external_tasks = external_tasks
         self.preprocessor = preprocessor  # the module
         self.cwd = cwd
@@ -68,12 +65,12 @@ class RPC:
         self.ws = None  # pylint: disable=invalid-name
         self.conn = []
 
-        for hook in hooks:
+        for hook in self.hooks:
             hook.rpc = self
 
         asyncio.run(self.run(host, port))
 
-    async def run(self, host: str, port: int):
+    async def run(self, host: str, port: int) -> None:
         """
         Runs the event loop
 
@@ -100,7 +97,7 @@ class RPC:
         pending = asyncio.all_tasks()
         self.event_loop.run_until_complete(asyncio.gather(*pending))
 
-    async def send_hook(self, name: str, *args, **kwargs):
+    async def send_hook(self, name: str, *args, **kwargs) -> None:
         """
         Calls any hooks that are registered with the RPC (e.g. SloDash)
 
@@ -118,7 +115,7 @@ class RPC:
             except AttributeError:
                 continue
 
-    async def log(self, data: Any):
+    async def log(self, data: Any) -> None:
         """
         Logs data to the console
 
@@ -131,7 +128,7 @@ class RPC:
         if self.console:
             self.console.log("[black on grey37] INFO [/]", data)
 
-    async def warn(self, data: Any):
+    async def warn(self, data: Any) -> None:
         """
         Logs a warning to the console
 
@@ -144,7 +141,7 @@ class RPC:
         if self.console:
             self.console.log("[black on yellow] WARN [/]", data)
 
-    async def error(self, data: Any):
+    async def error(self, data: Any) -> None:
         """
         Logs an error to the console
 
@@ -157,10 +154,12 @@ class RPC:
         if self.console:
             self.console.log("[black on red] ERROR [/]", data)
 
-    async def create_ws(self,
-                        ws_handler: Callable[[WebSocketServerProtocol], Awaitable[Any]],
-                        host: str = "localhost",
-                        port: int = 8765):
+    async def create_ws(
+        self,
+        ws_handler: Callable[[WebSocketServerProtocol], Awaitable[Any]],
+        host: str = "localhost",
+        port: int = 8765
+    ) -> None:
         """
         Creates a websocket connection to the React frontend
 
@@ -176,7 +175,7 @@ class RPC:
         self.ws = await serve(ws_handler, host, port)
         await self.ws.serve_forever()
 
-    async def _handle_ws(self, conn: WebSocketServerProtocol):
+    async def _handle_ws(self, conn: WebSocketServerProtocol) -> None:
         """
         Handles the websocket connection
 
@@ -190,7 +189,7 @@ class RPC:
         await self.log(f"Received Sloby connection from {':'.join(map(str, conn.remote_address))}")
         await self.listen(conn)
 
-    async def listen(self, conn: WebSocketServerProtocol):
+    async def listen(self, conn: WebSocketServerProtocol) -> None:
         """
         Listens for messages from the React frontend
 
@@ -213,7 +212,7 @@ class RPC:
                 conn_id = "Unknown"
             await self.warn(f"Lost Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn_id}")
 
-    async def handle_event(self, conn: WebSocketServerProtocol, data: dict):
+    async def handle_event(self, conn: WebSocketServerProtocol, data: dict) -> None:
         """
         Handles the event sent from the React frontend
 
@@ -236,7 +235,7 @@ class RPC:
         elif data["type"] == "get_route":
             await self.render_shard(conn, data["data"])
 
-    async def send(self, conn: WebSocketServerProtocol, data: dict):
+    async def send(self, conn: WebSocketServerProtocol, data: dict) -> None:
         """
         Sends data to the React frontend
 
@@ -249,7 +248,7 @@ class RPC:
         """
         await conn.send(json.dumps(data))
 
-    async def wait_for_hearbeat(self, conn: WebSocketServerProtocol):
+    async def wait_for_hearbeat(self, conn: WebSocketServerProtocol) -> None:
         """
         Waits for a heartbeat from the React frontend
 
@@ -259,14 +258,17 @@ class RPC:
         ### Returns
         - None
         """
-        async def internal_wait(latency):
+        async def internal_wait(latency) -> None:
             await asyncio.wait_for(event.wait(), timeout=(interval + latency) / 1000)
             event.clear()
-            await self.send(conn, {
-                "type": "heartbeatACK",
-                "data": None,
-                "sequence": None,
-            })
+            await self.send(
+                conn,
+                {
+                    "type": "heartbeatACK",
+                    "data": None,
+                    "sequence": None,
+                },
+            )
 
         event = self.conn[conn._sloby_id - 1]["heartbeat"]
         interval = self.conn[conn._sloby_id - 1]["heartbeat_interval"]
@@ -286,7 +288,7 @@ class RPC:
                     await conn.close()
                     break
 
-    async def heartbeat(self, conn: WebSocketServerProtocol):
+    async def heartbeat(self, conn: WebSocketServerProtocol) -> None:
         """
         Handles the heartbeat from the React frontend
 
@@ -298,13 +300,13 @@ class RPC:
         """
         self.conn[conn._sloby_id - 1]["heartbeat"].set()
 
-    async def pre_rendered_send(self, conn):
+    async def pre_rendered_send(self, conn) -> None:
         """Used to render the static components"""
         for component in self.pre_rendered:
             await self.send(conn, {"route": component["uri"], "html": await self.get_route(component["uri"])})
 
 
-    async def identify(self, conn: WebSocketServerProtocol, data: dict):
+    async def identify(self, conn: WebSocketServerProtocol, data: dict) -> None:
         """
         Identifies the React frontend's websocket
 
@@ -345,7 +347,7 @@ class RPC:
         # Create task to watch for heartbeat
         self.conn[conn._sloby_id - 1]["_internal_heartbeat"] = asyncio.ensure_future(self.wait_for_hearbeat(conn))
 
-    async def new_shard(self, conn: WebSocketServerProtocol, data: dict):
+    async def new_shard(self, conn: WebSocketServerProtocol, data: dict) -> None:
         """
         Handles a new shard request from the React frontend
 
@@ -364,7 +366,7 @@ class RPC:
             await self.reload_css(conn)
         await self.render_shard(conn, data)
 
-    async def render_shard(self, conn: WebSocketServerProtocol, data: dict):
+    async def render_shard(self, conn: WebSocketServerProtocol, data: dict) -> None:
         """
         Renders a shard to the React frontend
 
@@ -383,7 +385,7 @@ class RPC:
         await self.log(f"Rendered shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']} in "
                        f"{int(round((datetime.now() - start_time).total_seconds(), 3) * 1000)}ms")
 
-    async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str):
+    async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str) -> None:
         """
         Updates the html data of a shard
 
@@ -395,14 +397,17 @@ class RPC:
         ### Returns
         - None
         """
-        await self.send(conn, {
-            "type": "update_shard_data",
-            "data": {
-                "id": shard_id,
-                "html": html
-            },
-            "sequence": random.randint(1000, 9999),
-        })
+        await self.send(
+            conn,
+            {
+                "type": "update_shard_data",
+                "data": {
+                    "id": shard_id,
+                    "html": html
+                },
+                "sequence": random.randint(1000, 9999),
+            }
+        )
 
     async def shard_event(self, conn: WebSocketServerProtocol, data: dict):
         """
@@ -429,7 +434,7 @@ class RPC:
         """
         return self.app._render(route=route)
 
-    async def reload_all_css(self, *args, **kwargs):
+    async def reload_all_css(self, *args, **kwargs) -> list:
         """
         Reloads all css on all connections
 
@@ -444,7 +449,7 @@ class RPC:
 
         return []
 
-    async def reload_css(self, conn: WebSocketServerProtocol):
+    async def reload_css(self, conn: WebSocketServerProtocol) -> None:
         """
         Reloads the css on a connection
 
@@ -454,15 +459,18 @@ class RPC:
         ### Returns
         - None
         """
-        await self.send(conn, {
-            "type": "reload_css",
-            "data": {
-                "css": await self.get_css(),
-            },
-            "sequence": random.randint(1000, 9999),
-        })
+        await self.send(
+            conn,
+            {
+                "type": "reload_css",
+                "data": {
+                    "css": await self.get_css(),
+                },
+                "sequence": random.randint(1000, 9999),
+            }
+        )
 
-    async def get_css(self):
+    async def get_css(self) -> str:
         """
         Renders the CSS in the application
 
@@ -480,7 +488,7 @@ class RPC:
 
     #noinspection PyProtectedMember
     #noinspection PyMethodMayBeStatic
-    async def check_app(self, shard_route, routes):
+    async def check_app(self, shard_route, routes) -> bool | None:
         if AppComponent._components:
             for app_component in AppComponent._components:
                 if app_component["uri"] == shard_route:
@@ -493,7 +501,7 @@ class RPC:
 
 
 
-    async def hot_reload_routes(self, routes: list):
+    async def hot_reload_routes(self, routes: list) -> None:
         """
         Hot reloads routes on all connections
 
