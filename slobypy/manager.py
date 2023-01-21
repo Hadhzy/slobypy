@@ -295,17 +295,15 @@ class SloDash:
     # noinspection PyProtectedMember
     async def watch_app_added(self, path: Path) -> list | list[str] | None:
         """Hook that is called when the app file is created"""
+        if (self.path / "app.py").resolve() == path.resolve():
+            for component in AppComponent._components:
+                print("component", component)
+                if component["component"] in SlApp.only_components:
+                    continue
+                else:
+                    raise Exception(f"{component['component']}is not registered")
 
-        # print("app routes")
-        # routes = []
-        # if (self.path / "app.py").resolve() == path.resolve():
-        #     for component in AppComponent._components:
-        #         if component["component"] in SlApp.only_components:
-        #             routes.append(component["uri"])
-        #         else:
-        #             raise Exception("Error")
-        #
-        # return routes
+        return []
 
 
     # noinspection PyProtectedMember
