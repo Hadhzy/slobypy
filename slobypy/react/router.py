@@ -2,11 +2,15 @@ from __future__ import annotations
 from typing import Generator, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Self
+    from typing import Self  # type: ignore  # for python versions < 3.11
 
 # This project
 from slobypy.react._react_types import UriType
 from slobypy.rpc import RPC
+
+__all__: tuple[str, ...] = (
+    "SloRouter",
+)
 
 
 class SloRouter:
@@ -31,8 +35,7 @@ class SloRouter:
 
     def __get_object(self) -> Self:
         """Used to return a SloRouter with the latest route"""
-        obj = SloRouter(self.route)
-        return obj
+        return SloRouter(self.route)
 
     def __str__(self) -> str:
         return self.route
@@ -46,7 +49,6 @@ class SloRouter:
 
     def endpoints_count(self) -> int:
         """Used to return the endpoints in an uri"""
-
         endpoints_count = 0
         endpoints = self._endpoints_as_list()
 
@@ -64,10 +66,10 @@ class SloRouter:
         return self.route.split("/")
 
     @classmethod
-    def redirect(cls, url: UriType):
+    def redirect(cls, url: UriType) -> None:
         """Used to redirect the url"""
         cls.rpc = RPC(cls)
-        cls.rpc.handle_event({"type": "url_redirect"})
+        cls.rpc.handle_event({"type": "url_redirect"})  # missing "conn" argument
 
 
     def __iter__(self) -> Generator[int, None, None]:
@@ -75,5 +77,5 @@ class SloRouter:
         stop = self.endpoints_count()
         curr = start
         while curr < stop:
-            yield self._endpoints_as_list()[curr]
+            yield self._endpoints_as_list()[curr]  # expression of type "str" cannot be assigned to yield type "int"
             curr += 1

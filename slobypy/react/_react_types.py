@@ -1,3 +1,5 @@
 """Separated types for React components."""
 
-UriType = str
+from typing_extensions import TypeAlias
+
+UriType: TypeAlias = str

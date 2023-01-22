@@ -15,13 +15,18 @@ from dataclasses import dataclass
 
 import websockets.exceptions
 from rich.console import Console
-from websockets import serve  # pylint: disable=no-name-in-module
+from websockets import serve  # pylint: disable=no-name-in-module # type: ignore
 from websockets.legacy.server import WebSocketServerProtocol
 
 from .react.design import Design
 # This project
 from .react.component import AppComponent
 from slobypy.errors.pages import Page404
+
+__all__: tuple[str, ...] = (
+    "RPC",
+    "Event",
+)
 
 
 class RPC:
@@ -337,7 +342,8 @@ class RPC:
         await self.send_hook("on_identify", conn, data)
         await self.log(
             f"Identified Sloby connection from {':'.join(map(str, conn.remote_address))}, id: {conn._sloby_id}, "
-            f"client: [cyan]{data['client']}[/cyan], max_shards: {data['max_shards']}")
+            f"client: [cyan]{data['client']}[/cyan], max_shards: {data['max_shards']}"
+        )
 
         await self.send(conn, {
             "type": "ready",
@@ -391,8 +397,10 @@ class RPC:
         await self.update_shard_data(conn, data["id"], await self.get_route(data["route"]), data["route"])
 
         await self.send_hook("on_render_shard", conn, data)
-        await self.log(f"Rendered shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']} in "
-                       f"{int(round((datetime.now() - start_time).total_seconds(), 3) * 1000)}ms")
+        await self.log(
+            f"Rendered shard #{data['id']} on connection #{conn._sloby_id}, route: {data['route']} in "
+            f"{int(round((datetime.now() - start_time).total_seconds(), 3) * 1000)}ms"
+        )
 
     async def update_shard_data(self, conn: WebSocketServerProtocol, shard_id, html: str, shard_route: str) -> None:
         """
@@ -499,7 +507,7 @@ class RPC:
 
     #noinspection PyProtectedMember
     #noinspection PyMethodMayBeStatic
-    def _check_shard_render_alone(self, shard_route):
+    def _check_shard_render_alone(self, shard_route) -> bool:
         if AppComponent._components:
             for app_component in AppComponent._components:
                 print(app_component)
@@ -507,23 +515,18 @@ class RPC:
                     return True
             else:
                 return False
-        else:
-            return True
+        return True
 
     #noinspection PyProtectedMember
     #noinspection PyMethodMayBeStatic
-    async def _check_app_hot_reload(self, shard_route, routes):
+    async def _check_app_hot_reload(self, shard_route, routes) -> bool:
         if AppComponent._components:
             for app_component in AppComponent._components:
                 if app_component["uri"] == shard_route:
                     return True
             else:
                 return False
-        else:
-            return shard_route in routes
-
-
-
+        return shard_route in routes
 
     async def hot_reload_routes(self, routes: list) -> None:
         """
@@ -560,7 +563,6 @@ class Event:
     ### Returns
     - None
     """
-
     name: str
     type: str
     time: int

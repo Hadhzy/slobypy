@@ -1,6 +1,7 @@
 """Separated types for HTML elements."""
 
 from typing import Dict, Any, Tuple
+from typing_extensions import TypeAlias
 
-SlobyPyATTRS = Dict[str, Any]
-SlobyPyCONTENT = Tuple[Any]
+SlobyPyATTRS: TypeAlias = Dict[str, Any]
+SlobyPyCONTENT: TypeAlias = Tuple[Any]

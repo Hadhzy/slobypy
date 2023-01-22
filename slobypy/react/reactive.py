@@ -10,6 +10,9 @@ class NotSet:  # pylint: disable=too-few-public-methods
 
 NOT_SET = NotSet()
 
+__all__: tuple[str, ...] = (
+    "Reactive",
+)
 
 class Reactive:
     """
@@ -33,11 +36,11 @@ class Reactive:
         self.value = value  # store the values
         self.callbacks = []  # store the callbacks
 
-    def __set__(self, obj, value):
+    def __set__(self, obj, value) -> None:
         self.current_value = getattr(obj, self.public_name)
         if self.current_value != value:
             setattr(obj, self.internal_name, value)
-            slobypy.SlApp._render(obj)
+            slobypy.SlApp._render(obj)  # type: ignore
 
     def __get__(self, obj, objtype=None):
         value = getattr(obj, self.internal_name, NOT_SET)
@@ -45,6 +48,6 @@ class Reactive:
             return value
         return None
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner, name) -> None:
         self.public_name = name
         self.internal_name = '_reactive_' + name

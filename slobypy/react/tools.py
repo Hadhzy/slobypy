@@ -7,6 +7,10 @@ from urllib.parse import urlparse
 from slobypy.react._react_types import UriType
 from slobypy.errors.react_errors import URIError
 
+__all__: tuple[str, ...] = (
+    "uri_checker",
+)
+
 
 def uri_checker(uri: UriType = False) -> str | bool:
     """
