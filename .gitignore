@@ -128,7 +128,3 @@ dmypy.json
 /.idea!
 /test.py
 
-app.py
-preprocessor.py
-sloby.config.json
-components/example_component.py
