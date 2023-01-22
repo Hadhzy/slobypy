@@ -2,6 +2,10 @@
 
 from slobypy.react.scss_properties import POSSIBLE_ATTRIBUTES
 
+__all__: tuple[str, ...] = (
+    "SCSS",
+)
+
 
 class SCSS:
     """
@@ -16,15 +20,14 @@ class SCSS:
     """
     POSSIBLE_ATTRIBUTES = POSSIBLE_ATTRIBUTES
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():
             self.__setattr__(key, value)
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key, value) -> None:
         if key in self.POSSIBLE_ATTRIBUTES:
             super().__setattr__(key, value)
-        else:
-            raise AttributeError(f"Attribute {key} is not a valid CSS attribute")
+        raise AttributeError(f"Attribute {key} is not a valid CSS attribute")
 
     def __getattr__(self, item):
         if item in self.POSSIBLE_ATTRIBUTES:

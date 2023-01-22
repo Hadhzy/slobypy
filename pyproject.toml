@@ -6,7 +6,6 @@ authors = ["Hadházy Tamás <helsgithub15@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-
 python = "^3.11"
 mypy = "^0.991"
 fastapi = "^0.87.0"
@@ -22,4 +21,34 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 slobypy = "slobypy.manager:start_typer"
+
+[tool.pyright]
+include = [
+    "slobypy",
+    "tests/*.py",
+    "*.py"
+]
+typeCheckingMode = "strict"
+
+reportUnnecessaryTypeIgnoreComment = true
+
+reportOverlappingOverload = false
+reportPrivateUsage = false
+reportUnnecessaryIsInstance = false
+reportFunctionMemberAccess = false
+reportMissingTypeStubs = false
+reportUnusedFunction = false
+reportUnusedClass = false
+reportConstantRedefinition = false
+reportImportCycles = false
+reportIncompatibleMethodOverride = false
+reportIncompatibleVariableOverride = false
+
+# these are largely due to missing type hints, and make up most of the error count
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+reportUnknownArgumentType = false
+reportMissingParameterType = false
+reportUnknownVariableType = false
+reportMissingTypeArgument = false
 

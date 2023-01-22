@@ -4,12 +4,19 @@ from __future__ import annotations
 import inspect
 
 # Built-in
-from typing import Generator, Type, Self
+from typing import Generator, Type, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Self  # type: ignore  # for python versions < 3.11
 
 # This project
 from slobypy.react.scss import SCSS
-from slobypy import react
+from slobypy import react  # type: ignore
 from slobypy.errors.scss_errors import NoName
+
+__all__: tuple[str, ...] = (
+    "SCSSClass",
+)
 
 
 class SCSSClass:
@@ -35,7 +42,7 @@ class SCSSClass:
             self._style_data.append({key: value})  # update local style data
             self.add_style_global(key=key, value=value)  # update global style data
 
-    def child(self, child_scss_class: Self):
+    def child(self, child_scss_class: Self) -> Self:
         """
         Register a child
         ### Arguments
@@ -43,20 +50,16 @@ class SCSSClass:
         ### Returns
         value: Self
         """
-
         if isinstance(child_scss_class, SCSSClass):
             self.child_classes.append({self: child_scss_class})
-
         return self
 
     def render(self):
         """
         This method is used to render the whole scss class with children.
         """
-
         if not self.child_classes:  # without children
             return self.__render_single_class()
-
         return self._render()  # with children
 
     def _render(self, scss_class=None):
@@ -81,7 +84,6 @@ class SCSSClass:
             self.render_group += "\n"
 
         self.render_group += "}"
-
         return self.render_group
 
     def __render_single_class(self) -> str:
@@ -104,14 +106,12 @@ class SCSSClass:
             curr += f"\n {key}:{value};"  # make one line
 
         curr += "\n" + end
-
         return curr
 
     def check_scss_properties(self) -> None:
         """
         This method is used to check the scss properties, manually.
         """
-
         for key, value in self.properties.items():
             self.STYLE_CLASS.__setattr__(key, value)  # pylint: disable=unnecessary-dunder-call
 

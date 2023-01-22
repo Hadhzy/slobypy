@@ -3,6 +3,10 @@
 # This project
 from slobypy.react.scss_classes import SCSSClass
 
+__all__: tuple[str, ...] = (
+    "Design",
+)
+
 
 class Design:
     """
@@ -12,7 +16,7 @@ class Design:
     USED_CLASSES: list[dict[str, str | SCSSClass]] = []  # Used scss class and scss group
 
     @classmethod
-    def register(cls, scss_class: list[SCSSClass] | SCSSClass, source_path):
+    def register(cls, scss_class: list[SCSSClass] | SCSSClass, source_path) -> None:
         """
         This method is used to register the scss class.
 

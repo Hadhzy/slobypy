@@ -16,6 +16,9 @@ from .errors.pages import Page404
 if TYPE_CHECKING:
     from .react.component import Component
 
+__all__: tuple[str, ...] = (
+    "SlApp",
+)
 
 class SlApp:
     """
@@ -31,7 +34,7 @@ class SlApp:
     # Use list to prevent name conflicts
     _components = []
     only_components = []  # registered components(only)
-    rpc = None
+    rpc: RPC | None = None
 
 
     @classmethod
@@ -45,11 +48,9 @@ class SlApp:
         ### Returns
         - Callable: The decorator's wrapped callable
         """
-
         def wrap(component):
             cls.add(uri, component, inspect.stack()[1].filename, {"uri": uri})  # add the uri
             return component
-
         return wrap
 
     @classmethod
@@ -67,6 +68,7 @@ class SlApp:
         cls._components.append(
             {"uri": uri_checker(uri), "component": component, "source_path": Path(source), "metadata": metadata, "static": static})
         cls.only_components.append(component)
+
     @classmethod
     def dispatch(cls, event: Union[Event, Any]) -> None:
         """
@@ -98,9 +100,11 @@ class SlApp:
         """
         cls.rpc = RPC(cls, *args, **kwargs)
 
-    # Todo: Extend the render with more informal component data.
+    # Todo: 
+    #   - Extend the render with more informal component data.
+    #   - Implement overloads on this classmethod since it return types changes on the types of the passed parameters.
     @classmethod
-    def _render(cls, obj=None, route: str = False) -> tuple[Any, Any] | str | Any:
+    def _render(cls, obj = None, route: str = False) -> tuple[Any, Any] | str | Any:
         """
         This method is used to render the app to HTML.
 

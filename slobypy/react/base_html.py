@@ -5,11 +5,13 @@ from __future__ import annotations
 
 # Built-in
 import string
-from typing import Self
-from typing import Generator, Type
+from typing import Generator, Type, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Self  # type: ignore # for python versions < 3.11
 
 # This Project
-from slobypy import react
+from slobypy import react  # type: ignore
 from slobypy.react.component import Component
 from ._html_types import SlobyPyCONTENT, SlobyPyATTRS
 from .scss import SCSS
@@ -19,6 +21,11 @@ from .scss_properties import POSSIBLE_ATTRIBUTES
 
 CLASS_NAME_PROPERTY = "className"
 SCSS_GROUP_PROPERTY = "ScssGroup"
+
+
+__all__: tuple[str, ...] = (
+    "BaseElement",
+)
 
 
 class BaseElement:
@@ -62,7 +69,7 @@ class BaseElement:
 
         return rendered_html
 
-    def _create_listeners(self, item, new_kwargs):
+    def _create_listeners(self, item, new_kwargs) -> None:
         for key, value in item.items():
             if callable(value):
                 use_key = key
@@ -73,7 +80,7 @@ class BaseElement:
                 self.listeners[use_key] = value
                 new_kwargs.pop(key)
 
-    def _inline_scss(self, kwargs):
+    def _inline_scss(self, kwargs) -> None:
         for key, value in kwargs.items():
 
             if key == CLASS_NAME_PROPERTY:
@@ -98,7 +105,7 @@ class BaseElement:
                 return value
         return None
 
-    def _find_same_base_classes(self):
+    def _find_same_base_classes(self) -> None:
         for scss_global_class in react.Design.get_registered_classes():  # get all the classes
             scss_class = scss_global_class["scss_class"]
             if scss_class.properties["name"] == self.get_element_classname(self):  # same classname match
@@ -110,9 +117,7 @@ class BaseElement:
             if scss_class.properties["name"] != self.get_element_classname(self):
                 scss_class.check_scss_properties()  # check if the properties valid
 
-        return None
-
-    def depth_of_the_element(self, element) -> int:
+    def depth_of_the_element(self, element) -> int:  # type: ignore this comment should be removed when the method will be implemented
         """
         This method is used to return the depth of the element, depth -> integer, the element position from the component.
 
