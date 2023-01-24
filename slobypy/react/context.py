@@ -20,7 +20,7 @@ class Context:
         self.run()
 
     # noinspection PyMethodMayBeStatic
-    def create_data(self) -> Generator[Any, None, None]:  # type: ignore  this comment should be deleted when the method will be implemented
+    def create_data(self) -> Generator[Any, None, None]:  # type: ignore  # this comment should be deleted when the method will be implemented
         """Used to create the data by yielding it"""
         pass
 

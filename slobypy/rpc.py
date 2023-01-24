@@ -91,10 +91,15 @@ class RPC:
             await asyncio.create_subprocess_shell(*self.external_tasks)
 
         preprocessor_tasks = []
-        if self.preprocessor:
+
+        if self.preprocessor:  # if there is preprocessor
+
             processors = await self.preprocessor.init(self, self.cwd)
             self.css_preprocessor = processors.get("process_css", None)
             preprocessor_tasks = processors.get("tasks", [])
+
+        else:
+            await self.warn("[bold red]preprocessor is not defined!!!")
 
         futures = []
         for task in preprocessor_tasks:
@@ -510,7 +515,7 @@ class RPC:
     def _check_shard_render_alone(self, shard_route) -> bool:
         if AppComponent._components:
             for app_component in AppComponent._components:
-                print(app_component)
+
                 if app_component["uri"] == shard_route:
                     return True
             else:
