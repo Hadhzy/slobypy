@@ -74,7 +74,11 @@ class Component(ABC):
 
 
 class AppComponent(ABC):
-    """App based slobypy"""
+    """
+    App based slobypy
+    ------------------
+    goal: Used to provide an app based view in the slobypy, where you can use wrappers(context), and more features.
+    """
     _components: list = []  # Used to define the components in the app body
 
     def __init__(self) -> None:
