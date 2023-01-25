@@ -1,39 +1,32 @@
 from __future__ import annotations
-from typing import Generator, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable
+
+from ..rpc import RPC
 
 if TYPE_CHECKING:
-    from typing import Self  # type: ignore  # for python versions < 3.11
+    from typing_extensions import Self
 
-# This project
-from slobypy.react._react_types import UriType
-from slobypy.rpc import RPC
-
-__all__: tuple[str, ...] = (
-    "SloRouter",
-)
+__all__: tuple[str, ...] = ("SloRouter",)
 
 
 class SloRouter:
     """Used to define the route"""
 
     def __init__(self, curr_route: str) -> None:
-            self.route = curr_route
-            self._dynamic_routes: list[dict] = []
-            self._check_dynamic_routes()
+        self.route = curr_route
+        self._dynamic_routes: list[dict[str, int]] = []
+        self._check_dynamic_routes()
 
     def __truediv__(self, other: str) -> Self:
         """Add an endpoint and return a brand new SloRouter"""
         if self.route.endswith("/"):
             self.route += other
-
             return self.__get_object()
+        self.route += "/" + other
+        return self.__get_object()
 
-        else:
-            self.route += "/" + other
-
-            return self.__get_object()
-
-    def __get_object(self) -> Self:
+    def __get_object(self) -> SloRouter:
         """Used to return a SloRouter with the latest route"""
         return SloRouter(self.route)
 
@@ -58,7 +51,7 @@ class SloRouter:
 
         return endpoints_count
 
-    def dynamic_routes_iter(self) -> list:
+    def dynamic_routes_iter(self) -> list[dict[str, int]]:
         """Used to return the dynamic routes"""
         return self._dynamic_routes
 
@@ -66,16 +59,17 @@ class SloRouter:
         return self.route.split("/")
 
     @classmethod
-    def redirect(cls, url: UriType) -> None:
+    def redirect(cls, url: str) -> None:  # pylint: disable=unused-argument
         """Used to redirect the url"""
-        cls.rpc = RPC(cls)
-        cls.rpc.handle_event({"type": "url_redirect"})  # missing "conn" argument
+        cls.rpc = RPC(cls)  # type: ignore  # FIXME  # invalid type
+        cls.rpc.handle_event(..., {"type": "url_redirect"})  # type: ignore  # FIXME  # no value for 'conn' argument
 
-
-    def __iter__(self) -> Generator[int, None, None]:
+    def __iter__(self) -> Iterable[str]:
         start = 0
         stop = self.endpoints_count()
         curr = start
         while curr < stop:
-            yield self._endpoints_as_list()[curr]  # expression of type "str" cannot be assigned to yield type "int"
+            yield self._endpoints_as_list()[
+                curr
+            ]
             curr += 1

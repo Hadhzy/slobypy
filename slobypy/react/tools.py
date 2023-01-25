@@ -1,18 +1,12 @@
 """General utilities used throughout the react sub-package"""
-
-# Third-Party
 from urllib.parse import urlparse
 
-# This Project
-from slobypy.react._react_types import UriType
-from slobypy.errors.react_errors import URIError
+from ..errors.react_errors import URIError
 
-__all__: tuple[str, ...] = (
-    "uri_checker",
-)
+__all__: tuple[str, ...] = ("uri_checker",)
 
 
-def uri_checker(uri: UriType = False) -> str | bool:
+def uri_checker(uri: str | None = None) -> str:
     """
      ### Arguments
     - uri: The uri of the component
@@ -21,7 +15,7 @@ def uri_checker(uri: UriType = False) -> str | bool:
     uri: if the uri is valid
     error: if the uri is not valid
     """
-    if uri is False:
+    if uri is None:
         return ""
     slobypy_result = urlparse(uri)
 

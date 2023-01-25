@@ -1,48 +1,42 @@
 from __future__ import annotations
 
-# Third-Party
 import inspect
+from typing import TYPE_CHECKING, Any, Iterable
 
-# Built-in
-from typing import Generator, Type, TYPE_CHECKING
+from .. import react
+from ..errors.scss_errors import NoName
+from .scss import SCSS
 
 if TYPE_CHECKING:
-    from typing import Self  # type: ignore  # for python versions < 3.11
+    from typing_extensions import Self
 
-# This project
-from slobypy.react.scss import SCSS
-from slobypy import react  # type: ignore
-from slobypy.errors.scss_errors import NoName
-
-__all__: tuple[str, ...] = (
-    "SCSSClass",
-)
+__all__: tuple[str, ...] = ("SCSSClass",)
 
 
 class SCSSClass:
     STYLE_CLASS = SCSS()
-    _STYLES: list = []  # contain the style of the classes
+    _STYLES: list[dict[str, str]] = []  # contain the style of the classes
 
-    def __init__(self, register=False, **kwargs) -> None:
+    def __init__(self, register: bool = False, **kwargs: Any) -> None:
         """
         Create scss classes.
         """
-        self.register = False  # Register the parent
+        self.register: bool = False  # Register the parent
 
         if register:  # register it automatically
             react.Design.register(self, inspect.stack()[1].filename)
             self.register = True
 
-        self.properties = kwargs
-        self._style_data: list = []
-        self.child_classes: Self | list[Self] = []
+        self.properties: dict[str, Any] = kwargs
+        self._style_data: list[dict[str, Any]] = []
+        self.child_classes: list[dict[Self, SCSSClass]] = []
         self.render_group: str = ""
 
         for key, value in kwargs.items():
             self._style_data.append({key: value})  # update local style data
             self.add_style_global(key=key, value=value)  # update global style data
 
-    def child(self, child_scss_class: Self) -> Self:
+    def child(self, child_scss_class: SCSSClass) -> Self:
         """
         Register a child
         ### Arguments
@@ -50,11 +44,11 @@ class SCSSClass:
         ### Returns
         value: Self
         """
-        if isinstance(child_scss_class, SCSSClass):
+        if isinstance(child_scss_class, SCSSClass):  # type: ignore
             self.child_classes.append({self: child_scss_class})
         return self
 
-    def render(self):
+    def render(self) -> str:
         """
         This method is used to render the whole scss class with children.
         """
@@ -62,25 +56,27 @@ class SCSSClass:
             return self.__render_single_class()
         return self._render()  # with children
 
-    def _render(self, scss_class=None):
+    def _render(self, scss_class: SCSSClass | None = None) -> str:
         if scss_class is None:
             scss_class = self
 
         if self.register:
             scss_class.check_scss_properties()
 
-        self.render_group += scss_class.__render_single_class()[:-1]  # render the parent
+        self.render_group += scss_class.__render_single_class()[  # pylint: disable=protected-access
+            :-1
+        ]  # render the parent
 
         for child_class in scss_class.child_classes:
 
-            for key, value in child_class.items():
+            for value in child_class.values():
 
                 if value.child_classes:
                     self.render_group += "\n"
                     self._render(value)  # there is child
 
                 else:
-                    self.render_group += value.__render_single_class()
+                    self.render_group += value.__render_single_class()  # pylint: disable=protected-access
             self.render_group += "\n"
 
         self.render_group += "}"
@@ -113,9 +109,11 @@ class SCSSClass:
         This method is used to check the scss properties, manually.
         """
         for key, value in self.properties.items():
-            self.STYLE_CLASS.__setattr__(key, value)  # pylint: disable=unnecessary-dunder-call
+            setattr(self.STYLE_CLASS, key, value)
 
-    def add_class_style(self, *scss_class_dict: dict | list[dict], key: str = "", value: str = "") -> None:
+    def add_class_style(
+        self, *scss_class_dict: dict[str, str], key: str = "", value: str = ""
+    ) -> None:
         """
         This method is used to add the style to the local class.
         ### Arguments
@@ -125,15 +123,17 @@ class SCSSClass:
         ### Returns
         None
         """
-        if dict:
-            self._style_data.append(scss_class_dict)
-            self.add_style_global(scss_class_dict)
+        if scss_class_dict:
+            self._style_data.extend(scss_class_dict)
+            self.add_style_global(*scss_class_dict)
         else:
             self._style_data.append({key: value})
             self.add_style_global(key=value, value=value)
 
     @classmethod
-    def add_style_global(cls, *dict: dict | list[dict] | tuple, key: str = "", value: str = "") -> None:
+    def add_style_global(
+        cls, *mapping: dict[str, str], key: str = "", value: str = ""
+    ) -> None:
         """
         This method is used to add the style to the class attributes(class system) !not to the instance.
         ### Arguments
@@ -143,13 +143,13 @@ class SCSSClass:
         ### Returns
         None
         """
-        if dict:
-            cls._STYLES.append(dict)
+        if mapping:
+            cls._STYLES.extend(mapping)
         else:
             cls._STYLES.append({key: value})
 
     @property
-    def style_data(self) -> list:
+    def style_data(self) -> list[dict[str, Any]]:
         """
         This method is used to return the styles as a list.
         ### Arguments
@@ -160,21 +160,21 @@ class SCSSClass:
         return self._style_data
 
     @classmethod
-    def get_styles(cls) -> list:
+    def get_styles(cls) -> list[dict[str, str]]:
         """
         This method is used to return the scss_class system styles as a list(all of them).
         ### Arguments
         None
         ### Returns
         list: the scss_class system styles(every single scss class style)
-         """
+        """
         return cls._STYLES
 
     def __str__(self) -> str:
-        return f'{self._style_data}'
+        return f"{self._style_data}"
 
-    #Todo: Extend the iter with children
-    def __iter__(self) -> Generator[Type[dict], None, None]:
+    # Todo: Extend the iter with children
+    def __iter__(self) -> Iterable[dict[str, str]]:
         start = 0
         stop = len(self.style_data)
         curr = start
