@@ -76,37 +76,6 @@ print(my_class.render())
 }
 ```
 
-**Simple scss group**
-
-```py
-my_first_scss_group = SCSS_GROUP("first_scss_group")
-
-my_class = SCSS_CLASS(
-    name="my_class",
-    color="red",
-    position="relative",
-)
-my_class_2 = SCSS_CLASS(
-    name="my_class_2",
-    color="red",
-    position="relative",
-)
-
-my_first_scss_group.add(my_class)
-my_first_scss_group.relationship(my_class, child=my_class_2)
-```
-
-```
-.my_class{
- color:red;
- position:relative;
-
-.my_class_2{
- color:red;
- position:relative;
-}}
-
-```
 
 --------------
 
