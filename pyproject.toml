@@ -23,32 +23,8 @@ build-backend = "poetry.core.masonry.api"
 slobypy = "slobypy.manager:start_typer"
 
 [tool.pyright]
-include = [
-    "slobypy",
-    "tests/*.py",
-    "*.py"
-]
+exclude = ["tests/*", "**/site-packages/**/*.py"]
 typeCheckingMode = "strict"
+pythonVersion = "3.10"
 
 reportUnnecessaryTypeIgnoreComment = true
-
-reportOverlappingOverload = false
-reportPrivateUsage = false
-reportUnnecessaryIsInstance = false
-reportFunctionMemberAccess = false
-reportMissingTypeStubs = false
-reportUnusedFunction = false
-reportUnusedClass = false
-reportConstantRedefinition = false
-reportImportCycles = false
-reportIncompatibleMethodOverride = false
-reportIncompatibleVariableOverride = false
-
-# these are largely due to missing type hints, and make up most of the error count
-reportUnknownMemberType = false
-reportUnknownParameterType = false
-reportUnknownArgumentType = false
-reportMissingParameterType = false
-reportUnknownVariableType = false
-reportMissingTypeArgument = false
-

@@ -1,10 +1,9 @@
 """Used to build anything related to SCSS"""
+from typing import Any
 
-from slobypy.react.scss_properties import POSSIBLE_ATTRIBUTES
+from .scss_properties import POSSIBLE_ATTRIBUTES
 
-__all__: tuple[str, ...] = (
-    "SCSS",
-)
+__all__: tuple[str, ...] = ("SCSS",)
 
 
 class SCSS:
@@ -18,20 +17,18 @@ class SCSS:
     ### Returns
     - str: The html element as a string
     """
+
     POSSIBLE_ATTRIBUTES = POSSIBLE_ATTRIBUTES
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
-            self.__setattr__(key, value)
+            if key not in self.POSSIBLE_ATTRIBUTES:
+                raise AttributeError(f"Attribute {key} is not a valid CSS attribute")
+            setattr(self, key, value)
 
-    def __setattr__(self, key, value) -> None:
-        if key in self.POSSIBLE_ATTRIBUTES:
-            super().__setattr__(key, value)
-        raise AttributeError(f"Attribute {key} is not a valid CSS attribute")
-
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Any:
         if item in self.POSSIBLE_ATTRIBUTES:
-            return self.__dict__.get(item, None)
+            return self.__dict__.get(item)
         raise AttributeError(f"Attribute {item} is not a valid CSS attribute")
 
     def render(self) -> str:
@@ -44,5 +41,11 @@ class SCSS:
         ### Returns
         - str: The CSS data as a string
         """
-        return "; ".join([f"{key.replace('_', '-')}: {value}" if isinstance(
-            value, str) else f"{key.replace('_', '-')}: {' '.join(value)}" for key, value in self.__dict__.items()])
+        return "; ".join(
+            [
+                f"{key.replace('_', '-')}: {value}"
+                if isinstance(value, str)
+                else f"{key.replace('_', '-')}: {' '.join(value)}"
+                for key, value in self.__dict__.items()
+            ]
+        )

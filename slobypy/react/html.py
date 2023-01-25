@@ -1,9 +1,7 @@
-"""A collection of all HTML elements (scraped from MDN Docs)"""
-
 # pylint: disable=too-many-lines
 # pylint: disable=invalid-name
 
-# This Project
+"""A collection of all HTML elements (scraped from MDN Docs)"""
 from .base_html import BaseElement
 
 
@@ -19,7 +17,8 @@ class A(BaseElement):
     ### Returns
     - None
     """
-    tag = 'a'
+
+    tag = "a"
 
 
 class Abbr(BaseElement):
@@ -34,7 +33,8 @@ class Abbr(BaseElement):
     ### Returns
     - None
     """
-    tag = 'abbr'
+
+    tag = "abbr"
 
 
 class Address(BaseElement):
@@ -63,7 +63,8 @@ class Area(BaseElement):
     ### Returns
     - None
     """
-    tag = 'area'
+
+    tag = "area"
 
 
 class Article(BaseElement):
@@ -78,7 +79,8 @@ class Article(BaseElement):
     ### Returns
     - None
     """
-    tag = 'article'
+
+    tag = "article"
 
 
 class Aside(BaseElement):
@@ -93,7 +95,8 @@ class Aside(BaseElement):
     ### Returns
     - None
     """
-    tag = 'aside'
+
+    tag = "aside"
 
 
 class Audio(BaseElement):
@@ -108,7 +111,8 @@ class Audio(BaseElement):
     ### Returns
     - None
     """
-    tag = 'audio'
+
+    tag = "audio"
 
 
 class B(BaseElement):
@@ -123,7 +127,8 @@ class B(BaseElement):
     ### Returns
     - None
     """
-    tag = 'b'
+
+    tag = "b"
 
 
 class Base(BaseElement):
@@ -138,7 +143,8 @@ class Base(BaseElement):
     ### Returns
     - None
     """
-    tag = 'base'
+
+    tag = "base"
 
 
 class Bdi(BaseElement):
@@ -153,7 +159,8 @@ class Bdi(BaseElement):
     ### Returns
     - None
     """
-    tag = 'bdi'
+
+    tag = "bdi"
 
 
 class Bdo(BaseElement):
@@ -168,7 +175,8 @@ class Bdo(BaseElement):
     ### Returns
     - None
     """
-    tag = 'bdo'
+
+    tag = "bdo"
 
 
 class Blockquote(BaseElement):
@@ -183,7 +191,8 @@ class Blockquote(BaseElement):
     ### Returns
     - None
     """
-    tag = 'blockquote'
+
+    tag = "blockquote"
 
 
 class Body(BaseElement):
@@ -198,7 +207,8 @@ class Body(BaseElement):
     ### Returns
     - None
     """
-    tag = 'body'
+
+    tag = "body"
 
 
 class Br(BaseElement):
@@ -213,7 +223,8 @@ class Br(BaseElement):
     ### Returns
     - None
     """
-    tag = 'br'
+
+    tag = "br"
 
 
 class Button(BaseElement):
@@ -228,7 +239,8 @@ class Button(BaseElement):
     ### Returns
     - None
     """
-    tag = 'button'
+
+    tag = "button"
 
 
 class Canvas(BaseElement):
@@ -243,7 +255,8 @@ class Canvas(BaseElement):
     ### Returns
     - None
     """
-    tag = 'canvas'
+
+    tag = "canvas"
 
 
 class Caption(BaseElement):
@@ -258,7 +271,8 @@ class Caption(BaseElement):
     ### Returns
     - None
     """
-    tag = 'caption'
+
+    tag = "caption"
 
 
 class Cite(BaseElement):
@@ -273,7 +287,8 @@ class Cite(BaseElement):
     ### Returns
     - None
     """
-    tag = 'cite'
+
+    tag = "cite"
 
 
 class Code(BaseElement):
@@ -288,7 +303,8 @@ class Code(BaseElement):
     ### Returns
     - None
     """
-    tag = 'code'
+
+    tag = "code"
 
 
 class Col(BaseElement):
@@ -303,7 +319,8 @@ class Col(BaseElement):
     ### Returns
     - None
     """
-    tag = 'col'
+
+    tag = "col"
 
 
 class Colgroup(BaseElement):
@@ -318,7 +335,8 @@ class Colgroup(BaseElement):
     ### Returns
     - None
     """
-    tag = 'colgroup'
+
+    tag = "colgroup"
 
 
 class Data(BaseElement):
@@ -333,7 +351,8 @@ class Data(BaseElement):
     ### Returns
     - None
     """
-    tag = 'data'
+
+    tag = "data"
 
 
 class Datalist(BaseElement):
@@ -348,7 +367,8 @@ class Datalist(BaseElement):
     ### Returns
     - None
     """
-    tag = 'datalist'
+
+    tag = "datalist"
 
 
 class Dd(BaseElement):
@@ -363,7 +383,8 @@ class Dd(BaseElement):
     ### Returns
     - None
     """
-    tag = 'dd'
+
+    tag = "dd"
 
 
 class Del(BaseElement):
@@ -378,7 +399,8 @@ class Del(BaseElement):
     ### Returns
     - None
     """
-    tag = 'del'
+
+    tag = "del"
 
 
 class Details(BaseElement):
@@ -393,7 +415,8 @@ class Details(BaseElement):
     ### Returns
     - None
     """
-    tag = 'details'
+
+    tag = "details"
 
 
 class Dfn(BaseElement):
@@ -408,7 +431,8 @@ class Dfn(BaseElement):
     ### Returns
     - None
     """
-    tag = 'dfn'
+
+    tag = "dfn"
 
 
 class Dialog(BaseElement):
@@ -423,7 +447,8 @@ class Dialog(BaseElement):
     ### Returns
     - None
     """
-    tag = 'dialog'
+
+    tag = "dialog"
 
 
 class Div(BaseElement):
@@ -438,7 +463,8 @@ class Div(BaseElement):
     ### Returns
     - None
     """
-    tag = 'div'
+
+    tag = "div"
 
 
 class Dl(BaseElement):
@@ -453,7 +479,8 @@ class Dl(BaseElement):
     ### Returns
     - None
     """
-    tag = 'dl'
+
+    tag = "dl"
 
 
 class Dt(BaseElement):
@@ -468,7 +495,8 @@ class Dt(BaseElement):
     ### Returns
     - None
     """
-    tag = 'dt'
+
+    tag = "dt"
 
 
 class Em(BaseElement):
@@ -483,7 +511,8 @@ class Em(BaseElement):
     ### Returns
     - None
     """
-    tag = 'em'
+
+    tag = "em"
 
 
 class Embed(BaseElement):
@@ -498,7 +527,8 @@ class Embed(BaseElement):
     ### Returns
     - None
     """
-    tag = 'embed'
+
+    tag = "embed"
 
 
 class Fieldset(BaseElement):
@@ -513,7 +543,8 @@ class Fieldset(BaseElement):
     ### Returns
     - None
     """
-    tag = 'fieldset'
+
+    tag = "fieldset"
 
 
 class Figcaption(BaseElement):
@@ -528,7 +559,8 @@ class Figcaption(BaseElement):
     ### Returns
     - None
     """
-    tag = 'figcaption'
+
+    tag = "figcaption"
 
 
 class Figure(BaseElement):
@@ -543,7 +575,8 @@ class Figure(BaseElement):
     ### Returns
     - None
     """
-    tag = 'figure'
+
+    tag = "figure"
 
 
 class Footer(BaseElement):
@@ -558,7 +591,8 @@ class Footer(BaseElement):
     ### Returns
     - None
     """
-    tag = 'footer'
+
+    tag = "footer"
 
 
 class Form(BaseElement):
@@ -573,7 +607,8 @@ class Form(BaseElement):
     ### Returns
     - None
     """
-    tag = 'form'
+
+    tag = "form"
 
 
 class H1(BaseElement):
@@ -588,7 +623,8 @@ class H1(BaseElement):
     ### Returns
     - None
     """
-    tag = 'h1'
+
+    tag = "h1"
 
 
 class Head(BaseElement):
@@ -603,7 +639,8 @@ class Head(BaseElement):
     ### Returns
     - None
     """
-    tag = 'head'
+
+    tag = "head"
 
 
 class Header(BaseElement):
@@ -618,7 +655,8 @@ class Header(BaseElement):
     ### Returns
     - None
     """
-    tag = 'header'
+
+    tag = "header"
 
 
 class Hgroup(BaseElement):
@@ -633,7 +671,8 @@ class Hgroup(BaseElement):
     ### Returns
     - None
     """
-    tag = 'hgroup'
+
+    tag = "hgroup"
 
 
 class Hr(BaseElement):
@@ -648,7 +687,8 @@ class Hr(BaseElement):
     ### Returns
     - None
     """
-    tag = 'hr'
+
+    tag = "hr"
 
 
 class Html(BaseElement):
@@ -663,7 +703,8 @@ class Html(BaseElement):
     ### Returns
     - None
     """
-    tag = 'html'
+
+    tag = "html"
 
 
 class I(BaseElement):
@@ -678,7 +719,8 @@ class I(BaseElement):
     ### Returns
     - None
     """
-    tag = 'i'
+
+    tag = "i"
 
 
 class Iframe(BaseElement):
@@ -693,7 +735,8 @@ class Iframe(BaseElement):
     ### Returns
     - None
     """
-    tag = 'iframe'
+
+    tag = "iframe"
 
 
 class Img(BaseElement):
@@ -708,7 +751,8 @@ class Img(BaseElement):
     ### Returns
     - None
     """
-    tag = 'img'
+
+    tag = "img"
 
 
 class Input(BaseElement):
@@ -723,7 +767,8 @@ class Input(BaseElement):
     ### Returns
     - None
     """
-    tag = 'input'
+
+    tag = "input"
 
 
 class Ins(BaseElement):
@@ -738,7 +783,8 @@ class Ins(BaseElement):
     ### Returns
     - None
     """
-    tag = 'ins'
+
+    tag = "ins"
 
 
 class Kbd(BaseElement):
@@ -753,7 +799,8 @@ class Kbd(BaseElement):
     ### Returns
     - None
     """
-    tag = 'kbd'
+
+    tag = "kbd"
 
 
 class Label(BaseElement):
@@ -768,7 +815,8 @@ class Label(BaseElement):
     ### Returns
     - None
     """
-    tag = 'label'
+
+    tag = "label"
 
 
 class Legend(BaseElement):
@@ -783,7 +831,8 @@ class Legend(BaseElement):
     ### Returns
     - None
     """
-    tag = 'legend'
+
+    tag = "legend"
 
 
 class Li(BaseElement):
@@ -798,7 +847,8 @@ class Li(BaseElement):
     ### Returns
     - None
     """
-    tag = 'li'
+
+    tag = "li"
 
 
 class Link(BaseElement):
@@ -813,7 +863,8 @@ class Link(BaseElement):
     ### Returns
     - None
     """
-    tag = 'link'
+
+    tag = "link"
 
 
 class Main(BaseElement):
@@ -828,7 +879,8 @@ class Main(BaseElement):
     ### Returns
     - None
     """
-    tag = 'main'
+
+    tag = "main"
 
 
 class Map(BaseElement):
@@ -843,7 +895,8 @@ class Map(BaseElement):
     ### Returns
     - None
     """
-    tag = 'map'
+
+    tag = "map"
 
 
 class Mark(BaseElement):
@@ -858,7 +911,8 @@ class Mark(BaseElement):
     ### Returns
     - None
     """
-    tag = 'mark'
+
+    tag = "mark"
 
 
 class Menu(BaseElement):
@@ -873,7 +927,8 @@ class Menu(BaseElement):
     ### Returns
     - None
     """
-    tag = 'menu'
+
+    tag = "menu"
 
 
 class Meta(BaseElement):
@@ -888,7 +943,8 @@ class Meta(BaseElement):
     ### Returns
     - None
     """
-    tag = 'meta'
+
+    tag = "meta"
 
 
 class Meter(BaseElement):
@@ -903,7 +959,8 @@ class Meter(BaseElement):
     ### Returns
     - None
     """
-    tag = 'meter'
+
+    tag = "meter"
 
 
 class Nav(BaseElement):
@@ -918,7 +975,8 @@ class Nav(BaseElement):
     ### Returns
     - None
     """
-    tag = 'nav'
+
+    tag = "nav"
 
 
 class Noscript(BaseElement):
@@ -933,7 +991,8 @@ class Noscript(BaseElement):
     ### Returns
     - None
     """
-    tag = 'noscript'
+
+    tag = "noscript"
 
 
 class Object(BaseElement):
@@ -948,7 +1007,8 @@ class Object(BaseElement):
     ### Returns
     - None
     """
-    tag = 'object'
+
+    tag = "object"
 
 
 class Ol(BaseElement):
@@ -963,7 +1023,8 @@ class Ol(BaseElement):
     ### Returns
     - None
     """
-    tag = 'ol'
+
+    tag = "ol"
 
 
 class Optgroup(BaseElement):
@@ -978,7 +1039,8 @@ class Optgroup(BaseElement):
     ### Returns
     - None
     """
-    tag = 'optgroup'
+
+    tag = "optgroup"
 
 
 class Option(BaseElement):
@@ -993,7 +1055,8 @@ class Option(BaseElement):
     ### Returns
     - None
     """
-    tag = 'option'
+
+    tag = "option"
 
 
 class Output(BaseElement):
@@ -1008,7 +1071,8 @@ class Output(BaseElement):
     ### Returns
     - None
     """
-    tag = 'output'
+
+    tag = "output"
 
 
 class P(BaseElement):
@@ -1023,7 +1087,8 @@ class P(BaseElement):
     ### Returns
     - None
     """
-    tag = 'p'
+
+    tag = "p"
 
 
 class Picture(BaseElement):
@@ -1038,7 +1103,8 @@ class Picture(BaseElement):
     ### Returns
     - None
     """
-    tag = 'picture'
+
+    tag = "picture"
 
 
 class Portal(BaseElement):
@@ -1053,7 +1119,8 @@ class Portal(BaseElement):
     ### Returns
     - None
     """
-    tag = 'portal'
+
+    tag = "portal"
 
 
 class Pre(BaseElement):
@@ -1068,7 +1135,8 @@ class Pre(BaseElement):
     ### Returns
     - None
     """
-    tag = 'pre'
+
+    tag = "pre"
 
 
 class Progress(BaseElement):
@@ -1083,7 +1151,8 @@ class Progress(BaseElement):
     ### Returns
     - None
     """
-    tag = 'progress'
+
+    tag = "progress"
 
 
 class Q(BaseElement):
@@ -1098,7 +1167,8 @@ class Q(BaseElement):
     ### Returns
     - None
     """
-    tag = 'q'
+
+    tag = "q"
 
 
 class Rp(BaseElement):
@@ -1113,7 +1183,8 @@ class Rp(BaseElement):
     ### Returns
     - None
     """
-    tag = 'rp'
+
+    tag = "rp"
 
 
 class Rt(BaseElement):
@@ -1128,7 +1199,8 @@ class Rt(BaseElement):
     ### Returns
     - None
     """
-    tag = 'rt'
+
+    tag = "rt"
 
 
 class Ruby(BaseElement):
@@ -1143,7 +1215,8 @@ class Ruby(BaseElement):
     ### Returns
     - None
     """
-    tag = 'ruby'
+
+    tag = "ruby"
 
 
 class S(BaseElement):
@@ -1158,7 +1231,8 @@ class S(BaseElement):
     ### Returns
     - None
     """
-    tag = 's'
+
+    tag = "s"
 
 
 class Samp(BaseElement):
@@ -1173,7 +1247,8 @@ class Samp(BaseElement):
     ### Returns
     - None
     """
-    tag = 'samp'
+
+    tag = "samp"
 
 
 class Script(BaseElement):
@@ -1188,7 +1263,8 @@ class Script(BaseElement):
     ### Returns
     - None
     """
-    tag = 'script'
+
+    tag = "script"
 
 
 class Section(BaseElement):
@@ -1203,7 +1279,8 @@ class Section(BaseElement):
     ### Returns
     - None
     """
-    tag = 'section'
+
+    tag = "section"
 
 
 class Select(BaseElement):
@@ -1218,7 +1295,8 @@ class Select(BaseElement):
     ### Returns
     - None
     """
-    tag = 'select'
+
+    tag = "select"
 
 
 class Slot(BaseElement):
@@ -1233,7 +1311,8 @@ class Slot(BaseElement):
     ### Returns
     - None
     """
-    tag = 'slot'
+
+    tag = "slot"
 
 
 class Small(BaseElement):
@@ -1248,7 +1327,8 @@ class Small(BaseElement):
     ### Returns
     - None
     """
-    tag = 'small'
+
+    tag = "small"
 
 
 class Source(BaseElement):
@@ -1263,7 +1343,8 @@ class Source(BaseElement):
     ### Returns
     - None
     """
-    tag = 'source'
+
+    tag = "source"
 
 
 class Span(BaseElement):
@@ -1278,7 +1359,8 @@ class Span(BaseElement):
     ### Returns
     - None
     """
-    tag = 'span'
+
+    tag = "span"
 
 
 class Strong(BaseElement):
@@ -1293,7 +1375,8 @@ class Strong(BaseElement):
     ### Returns
     - None
     """
-    tag = 'strong'
+
+    tag = "strong"
 
 
 class Style(BaseElement):
@@ -1308,7 +1391,8 @@ class Style(BaseElement):
     ### Returns
     - None
     """
-    tag = 'style'
+
+    tag = "style"
 
 
 class Sub(BaseElement):
@@ -1323,7 +1407,8 @@ class Sub(BaseElement):
     ### Returns
     - None
     """
-    tag = 'sub'
+
+    tag = "sub"
 
 
 class Summary(BaseElement):
@@ -1338,7 +1423,8 @@ class Summary(BaseElement):
     ### Returns
     - None
     """
-    tag = 'summary'
+
+    tag = "summary"
 
 
 class Sup(BaseElement):
@@ -1353,7 +1439,8 @@ class Sup(BaseElement):
     ### Returns
     - None
     """
-    tag = 'sup'
+
+    tag = "sup"
 
 
 class Table(BaseElement):
@@ -1368,7 +1455,8 @@ class Table(BaseElement):
     ### Returns
     - None
     """
-    tag = 'table'
+
+    tag = "table"
 
 
 class Tbody(BaseElement):
@@ -1383,7 +1471,8 @@ class Tbody(BaseElement):
     ### Returns
     - None
     """
-    tag = 'tbody'
+
+    tag = "tbody"
 
 
 class Td(BaseElement):
@@ -1398,7 +1487,8 @@ class Td(BaseElement):
     ### Returns
     - None
     """
-    tag = 'td'
+
+    tag = "td"
 
 
 class Template(BaseElement):
@@ -1413,7 +1503,8 @@ class Template(BaseElement):
     ### Returns
     - None
     """
-    tag = 'template'
+
+    tag = "template"
 
 
 class Textarea(BaseElement):
@@ -1428,7 +1519,8 @@ class Textarea(BaseElement):
     ### Returns
     - None
     """
-    tag = 'textarea'
+
+    tag = "textarea"
 
 
 class Tfoot(BaseElement):
@@ -1443,7 +1535,8 @@ class Tfoot(BaseElement):
     ### Returns
     - None
     """
-    tag = 'tfoot'
+
+    tag = "tfoot"
 
 
 class Th(BaseElement):
@@ -1458,7 +1551,8 @@ class Th(BaseElement):
     ### Returns
     - None
     """
-    tag = 'th'
+
+    tag = "th"
 
 
 class Thead(BaseElement):
@@ -1473,7 +1567,8 @@ class Thead(BaseElement):
     ### Returns
     - None
     """
-    tag = 'thead'
+
+    tag = "thead"
 
 
 class Time(BaseElement):
@@ -1488,7 +1583,8 @@ class Time(BaseElement):
     ### Returns
     - None
     """
-    tag = 'time'
+
+    tag = "time"
 
 
 class Title(BaseElement):
@@ -1503,7 +1599,8 @@ class Title(BaseElement):
     ### Returns
     - None
     """
-    tag = 'title'
+
+    tag = "title"
 
 
 class Tr(BaseElement):
@@ -1518,7 +1615,8 @@ class Tr(BaseElement):
     ### Returns
     - None
     """
-    tag = 'tr'
+
+    tag = "tr"
 
 
 class Track(BaseElement):
@@ -1533,7 +1631,8 @@ class Track(BaseElement):
     ### Returns
     - None
     """
-    tag = 'track'
+
+    tag = "track"
 
 
 class U(BaseElement):
@@ -1548,7 +1647,8 @@ class U(BaseElement):
     ### Returns
     - None
     """
-    tag = 'u'
+
+    tag = "u"
 
 
 class Ul(BaseElement):
@@ -1563,7 +1663,8 @@ class Ul(BaseElement):
     ### Returns
     - None
     """
-    tag = 'ul'
+
+    tag = "ul"
 
 
 class Var(BaseElement):
@@ -1578,7 +1679,8 @@ class Var(BaseElement):
     ### Returns
     - None
     """
-    tag = 'var'
+
+    tag = "var"
 
 
 class Video(BaseElement):
@@ -1593,7 +1695,8 @@ class Video(BaseElement):
     ### Returns
     - None
     """
-    tag = 'video'
+
+    tag = "video"
 
 
 class Wbr(BaseElement):
@@ -1608,4 +1711,5 @@ class Wbr(BaseElement):
     ### Returns
     - None
     """
-    tag = 'wbr'
+
+    tag = "wbr"
