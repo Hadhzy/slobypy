@@ -32,13 +32,9 @@ class Context(Generic[T]):
             if context_data := self.get_data():
                 setattr(component, "context", context_data)
 
-    def get_data(self) -> list[T]:
+    def get_data(self) -> list[dict[str, T]]:
         """Used to load the data from the create_data"""
-        context_data: list[T] = []
-        for data in self.create_data():
-            context_data.append(data)
-
-        return context_data
+        return list(self.create_data())
 
     def _check_component_type(self, component: Any) -> TypeGuard[cmp.Component]:
         if not isinstance(component, cmp.Component):
