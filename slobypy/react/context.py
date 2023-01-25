@@ -19,7 +19,7 @@ class Context(Generic[T]):
         self.components = components
         self.run()
 
-    def create_data(self) -> Iterable[T]:
+    def create_data(self) -> Iterable[dict[str, T]]:
         """Used to create the data by yielding it"""
         raise NotImplementedError
 
