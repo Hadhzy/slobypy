@@ -49,11 +49,13 @@ Generate a new project with the following command:
 python -m slobypy generate <project_name>
 ```
 
+
 Start streaming JIT compiled data to Sloby:
 
 ```bash
 python -m slobypy run
 ```
 
+[Examples](https://github.com/FlurryGlo/slobypy/tree/main/examples)
 
 [🎉**Contributors**🎉](https://github.com/FlurryGlo/slobypy/graphs/contributors)
