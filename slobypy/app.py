@@ -1,24 +1,19 @@
 from __future__ import annotations
 
-# Third-Party
 import inspect
-
-# Built-in
-from typing import TYPE_CHECKING, Union, Any, Callable, Type
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable
 
-# This Project
-from .rpc import Event, RPC
-from .react.tools import uri_checker
-from .react.router import SloRouter
 from .errors.pages import Page404
+from .react.router import SloRouter
+from .react.tools import uri_checker
+from .rpc import RPC, Event
 
 if TYPE_CHECKING:
     from .react.component import Component
 
-__all__: tuple[str, ...] = (
-    "SlApp",
-)
+__all__: tuple[str, ...] = ("SlApp",)
+
 
 class SlApp:
     """
@@ -31,14 +26,16 @@ class SlApp:
     ### Returns
     - None
     """
+
     # Use list to prevent name conflicts
-    _components = []
-    only_components = []  # registered components(only)
+    _components: list[dict[str, Any]] = []
+    only_components: list[type[Component]] = []  # registered components(only)
     rpc: RPC | None = None
 
-
     @classmethod
-    def component(cls, uri: str | SloRouter, static: bool = False) -> Callable:
+    def component(
+        cls, uri: str | SloRouter, static: bool = False
+    ) -> Callable[[type[Component]], type[Component]]:
         """
         This decorator is used to register a component to the app.
 
@@ -48,13 +45,24 @@ class SlApp:
         ### Returns
         - Callable: The decorator's wrapped callable
         """
-        def wrap(component):
-            cls.add(uri, component, inspect.stack()[1].filename, {"uri": uri})  # add the uri
+
+        def wrap(component: type[Component]) -> type[Component]:
+            cls.add(
+                uri, component, inspect.stack()[1].filename, {"uri": uri}, static
+            )  # add the uri
             return component
+
         return wrap
 
     @classmethod
-    def add(cls, uri: str | SloRouter, component: Type[Component], source, metadata, static: bool = False) -> None:
+    def add(  # pylint: disable=too-many-arguments
+        cls,
+        uri: str | SloRouter,
+        component: type[Component],
+        source: str,
+        metadata: dict[str, Any],
+        static: bool = False,
+    ) -> None:
         """
         This method is used to add a component to the app.
         ### Arguments
@@ -64,13 +72,22 @@ class SlApp:
         ### Returns
         - None
         """
+        if isinstance(uri, SloRouter):
+            uri = uri.route
         # TODO: Add URI checking regex
         cls._components.append(
-            {"uri": uri_checker(uri), "component": component, "source_path": Path(source), "metadata": metadata, "static": static})
+            {
+                "uri": uri_checker(uri),
+                "component": component,
+                "source_path": Path(source),
+                "metadata": metadata,
+                "static": static,
+            }
+        )
         cls.only_components.append(component)
 
     @classmethod
-    def dispatch(cls, event: Union[Event, Any]) -> None:
+    def dispatch(cls, event: Event | Any) -> None:
         """
         This method is used to emit an event to the targeted component.
 
@@ -81,14 +98,14 @@ class SlApp:
         - None
         """
         for component in cls._components:
-            if component.name() == event.name:
+            if component["component"].name() == event.name:
                 try:
                     getattr(component, "on_" + event.type)(event)
                 except AttributeError:
                     pass
 
     @classmethod
-    def run(cls, *args, **kwargs):
+    def run(cls, *args: Any, **kwargs: Any) -> None:
         """
         This method is used to run the app.
 
@@ -100,11 +117,10 @@ class SlApp:
         """
         cls.rpc = RPC(cls, *args, **kwargs)
 
-    # Todo: 
+    # Todo:
     #   - Extend the render with more informal component data.
-    #   - Implement overloads on this classmethod since it return types changes on the types of the passed parameters.
     @classmethod
-    def _render(cls, obj = None, route: str = False) -> tuple[Any, Any] | str | Any:
+    def _render(cls, obj: Component | None = None, route: str | None = None) -> str:
         """
         This method is used to render the app to HTML.
 
@@ -123,7 +139,8 @@ class SlApp:
             for component in cls._components:
                 if component["uri"] == route:
                     return component["component"]().render()
-            else:
-                return Page404(route=route).show()
+            return Page404(route=route).show()
 
-        return "".join(component["component"]().render() for component in cls._components)
+        return "".join(
+            component["component"]().render() for component in cls._components
+        )

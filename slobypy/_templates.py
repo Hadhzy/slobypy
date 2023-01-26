@@ -53,7 +53,8 @@ class MyComponent2(Component):
 
 """
 
-CONFIG = Template("""\
+CONFIG = Template(
+    """\
 {
   "name": "My Project",
   "version": "1.0.0",
@@ -66,9 +67,11 @@ CONFIG = Template("""\
   $preprocessor
   "processed_js": ""
 }
-""")
+"""
+)
 
-PREPROCESSOR = Template("""
+PREPROCESSOR = Template(
+    """
 import asyncio
 from pathlib import Path
 
@@ -115,6 +118,5 @@ async def process_css() -> Path:
     await css_event.wait()
     return Path("css/output.css")
 
-
-""")
-
+"""
+)

@@ -49,119 +49,13 @@ Generate a new project with the following command:
 python -m slobypy generate <project_name>
 ```
 
+
 Start streaming JIT compiled data to Sloby:
 
 ```bash
 python -m slobypy run
 ```
 
-### SCSS
-
-**Simple scss class**
-
-```py
-my_class = SCSS_CLASS(
-    name="base_class1",
-    color="red",
-    position="relative"
-)
-
-print(my_class.render())
-```
-
-```
-.base_class1{
- color:red;
- position:relative;
-}
-```
-
-**Simple scss group**
-
-```py
-my_first_scss_group = SCSS_GROUP("first_scss_group")
-
-my_class = SCSS_CLASS(
-    name="my_class",
-    color="red",
-    position="relative",
-)
-my_class_2 = SCSS_CLASS(
-    name="my_class_2",
-    color="red",
-    position="relative",
-)
-
-my_first_scss_group.add(my_class)
-my_first_scss_group.relationship(my_class, child=my_class_2)
-```
-
-```
-.my_class{
- color:red;
- position:relative;
-
-.my_class_2{
- color:red;
- position:relative;
-}}
-
-```
-
---------------
-
-### HTML
-
-**Simple html element**
-
-```py
-p = P("paragraph body", P("child1"))
-print(p.render())
-```
-
-```
-<p>paragraph body<p>child1</p>
-</p>
-```
-
------------
-**With properties**
-
-```py
-p = P(P("child1"), color="red")
-print(p.render())
-```
-
-```
-<p color="red"><p >child1</p>
-</p>
-```
-
-------------
-
-### COMPONENT
-
-**Simple component with abstract methods.**
-
-```py
-class MyFirstComponent(Component):
-    def name(self):
-        return "MyComponentName"
-
-    def body(self):
-        yield P("inside the component body")
-```
-
-**Component "registration" with the uri"**
-
-
-```py
-app = SlApp()
-
-
-@app.component(uri="test/first")
-class MyFirstComponent(Component):
-    ...
-```
+[Examples](https://github.com/FlurryGlo/slobypy/tree/main/examples)
 
 [🎉**Contributors**🎉](https://github.com/FlurryGlo/slobypy/graphs/contributors)
