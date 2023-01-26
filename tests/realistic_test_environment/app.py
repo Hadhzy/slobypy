@@ -1,11 +1,6 @@
-from slobypy.react import *
-from tests.realistic_test_environment.components.example_component import MyComponent1, MyComponent2, MyComponent3
+from tests.realistic_test_environment.components.example_component import MyComponent1, MyComponent3
 from slobypy.react.component import *
 from slobypy.react.context import Context
-
-
-class Test:
-    pass
 
 
 class MyContext(Context):
@@ -15,7 +10,7 @@ class MyContext(Context):
 
 class MyApp(AppComponent):
     def body(self):
-        yield MyContext(MyComponent1())
+        yield MyContext(MyComponent3())
 
 
 MyApp()

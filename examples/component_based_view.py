@@ -1,3 +1,4 @@
+from slobypy.react import *
 from slobypy import *
 
 
@@ -12,6 +13,7 @@ class MyComponent1(Component):
 
     def body(self):
         yield P("test1", onClick=self.on_click)
+        yield P(self.context)
         yield MyComponent2(props={"important_data": "Woah, this is a hahao10!"})
 
 
@@ -25,7 +27,7 @@ class MyComponent3(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P("test", onClick=self.on_click)
+        yield P(self.__dict__, onClick=self.on_click)
 
 
 
@@ -39,4 +41,5 @@ class MyComponent2(Component):
 
     def body(self):
         yield P(self.props["important_data"], onClick=self.on_click)
+
 

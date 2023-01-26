@@ -1,46 +1,51 @@
 from __future__ import annotations
+# Built-in
+from typing import Generator, Any
 
-from typing import Any, Generic, Iterable, TypeGuard, TypeVar
+# This project
+from slobypy.errors.react_errors import NotValidComponent
+import slobypy.react.component as cmp
+from .tools import find_component_in_app
 
-from . import component as cmp
-from ..errors.react_errors import NotValidComponent
-
-__all__ = ("Context",)
-
-T = TypeVar("T")
+__all__ = (
+    "Context",
+)
 
 
-class Context(Generic[T]):
-    _components: list[
-        cmp.Component
-    ] = []  # Used to define the components in the context.
-
+class Context:
+    """
+    Used to provide data transfer for the user.
+    """
     def __init__(self, *components: cmp.Component) -> None:
-        self.components = components
-        self.run()
+        """
+        ### Arguments
+         - components: Slobypy Components as an object -> Component().
+        ### Returns
+        - None
+        """
 
-    def create_data(self) -> Iterable[dict[str, T]]:
+        self.components = components  # Defined components by the user
+        self.components_data: list = []  # Used to store the checked components
+
+    # noinspection PyMethodMayBeStatic
+    def create_data(self) -> Generator[Any, None, None]:  # type: ignore  # this comment should be deleted when the method will be implemented
         """Used to create the data by yielding it"""
-        raise NotImplementedError
+        pass
 
     def run(self) -> None:
         """Used to render the components inside the context"""
         for component in self.components:
-            self._check_component_type(component)
 
-            self._components.append(component)
-            if context_data := self.get_data():
-                setattr(component, "context", context_data)
+            self._check_component_type(component)  # check if it's a component
 
-    def get_data(self) -> list[T]:
-        """Used to load the data from the create_data"""
-        context_data: list[T] = []
-        for data in self.create_data():
-            context_data.append(data)
+            self.components_data.append(component)  # add the component to the components_data
 
-        return context_data
+            for context_data in self.create_data():
+                # loop through the create_data in order to get the context_data
+                if component_dict := find_component_in_app(component):
+                    component_dict["context"] = context_data
 
-    def _check_component_type(self, component: Any) -> TypeGuard[cmp.Component]:
+    #noinspection PyMethodMayBeStatic
+    def _check_component_type(self, component) -> None:
         if not isinstance(component, cmp.Component):
             raise NotValidComponent(f"{component} is not valid!")
-        return True

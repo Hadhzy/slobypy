@@ -1,12 +1,21 @@
 """General utilities used throughout the react sub-package"""
+from __future__ import annotations
+# Third-Party
 from urllib.parse import urlparse
+from typing import TYPE_CHECKING
 
-from ..errors.react_errors import URIError
+# This Project
+from slobypy.errors.react_errors import URIError
+import slobypy.app as application
 
-__all__: tuple[str, ...] = ("uri_checker",)
+if TYPE_CHECKING:
+    from slobypy.react.component import Component
+__all__: tuple[str, ...] = (
+    "uri_checker",
+)
 
 
-def uri_checker(uri: str | None = None) -> str:
+def uri_checker(uri: str = False) -> str | bool:
     """
      ### Arguments
     - uri: The uri of the component
@@ -15,7 +24,7 @@ def uri_checker(uri: str | None = None) -> str:
     uri: if the uri is valid
     error: if the uri is not valid
     """
-    if uri is None:
+    if uri is False:
         return ""
     slobypy_result = urlparse(uri)
 
@@ -25,4 +34,9 @@ def uri_checker(uri: str | None = None) -> str:
     raise URIError("Not valid uri")
 
 
-uri_checker()
+# noinspection PyProtectedMember
+def find_component_in_app(instance: Component) -> bool | dict:
+    for component in application.SlApp._components:
+        if isinstance(instance, component["component"]):
+            return component
+    return False
