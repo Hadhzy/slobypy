@@ -10,12 +10,14 @@ import slobypy.app as application
 
 if TYPE_CHECKING:
     from slobypy.react.component import Component
+
 __all__: tuple[str, ...] = (
     "uri_checker",
+    "find_component_in_app",
 )
 
 
-def uri_checker(uri: str = False) -> str | bool:
+def uri_checker(uri: str = "") -> str | bool:
     """
      ### Arguments
     - uri: The uri of the component
@@ -24,8 +26,10 @@ def uri_checker(uri: str = False) -> str | bool:
     uri: if the uri is valid
     error: if the uri is not valid
     """
-    if uri is False:
+
+    if not uri:
         return ""
+
     slobypy_result = urlparse(uri)
 
     if slobypy_result.path and slobypy_result.scheme is not True:
@@ -35,7 +39,7 @@ def uri_checker(uri: str = False) -> str | bool:
 
 
 # noinspection PyProtectedMember
-def find_component_in_app(instance: Component) -> bool | dict:
+def find_component_in_app(instance: "Component") -> bool | dict:
     for component in application.SlApp._components:
         if isinstance(instance, component["component"]):
             return component
