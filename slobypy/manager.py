@@ -12,7 +12,6 @@ import urllib.error
 from pathlib import Path
 from importlib import reload
 
-import textual
 # Third-Party
 import typer
 from textual.events import Key
@@ -32,7 +31,7 @@ from rich.table import Table
 
 # Textual
 from textual.app import App, ComposeResult
-from textual.widgets import Footer,Static
+from textual.widgets import Footer, Static
 from textual.widget import Widget
 from textual.reactive import reactive
 from textual.binding import Binding
@@ -44,7 +43,7 @@ console = Console()
 # noinspection PyArgum
 # entList
 @app.command()
-def generate(path: str, overwrite: bool = False, no_preprocessor=False):
+def generate(path: Path, overwrite: bool = False, no_preprocessor=False):
     """
     Generate a new project.
 
@@ -70,7 +69,7 @@ def generate(path: str, overwrite: bool = False, no_preprocessor=False):
 
     # Create directories if they don't exist
     path.mkdir(parents=True, exist_ok=True)  # exist_ok mutes the error if the directory already exists
-    (path / "components").mkdir(parents=True, exist_ok=True)
+    (path / "components").mkdir(parents=True, exist_ok=True) # type: ignore
     (path / "scss").mkdir(parents=True, exist_ok=True)
 
     NEW_CONFIG = CONFIG.substitute(preprocessor=f'"preprocessor": "preprocessor.py",')
@@ -133,7 +132,6 @@ def generate_delete(path: Path):
     console.print("Successfully delete!", style="magenta")
 
 
-
 @app.command()
 def run(config: str = "sloby.config.json") -> None:
     """
@@ -162,7 +160,7 @@ def run(config: str = "sloby.config.json") -> None:
             preprocessor = import_file(Path(config["preprocessor"]))
 
     # Modules are used to keep track of ALL imported modules
-    modules = {path.resolve(): import_file(path)}  # execute the app.py
+    modules = {path.resolve(): import_file(path)}  # execute the app.py (user-provided)
 
     component_base_path = Path(config["components"])  # the component folder
     component_paths = [component for component in component_base_path.iterdir() if
@@ -217,6 +215,7 @@ def import_file(path: Path):
         sys.meta_path.append(ModuleFinder({path.stem: str(path.resolve())}))
         sys.modules[path.stem] = module
         spec.loader.exec_module(module)
+        print("execute something!")
         return module
     except AttributeError:
         typer.echo("File not found")
@@ -252,7 +251,7 @@ class SloDash:
             return []
 
     # noinspection PyProtectedMember
-    async def watch_scss_modified(self, path: Path) -> list | None:
+    async def watch_scss_modified(self, path: Path) -> list:
         """Hook that is called when a scss file is modified"""
         if (self.path / "scss").resolve() in path.parents:
             for scss_class in Design.get_registered_classes():
@@ -272,58 +271,54 @@ class SloDash:
     # noinspection PyProtectedMember
     async def watch_component_added(self, path: Path) -> list | list[str]:
         """Hook that is called when a component file is added"""
-
-        if (self.path / 'components').resolve() in path.parents:
-            return [self.check_pre_rendered(component) for component in SlApp._components if
-                    component["source_path"] == path]
-        return []
+        if not AppComponent._components:
+            if (self.path / 'components').resolve() in path.parents:
+                return [self.check_pre_rendered(component) for component in SlApp._components if
+                        component["source_path"] == path]
+            return []
 
     # noinspection PyProtectedMember
-    async def watch_component_modified(self, path: Path) -> list | None:
+    async def watch_component_modified(self, path: Path) -> list:
         """Hook that is called when a component file is modified"""
 
         routes = []
         if (self.path / 'components').resolve() in path.parents:
-            print("component modified")
             for component in SlApp._components.copy():
                 if str(component["source_path"].resolve()) == str(path.resolve()):
                     SlApp._components.remove(component)
                     routes.append(component["uri"])
-        print("component routes", routes)
         return routes
 
     # noinspection PyProtectedMember
+    # Todo:  components checking is redundant here
     async def watch_app_added(self, path: Path) -> list | list[str] | None:
         """Hook that is called when the app file is created"""
 
-        # print("app routes")
-        # routes = []
-        # if (self.path / "app.py").resolve() == path.resolve():
-        #     for component in AppComponent._components:
-        #         if component["component"] in SlApp.only_components:
-        #             routes.append(component["uri"])
-        #         else:
-        #             raise Exception("Error")
-        #
-        # return routes
+        routes = []
+        if (self.path / "app.py").resolve() == path.resolve():
+            for component in AppComponent._components:
+                routes.append(component["uri"])
+
+
+        return routes
 
 
     # noinspection PyProtectedMember
-    async def watch_app_modified(self, path: Path) -> list | None:
+    async def watch_app_modified(self, path: Path) -> list:
         """Hook that is called when the app file is modified"""
         routes = []
         if (self.path / "app.py").resolve() == path.resolve():
-            print("app modified")
+            print("[1]" "-" * 20, AppComponent._components, "-"*20)
             for component in AppComponent._components.copy():
                 AppComponent._components.remove(component)
                 routes.append(component["uri"])
-
+            print("[2]" "-" * 20, AppComponent._components, "-" * 20)
         return routes
 
     # noinspection PyProtectedMember
     async def watch_root(self, path):
         """Watch the root folder for changes"""
-        console.log(f"Watching {str(path.resolve())} for changes")
+        console.print(f"[bold italic yellow]Watching {str(path.resolve())} for changes")
         async for changes in awatch(str(path.resolve())):
             for change in changes:
                 path = Path(change[1])
@@ -352,7 +347,7 @@ class SloDash:
                     for callback in self.watch_callbacks:
                         if callback["changes_done"] is not None:
                             await callback["changes_done"](path)  # call the reload_all_css with parameter: path
-                    print("routes")
+
 
                     await self.rpc.hot_reload_routes(routes)
 
@@ -544,10 +539,12 @@ class SloText(App):
                 self.buffer.buffer = f"[green]?[/green] UI Framework: [cyan]{self.selection[self.selected_preprocessor].original_text}[/cyan]\n"
                 self.current_header.text = "Example header"
 
-    def get_selected_preprocessor(self) -> list[str, list[str, str]]:
+    def get_selected_preprocessor(self) -> list[str, str]:
         """Used to return the selected preprocessor"""
         selected_preprocessor_text = self.selection[self.selected_preprocessor].original_text.lower()
         return [selected_preprocessor_text, self.PREPROCESSOR_INFORMATION[selected_preprocessor_text][1]]
+
+
 
 
 def start_typer():
