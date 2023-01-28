@@ -27,7 +27,7 @@ __all__: tuple[str, ...] = (
 
 class Component(ABC):
     """Base Component"""
-    def __new__(cls, props=None, *args, **kwargs) -> Self:
+    def __new__(cls, props=None, *args, **kwargs):
         # noinspection PyTypeChecker
         component = super().__new__(cls, *args, **kwargs)
         # noinspection PyProtectedMember
@@ -37,9 +37,14 @@ class Component(ABC):
 
         component.props = {} if props is None else props  # component props
         component.style = SCSS()  # Todo: Maybe remove?
-        component.context = find_component_in_app(component)["context"]  # Add a context value by default
 
         return component
+    def __getattr__(self, item):
+
+        if item == "context":  # return the specific context
+            return find_component_in_app(self)["context"]
+
+        return self.__getattr__(item)
 
     @property
     @abstractmethod

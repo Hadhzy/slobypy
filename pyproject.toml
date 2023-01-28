@@ -25,6 +25,6 @@ slobypy = "slobypy.manager:start_typer"
 [tool.pyright]
 exclude = ["tests/*", "**/site-packages/**/*.py"]
 typeCheckingMode = "strict"
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 
 reportUnnecessaryTypeIgnoreComment = true
