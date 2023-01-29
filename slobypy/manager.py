@@ -24,6 +24,7 @@ from slobypy.react.design import Design
 from slobypy.rpc import RPC
 from slobypy._templates import *
 from slobypy.react.component import AppComponent
+from slobypy.react.tools import SloDebugHandler
 # Rich
 from rich.console import Console
 from rich.panel import Panel
@@ -43,7 +44,7 @@ console = Console()
 # noinspection PyArgum
 # entList
 @app.command()
-def generate(path: Path, overwrite: bool = False, no_preprocessor=False):
+def generate(path: Path, overwrite: bool = False, no_preprocessor=False, debug_json: Path | str = ""):
     """
     Generate a new project.
 
@@ -55,6 +56,7 @@ def generate(path: Path, overwrite: bool = False, no_preprocessor=False):
     ### Returns
     - None
     """
+
     # Used to generate a new project
     path = Path(path)
     # Check if path is empty
@@ -106,6 +108,22 @@ def generate(path: Path, overwrite: bool = False, no_preprocessor=False):
         with open((path / "preprocessor.py"), "w") as f:
             if no_preprocessor is not True:
                 f.write(NEW_PREPROCESSOR)
+
+
+@app.command()
+def SloBug(path: Path = ""):
+    """Used to help the user debug the code"""
+
+    json_path = path
+
+    SloDebugHandler.set_path(json_path)  # Create the path
+
+    if SloDebugHandler.analyse():
+        console.log("Successfully loaded!")
+    else:
+        console.log(f"Successfully created:{json_path.absolute()}")  # Create the file with the path
+
+    SloInspector().run()  # Run the UI
 
 
 @app.command()
@@ -433,6 +451,20 @@ class BufferWidget(Static):
         return self.buffer
 
 
+class ComponentFromJson:
+    pass
+
+
+class Component(Static):
+    def __init__(self, component):
+        super().__init__()
+
+        self.component = component
+
+    def render(self):
+        return self.component
+
+
 class SloText(App):
     BINDINGS = [
         Binding(
@@ -545,6 +577,27 @@ class SloText(App):
         return [selected_preprocessor_text, self.PREPROCESSOR_INFORMATION[selected_preprocessor_text][1]]
 
 
+class SloInspector(App):
+    BINDINGS = [
+        Binding(
+            key="q", action="quit", description="Quit the app"),
+    ]
+    buffer = BufferWidget()
+
+    registered_component = []
+    app_component = []
+
+    def __init__(self):
+        super().__init__()
+
+    def compose(self):
+        yield self.buffer
+        # Registered components
+        ...
+        # App Components
+        ...
+
+        yield Footer()
 
 
 def start_typer():

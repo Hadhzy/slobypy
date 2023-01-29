@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Generator, Type
 # This project
 from slobypy.react.scss import SCSS
 from slobypy.errors.react_errors import NotValidComponent
-from .tools import find_component_in_app
+from .tools import *
 import slobypy.app as app
 
 import slobypy.react.context as ctx
