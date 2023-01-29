@@ -10,17 +10,6 @@
 <p align="center"><b>Use Python to design your own website from backend to frontend!</b></p>
 <p align="center"><b>Alternatively, connect your existing Sloby frontend to your SlobyPy backend!</b></p>
 
-## 📝 Table of Contents
-
-- [📝 Table of Contents](#-table-of-contents)
-- [ :information_source: About the project <a name = "about"></a>](#-about-)
-- [🏁 Getting Started <a name = "getting_started"></a>](#-getting-started-)
-    - [SCSS](#scss)
-    - [HTML](#html)
-    - [COMPONENT](#component)
-- [⛏️ Built Using <a name = "built_using"></a>](#️-built-using-)
-- [✍️ Authors <a name = "authors"></a>](#️-authors-)
-- [💾 Docs  <a name = "docs"></a>](#-docs-)
 
 --------------
 
@@ -56,6 +45,8 @@ Start streaming JIT compiled data to Sloby:
 python -m slobypy run
 ```
 
-[Examples](https://github.com/FlurryGlo/slobypy/tree/main/examples)
+🔱
+[Slobypy Examples](https://github.com/FlurryGlo/slobypy/tree/main/examples)
+🔱
 
 [🎉**Contributors**🎉](https://github.com/FlurryGlo/slobypy/graphs/contributors)
