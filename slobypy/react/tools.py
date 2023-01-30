@@ -1,4 +1,4 @@
-"""General utilities used throughout the react sub-package"""
+"""General utilities used throughout the React sub-package"""
 from __future__ import annotations
 # Third-Party
 from urllib.parse import urlparse
@@ -9,6 +9,7 @@ import json
 from slobypy.errors.react_errors import URIError
 import slobypy.app as application
 from slobypy._templates import SLO_DEBUG_HANDLER
+from slobypy.errors.cli_errors import AlreadyExistsException
 if TYPE_CHECKING:
     from slobypy.react.component import Component
 
@@ -49,13 +50,14 @@ def find_component_in_app(instance: "Component") -> bool | dict:
 
 
 class SloDebugHandler:
+    """Used to handle the handler json file(add,delete, update)"""
 
-    path: Path = Path()
+    path: Path = ""
 
     @classmethod
-    def analyse(cls):
-
-        if cls.path.exists():
+    def analyse(cls) -> bool:
+        """Start the handler json file creating process"""
+        if cls.path:
             return True
 
         cls._create_file(cls.path)
@@ -68,18 +70,34 @@ class SloDebugHandler:
 
     @classmethod
     def set_path(cls, path: Path):
-        cls.path = path
+        """Used to set the path for the handler json file"""
+        if not Path(path).exists():
+            cls.path = path
+        else:
+            raise AlreadyExistsException(f"{path} is already exists")
 
     @classmethod
-    def add_json(cls, key, add_item: dict):
+    def add_json(cls, base_key: str, sub_key: str, add_item: dict) -> None:
+       """
+       This method is used to add a new component to the handler json
+       ### Arguments
+        - base_key: registered_components | app_components
+        - sub_key : component_route
+        - add_item: component_data -> dict (uri, component, source_path, metadata, static)
+       """
        json_data = cls._load()
 
-       json_data[key].append(add_item)
-
+       json_data[base_key][sub_key] = str(add_item)
        cls._dump(json_data)
 
     @classmethod
-    def delete_json(cls, base_key, sub_key):
+    def delete_json(cls, base_key: str, sub_key: str) -> None:
+        """
+         This method is used to delete a component from the handler json
+         ### Arguments:
+          -  base_key: registered_components | app_components
+          -  sub_key : component_route
+        """
         json_data = cls._load()
 
         del json_data[base_key][sub_key]

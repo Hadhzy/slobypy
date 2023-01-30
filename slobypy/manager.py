@@ -44,7 +44,7 @@ console = Console()
 # noinspection PyArgum
 # entList
 @app.command()
-def generate(path: Path, overwrite: bool = False, no_preprocessor=False, debug_json: Path | str = ""):
+def generate(path: Path, overwrite: bool = False, no_preprocessor=False):
     """
     Generate a new project.
 
@@ -71,7 +71,7 @@ def generate(path: Path, overwrite: bool = False, no_preprocessor=False, debug_j
 
     # Create directories if they don't exist
     path.mkdir(parents=True, exist_ok=True)  # exist_ok mutes the error if the directory already exists
-    (path / "components").mkdir(parents=True, exist_ok=True) # type: ignore
+    (path / "components").mkdir(parents=True, exist_ok=True)  # type: ignore
     (path / "scss").mkdir(parents=True, exist_ok=True)
 
     NEW_CONFIG = CONFIG.substitute(preprocessor=f'"preprocessor": "preprocessor.py",')
@@ -111,19 +111,9 @@ def generate(path: Path, overwrite: bool = False, no_preprocessor=False, debug_j
 
 
 @app.command()
-def SloBug(path: Path = ""):
+def SloBug():
     """Used to help the user debug the code"""
-
-    json_path = path
-
-    SloDebugHandler.set_path(json_path)  # Create the path
-
-    if SloDebugHandler.analyse():
-        console.log("Successfully loaded!")
-    else:
-        console.log(f"Successfully created:{json_path.absolute()}")  # Create the file with the path
-
-    SloInspector().run()  # Run the UI
+    SloInspector().run()  # Run the Inspection ui
 
 
 @app.command()
@@ -151,7 +141,7 @@ def generate_delete(path: Path):
 
 
 @app.command()
-def run(config: str = "sloby.config.json") -> None:
+def run(config: str = "sloby.config.json", slo_bug: Path = "") -> None:
     """
     This function is used to run the websockets.
 
@@ -161,6 +151,15 @@ def run(config: str = "sloby.config.json") -> None:
     ### Returns
     - None
     """
+    json_path = Path(slo_bug)
+
+    if slo_bug:  # if slo_bug defined
+        SloDebugHandler.set_path(json_path)  # !May be duplicated files if it's not match
+
+        if SloDebugHandler.analyse():  # if cls.path already defined
+            console.print(f"[blue underline]There is already a handler json file")
+        else:  # if not
+            console.log(f"[blue underline]Successfully created: {json_path.absolute()}")
 
     # Attempt to import the file using importlib
     config_path = Path(config)
@@ -291,7 +290,11 @@ class SloDash:
         """Hook that is called when a component file is added"""
         if not AppComponent._components:
             if (self.path / 'components').resolve() in path.parents:
-                return [self.check_pre_rendered(component) for component in SlApp._components if
+                return [(self.check_pre_rendered(component),
+
+                        SloDebugHandler.add_json(base_key="registered_components", sub_key=component["uri"], add_item=component))
+
+                        for component in SlApp._components if
                         component["source_path"] == path]
             return []
 
@@ -304,6 +307,7 @@ class SloDash:
             for component in SlApp._components.copy():
                 if str(component["source_path"].resolve()) == str(path.resolve()):
                     SlApp._components.remove(component)
+                    SloDebugHandler.delete_json(base_key="registered_components", sub_key=component["uri"])
                     routes.append(component["uri"])
         return routes
 
@@ -370,7 +374,7 @@ class SloDash:
                     await self.rpc.hot_reload_routes(routes)
 
     # noinspection PyMethodMayBeStatic
-    async def on_start(self, host, port):
+    async def on_start(self, port):
         """Hook that is called when the app starts"""
         self.watch_callbacks = [
             {
@@ -452,7 +456,18 @@ class BufferWidget(Static):
 
 
 class ComponentFromJson:
-    pass
+
+    # noinspection PyMethodMayBeStatic
+    # noinspection PyProtectedMember
+    @classmethod
+    def get_registered_components(cls):
+        return SloDebugHandler._load()["registered_components"]
+
+    # noinspection PyMethodMayBeStatic
+    # noinspection PyProtectedMember
+    @classmethod
+    def get_app_components(cls):
+        return SloDebugHandler._load()["app_components"]
 
 
 class Component(Static):
@@ -593,9 +608,11 @@ class SloInspector(App):
     def compose(self):
         yield self.buffer
         # Registered components
-        ...
+        for component in ComponentFromJson.get_registered_components():
+            yield Component(component)
         # App Components
-        ...
+        for component in ComponentFromJson.get_registered_components():
+            yield Component(component)
 
         yield Footer()
 

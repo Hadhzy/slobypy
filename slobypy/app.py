@@ -27,7 +27,7 @@ class SlApp:
     """
 
     # Use list to prevent name conflicts
-    _components: list[dict[str, Any]] = []
+    _components: list[dict[str, Any]] = []  # (uri, component, source, metadata, static)
     only_components: list[type[Component]] = []  # registered components(only)
     rpc: RPC | None = None
 
@@ -87,7 +87,7 @@ class SlApp:
                component_data
         )
 
-        SloDebugHandler.add_json(component_data)  # add the component_data to the handler
+        SloDebugHandler.add_json(base_key="registered_components", sub_key=uri_checker(uri), add_item=component_data)  # add the registered_component to the handler
 
         cls.only_components.append(component)
 
