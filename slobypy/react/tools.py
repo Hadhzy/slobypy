@@ -71,14 +71,28 @@ class SloDebugHandler:
         cls.path = path
 
     @classmethod
-    def add_json(cls, add_item: dict):
-        with open(cls.path, "w") as file:
-            file.write(json.dumps(add_item))
+    def add_json(cls, key, add_item: dict):
+       json_data = cls._load()
+
+       json_data[key].append(add_item)
+
+       cls._dump(json_data)
 
     @classmethod
-    def delete_json(cls, delete_item: str):
-        with open(cls.path, "w") as file:
+    def delete_json(cls, base_key, sub_key):
+        json_data = cls._load()
 
-            data = json.load(file)
-            removed_data = data.pop(delete_item)
-            file.write(removed_data)
+        del json_data[base_key][sub_key]
+
+        cls._dump(json_data)
+
+    @classmethod
+    def _load(cls):
+        with open(cls.path, "r") as f:
+            data = json.load(f)
+        return data
+
+    @classmethod
+    def _dump(cls, data):
+        with open(cls.path, "w") as f:
+            json.dump(data, f)

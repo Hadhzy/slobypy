@@ -123,7 +123,7 @@ async def process_css() -> Path:
 
 SLO_DEBUG_HANDLER = """
 {
-    registered_components: ""
-    app_components: ""
+    "registered_components": {},
+    "app_components": {}
 }
 """
