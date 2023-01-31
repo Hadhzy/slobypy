@@ -65,7 +65,8 @@ CONFIG = Template(
   "runtime_tasks": [],
   "processed_css": "",
   $preprocessor
-  "processed_js": ""
+  "processed_js": "",
+  "debug-file": "handler_debug.json"
 }
 """
 )
