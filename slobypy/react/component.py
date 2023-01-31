@@ -108,7 +108,11 @@ class AppComponent(ABC):
     def _find_component(self, element) -> None:
         for component in app.SlApp.only_components:  # type: ignore
             if isinstance(element, component):
-                self._components.append(self._get_as_full_component(component))
+
+                component_as_full = self._get_as_full_component(component)
+                #SloDebugHandler.add_json(base_key="app_components", sub_key=component_as_full["uri"], add_item=component_as_full)
+
+                self._components.append(component_as_full)
                 return
         else:
             raise NotValidComponent(f"{element} is not a valid component or context!")  # if the component in not valid or not registered

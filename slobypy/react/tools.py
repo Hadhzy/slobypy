@@ -8,8 +8,8 @@ import json
 # This Project
 from slobypy.errors.react_errors import URIError
 import slobypy.app as application
-from slobypy._templates import SLO_DEBUG_HANDLER
-from slobypy.errors.cli_errors import AlreadyExistsException
+from slobypy._templates import *
+
 if TYPE_CHECKING:
     from slobypy.react.component import Component
 
@@ -52,29 +52,16 @@ def find_component_in_app(instance: "Component") -> bool | dict:
 class SloDebugHandler:
     """Used to handle the handler json file(add,delete, update)"""
 
-    path: Path = ""
+    path = ""
 
     @classmethod
-    def analyse(cls) -> bool:
-        """Start the handler json file creating process"""
-        if cls.path:
-            return True
-
-        cls._create_file(cls.path)
-        return False
+    def set_path(cls, path):
+        cls.path = path
 
     @classmethod
-    def _create_file(cls, name):
-        with open(name, "w") as file:
+    def _create_file(cls, file_path):
+        with open(file_path, "w") as file:
             file.write(SLO_DEBUG_HANDLER)
-
-    @classmethod
-    def set_path(cls, path: Path):
-        """Used to set the path for the handler json file"""
-        if not Path(path).exists():
-            cls.path = path
-        else:
-            raise AlreadyExistsException(f"{path} is already exists")
 
     @classmethod
     def add_json(cls, base_key: str, sub_key: str, add_item: dict) -> None:
@@ -87,7 +74,7 @@ class SloDebugHandler:
        """
        json_data = cls._load()
 
-       json_data[base_key][sub_key] = str(add_item)
+       json_data[base_key][sub_key] = add_item
        cls._dump(json_data)
 
     @classmethod

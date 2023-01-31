@@ -87,7 +87,7 @@ class SlApp:
                component_data
         )
 
-        SloDebugHandler.add_json(base_key="registered_components", sub_key=uri_checker(uri), add_item=component_data)  # add the registered_component to the handler
+        #SloDebugHandler.add_json(base_key="registered_components", sub_key=uri_checker(uri), add_item=component_data)  # add the registered_component to the handler
 
         cls.only_components.append(component)
 
@@ -121,7 +121,6 @@ class SlApp:
         - None
         """
         cls.rpc = RPC(cls, *args, **kwargs)
-
     # Todo:
     #   - Extend the render with more informal component data.
     @classmethod
