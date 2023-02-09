@@ -467,12 +467,13 @@ class SloText(App):
         Binding(
             key="q", action="quit", description="Quit the app"),
     ]
-    selected_preprocessor: int = 0
-    selection = reactive([GenerateOption("") for _ in range(5)])
+    selected_preprocessor: int = 0  # preprocessors index
+    selected_debug_json: int = 0  # debug_json index
+    selection = reactive([GenerateOption("") for _ in range(5)])  # preprocessor selection
     # current_header = GenerateOption("Pick a UI framework preset:")
-    current_header = GenerateOption("")
+    current_header = GenerateOption("")  # the actual text
     buffer = BufferWidget()
-
+    debug_json_selection = reactive(GenerateOption("") for _ in range(2))  # SloDebug handler
     PREPROCESSOR_INFORMATION: dict[str, list] = {
         "tailwind": ["npm install tailwindcss", "npx tailwindcss -i ./css/input.css -o ./css/output.css --watch"],
         "bootstrap": ["npm install bootstrap", "npm run"],
@@ -483,7 +484,97 @@ class SloText(App):
         self.path = path
         self.data = {}
         self.stage = "projName"
+
         super().__init__()
+
+    def _handle_projName(self, event):
+        if event.key == "enter":
+            self.stage = "version"
+            if self.current_header.input == "":
+                self.current_header.input = self.path.name
+            self.data["name"] = self.current_header.input
+            self.buffer.buffer += f"[green]?[/green] Project name: [cyan]{self.data['name']}[/cyan]\n"
+            self.current_header.input = ""
+            self.current_header.original_text = f"[green]?[/green] Version [white](1.0.0)[/white]: [cyan]"
+            self.current_header.text = f"[green]?[/green] Version [white](1.0.0)[/white]: [cyan]"
+        else:
+            self.current_header.text_input(event)
+
+    def _handle_version(self, event):
+        if event.key == "enter":
+            self.stage = "description"
+            if self.current_header.input == "":
+                self.current_header.input = "1.0.0"
+            self.data["version"] = self.current_header.input
+            self.buffer.buffer += f"[green]?[/green] Version: [cyan]{self.data['version']}[/cyan]\n"
+            self.current_header.input = ""
+            self.current_header.original_text = f"[green]?[/green] Description [white](A Sloby project)[/white]: " \
+                                                f"[cyan] "
+            self.current_header.text = f"[green]?[/green] Description [white](A Sloby project)[/white]: "
+        else:
+            self.current_header.text_input(event)
+
+    def _handle_description(self, event):
+        if event.key == "enter":
+            self.stage = "preprocessor"
+            if self.current_header.input == "":
+                self.current_header.input = "A Sloby project"
+            self.data["description"] = self.current_header.input
+            self.buffer.buffer += f"[green]?[/green] Description: [cyan]{self.data['description']}[/cyan]\n"
+            self.current_header.text = f"[green]?[/green] Author [white](None)[/white]: [cyan]"
+            self.current_header.input = ""
+            self.current_header.text = f"[green]?[/green] Pick a UI framework preset: "
+            new_selection = ["None", "Tailwind", "Bootstrap", "Animate", "Sass"]
+            for old, new in zip(self.selection, new_selection):
+                old.original_text = new
+                old.text = new
+            self.selection[0].text = f"[cyan]> {self.selection[0].original_text}[/cyan]"
+        else:
+            self.current_header.text_input(event)
+
+    def _handle_preprocessors(self, event):
+        if event.key in ("down", "up"):
+            if event.key == "down":
+                previous_selected = self.selected_preprocessor
+                if self.selected_preprocessor == len(self.selection) - 1:
+                    self.selected_preprocessor = -1
+                modifier = 1
+            else:
+                previous_selected = self.selected_preprocessor
+                if self.selected_preprocessor == 0:
+                    self.selected_preprocessor = len(self.selection)
+                modifier = -1
+            current_text = self.selection[self.selected_preprocessor + modifier]  # GenerateOption object
+            current_text.text = f"[cyan]> {current_text.text}[/cyan]"  # GenerateOption object set text
+            previous_text = self.selection[previous_selected]
+            previous_text.text = previous_text.original_text
+            self.selected_preprocessor += modifier
+
+    def _handle_SloDebugHandler(self, event):
+
+        if event.key in ("down", "up"):
+            new_selection = ["yes", "no"]  # options
+
+            for old, new in zip(self.debug_json_selection, new_selection):  # set the debug_json_selection based on new_selection (add values)
+                old.original_text = new  # set original_text
+                old.text = new  # set text
+
+            if event.key == "down":  # down
+                previous_selected = self.selected_debug_json  # get the previous
+                if self.selected_debug_json == len(self.debug_json_selection) - 1:  # if we reach the end of the selection(almost)
+                    self.selected_debug_json = - 1  # do the selection
+                modifier = 1  # in order to get the correct index after the selected value(selected_debug_json)
+            else:  # up
+                previous_selected = self.selected_debug_json  # get the previous
+                if self.selected_debug_json == 0:  # if we react the top of the selection(almost)
+                    self.selected_debug_json = len(self.debug_json_selection)  # do the selection
+                modifier = -1  # in order to get the correct index after the selected value(selected_debug_json)
+
+            current_text = self.debug_json_selection[self.selected_debug_json + modifier]  # get the current text
+            current_text.text = f"[cyan]> {current_text.text}[/cyan]"  # display text
+            previous_text = self.debug_json_selection[previous_selected]  # get previous text
+            previous_text.text = previous_text.original_text  # previous text set original text(up-down color effect)
+            self.selected_debug_json += modifier  # go to the next value
 
     def compose(self) -> ComposeResult:
         """The body"""
@@ -505,64 +596,19 @@ class SloText(App):
     def on_key(self, event: Key) -> None:
         """Handle key presses"""
         if self.stage == "projName":
-            if event.key == "enter":
-                self.stage = "version"
-                if self.current_header.input == "":
-                    self.current_header.input = self.path.name
-                self.data["name"] = self.current_header.input
-                self.buffer.buffer += f"[green]?[/green] Project name: [cyan]{self.data['name']}[/cyan]\n"
-                self.current_header.input = ""
-                self.current_header.original_text = f"[green]?[/green] Version [white](1.0.0)[/white]: [cyan]"
-                self.current_header.text = f"[green]?[/green] Version [white](1.0.0)[/white]: [cyan]"
-            else:
-                self.current_header.text_input(event)
+            self._handle_projName(event)
+
         elif self.stage == "version":
-            if event.key == "enter":
-                self.stage = "description"
-                if self.current_header.input == "":
-                    self.current_header.input = "1.0.0"
-                self.data["version"] = self.current_header.input
-                self.buffer.buffer += f"[green]?[/green] Version: [cyan]{self.data['version']}[/cyan]\n"
-                self.current_header.input = ""
-                self.current_header.original_text = f"[green]?[/green] Description [white](A Sloby project)[/white]: " \
-                                                    f"[cyan] "
-                self.current_header.text = f"[green]?[/green] Description [white](A Sloby project)[/white]: "
-            else:
-                self.current_header.text_input(event)
+           self._handle_version(event)
+
         elif self.stage == "description":
-            if event.key == "enter":
-                self.stage = "preprocessor"
-                if self.current_header.input == "":
-                    self.current_header.input = "A Sloby project"
-                self.data["description"] = self.current_header.input
-                self.buffer.buffer += f"[green]?[/green] Description: [cyan]{self.data['description']}[/cyan]\n"
-                self.current_header.text = f"[green]?[/green] Author [white](None)[/white]: [cyan]"
-                self.current_header.input = ""
-                self.current_header.text = f"[green]?[/green] Pick a UI framework preset: "
-                new_selection = ["None", "Tailwind", "Bootstrap", "Animate", "Sass"]
-                for old, new in zip(self.selection, new_selection):
-                    old.original_text = new
-                    old.text = new
-                self.selection[0].text = f"[cyan]> {self.selection[0].original_text}[/cyan]"
-            else:
-                self.current_header.text_input(event)
+            self._handle_description(event)
+
         elif self.stage == "preprocessor":
-            if event.key in ("down", "up"):
-                if event.key == "down":
-                    previous_selected = self.selected_preprocessor
-                    if self.selected_preprocessor == len(self.selection) - 1:
-                        self.selected_preprocessor = -1
-                    modifier = 1
-                else:
-                    previous_selected = self.selected_preprocessor
-                    if self.selected_preprocessor == 0:
-                        self.selected_preprocessor = len(self.selection)
-                    modifier = -1
-                current_text = self.selection[self.selected_preprocessor + modifier]
-                current_text.text = f"[cyan]> {current_text.text}[/cyan]"
-                previous_text = self.selection[previous_selected]
-                previous_text.text = previous_text.original_text
-                self.selected_preprocessor += modifier
+            self._handle_preprocessors(event)
+
+        elif self.stage == "SloDebugHandler":
+            self._handle_SloDebugHandler(event)
 
             if event.key == "enter":
                 self.buffer.buffer = f"[green]?[/green] UI Framework: [cyan]{self.selection[self.selected_preprocessor].original_text}[/cyan]\n"
