@@ -50,3 +50,6 @@ python -m slobypy run
 🔱
 
 [🎉**Contributors**🎉](https://github.com/FlurryGlo/slobypy/graphs/contributors)
+
+***
+[✌**Contribute to the slobypy**✌️](https://github.com/FlurryGlo/slobypy/tree/main/CONTRIBUTING.md)

@@ -3,7 +3,6 @@ from __future__ import annotations
 # Third-Party
 from urllib.parse import urlparse
 from typing import TYPE_CHECKING
-from pathlib import Path
 import json
 # This Project
 from slobypy.errors.react_errors import URIError
@@ -50,7 +49,7 @@ def find_component_in_app(instance: "Component") -> bool | dict:
 
 
 class SloDebugHandler:
-    """Used to handle the handler json file(add,delete, update)"""
+    """Used to handle the DebugHandler json file(add, delete, update)"""
 
     path = ""
 
@@ -60,6 +59,9 @@ class SloDebugHandler:
 
     @classmethod
     def _create_file(cls, file_path):
+
+        cls.path = file_path
+
         with open(file_path, "w") as file:
             file.write(SLO_DEBUG_HANDLER)
 
@@ -94,6 +96,7 @@ class SloDebugHandler:
     @classmethod
     def _load(cls):
         with open(cls.path, "r") as f:
+
             data = json.load(f)
         return data
 
