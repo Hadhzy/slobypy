@@ -32,7 +32,7 @@ from rich.table import Table
 
 # Textual
 from textual.app import App, ComposeResult
-from textual.widgets import Footer, Static
+from textual.widgets import Footer, Static, Label
 from textual.widget import Widget
 from textual.reactive import reactive
 from textual.binding import Binding
@@ -88,8 +88,8 @@ def generate(path: Path, overwrite: bool = False, no_preprocessor=False):
         slo_text = SloText(path)
         slo_text.run()
 
-        selected_preprocessor = slo_text.get_selected_preprocessor()[0]
-        library_start = slo_text.get_selected_preprocessor()[1]
+        selected_preprocessor = slo_text.get_selected_preprocessor()[0] or ""
+        library_start = slo_text.get_selected_preprocessor()[1] or ""
         NEW_PREPROCESSOR = PREPROCESSOR.substitute(library=selected_preprocessor,
                                                    library_start=library_start)
 
@@ -118,11 +118,12 @@ def generate_delete(path: Path):
             typer.echo("The path is empty")
 
     config_file = Path(path / "sloby.config.json")
+    debug_json_file = Path(path / "handler_debug.json")
     app_file = Path(path / "app.py")
     example_component = Path(path / "components" / "example_component.py")
     preprocessor = Path(path / "preprocessor.py")
 
-    deleted_files = [config_file, app_file, example_component, preprocessor]
+    deleted_files = [config_file, app_file, example_component, debug_json_file, preprocessor]
 
     for file in deleted_files:
         try:
@@ -131,7 +132,7 @@ def generate_delete(path: Path):
         except:
             console.print(f"Can't remove:{file}", style="yellow")
 
-    console.print("Successfully delete!", style="magenta")
+    console.print("Delete process finished!", style="magenta")
 
 
 @app.command()
@@ -148,6 +149,10 @@ def run(config: str = "sloby.config.json") -> None:
 
     # Attempt to import the file using importlib
     config_path = Path(config)
+    # Create SloDebugHandler file
+    # noinspection PyProtectedMember
+
+    SloDebugHandler._create_file(Path(config_path.parent.absolute() / "handler_debug.json"))
 
     # Read config_path with json
     with open(config_path, "r") as f:
@@ -183,6 +188,18 @@ def run(config: str = "sloby.config.json") -> None:
     SlApp.run(hooks=[dash], console=console,
               event_loop=dash.event_loop, tasks=dash.tasks, external_tasks=runtime_tasks, preprocessor=preprocessor,
               cwd=path.parent, pre_rendered=dash.pre_rendered)
+
+
+@app.command()
+def Slo_Debug_Handler(debug_handler: Path):
+    """Used to provide a debug purpose for the user"""
+
+    #noinspection PyProtectedMember
+    with open(debug_handler, "r") as f:
+        data = json.load(f)
+    debug = SloDebugHandlerUI(data)
+
+    debug.run()  # run the SloDebugHandlerUI
 
 
 class ModuleFinder(importlib.abc.MetaPathFinder):
@@ -440,28 +457,6 @@ class BufferWidget(Static):
         return self.buffer
 
 
-class ComponentFromJson:
-    # noinspection PyMethodMayBeStatic
-    # noinspection PyProtectedMember
-    def get_registered_components(self):
-        return SloDebugHandler._load()["registered_components"]
-
-    # noinspection PyMethodMayBeStatic
-    # noinspection PyProtectedMember
-    def get_app_components(self):
-        return SloDebugHandler._load()["app_components"]
-
-
-class Component(Static):
-    def __init__(self, component):
-        super().__init__()
-
-        self.component = component
-
-    def render(self):
-        return self.component
-
-
 class SloText(App):
     BINDINGS = [
         Binding(
@@ -533,48 +528,24 @@ class SloText(App):
             self.current_header.text_input(event)
 
     def _handle_preprocessors(self, event):
-        if event.key in ("down", "up"):
-            if event.key == "down":
-                previous_selected = self.selected_preprocessor
-                if self.selected_preprocessor == len(self.selection) - 1:
-                    self.selected_preprocessor = -1
-                modifier = 1
-            else:
-                previous_selected = self.selected_preprocessor
-                if self.selected_preprocessor == 0:
-                    self.selected_preprocessor = len(self.selection)
-                modifier = -1
-            current_text = self.selection[self.selected_preprocessor + modifier]  # GenerateOption object
-            current_text.text = f"[cyan]> {current_text.text}[/cyan]"  # GenerateOption object set text
-            previous_text = self.selection[previous_selected]
-            previous_text.text = previous_text.original_text
-            self.selected_preprocessor += modifier
+            if event.key in ("down", "up"):
+                if event.key == "down":
+                    previous_selected = self.selected_preprocessor
+                    if self.selected_preprocessor == len(self.selection) - 1:
+                        self.selected_preprocessor = -1
+                    modifier = 1
+                else:
+                    previous_selected = self.selected_preprocessor
+                    if self.selected_preprocessor == 0:
+                        self.selected_preprocessor = len(self.selection)
+                    modifier = -1
 
-    def _handle_SloDebugHandler(self, event):
+                current_text = self.selection[self.selected_preprocessor + modifier]
+                current_text.text = f"[cyan]> {current_text.text}[/cyan]"
+                previous_text = self.selection[previous_selected]
+                previous_text.text = previous_text.original_text
+                self.selected_preprocessor += modifier
 
-        if event.key in ("down", "up"):
-            new_selection = ["yes", "no"]  # options
-
-            for old, new in zip(self.debug_json_selection, new_selection):  # set the debug_json_selection based on new_selection (add values)
-                old.original_text = new  # set original_text
-                old.text = new  # set text
-
-            if event.key == "down":  # down
-                previous_selected = self.selected_debug_json  # get the previous
-                if self.selected_debug_json == len(self.debug_json_selection) - 1:  # if we reach the end of the selection(almost)
-                    self.selected_debug_json = - 1  # do the selection
-                modifier = 1  # in order to get the correct index after the selected value(selected_debug_json)
-            else:  # up
-                previous_selected = self.selected_debug_json  # get the previous
-                if self.selected_debug_json == 0:  # if we react the top of the selection(almost)
-                    self.selected_debug_json = len(self.debug_json_selection)  # do the selection
-                modifier = -1  # in order to get the correct index after the selected value(selected_debug_json)
-
-            current_text = self.debug_json_selection[self.selected_debug_json + modifier]  # get the current text
-            current_text.text = f"[cyan]> {current_text.text}[/cyan]"  # display text
-            previous_text = self.debug_json_selection[previous_selected]  # get previous text
-            previous_text.text = previous_text.original_text  # previous text set original text(up-down color effect)
-            self.selected_debug_json += modifier  # go to the next value
 
     def compose(self) -> ComposeResult:
         """The body"""
@@ -607,20 +578,26 @@ class SloText(App):
         elif self.stage == "preprocessor":
             self._handle_preprocessors(event)
 
-        elif self.stage == "SloDebugHandler":
-            self._handle_SloDebugHandler(event)
+        # elif self.stage == "SloDebugHandler":
+        #     self._handle_SloDebugHandler(event)
 
             if event.key == "enter":
                 self.buffer.buffer = f"[green]?[/green] UI Framework: [cyan]{self.selection[self.selected_preprocessor].original_text}[/cyan]\n"
                 self.current_header.text = "Example header"
 
-    def get_selected_preprocessor(self) -> list[str, str]:
+    def get_selected_preprocessor(self) -> list[str, str] | None:
         """Used to return the selected preprocessor"""
         selected_preprocessor_text = self.selection[self.selected_preprocessor].original_text.lower()
+        if selected_preprocessor_text == "none":  # there is no preprocessor
+
+            console.log("there is no preprocessor selected")
+            return
+
         return [selected_preprocessor_text, self.PREPROCESSOR_INFORMATION[selected_preprocessor_text][1]]
 
 
-class SloInspector(App):
+class SloDebugHandlerUI(App):
+    """Slo"""
     BINDINGS = [
         Binding(
             key="q", action="quit", description="Quit the app"),
@@ -631,15 +608,15 @@ class SloInspector(App):
     app_component = []
 
 
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self, handler_dict: dict):
         super().__init__()
+        self.handler_dict = handler_dict
 
     def compose(self):
         yield self.buffer
         # Registered components
-        for component in ComponentFromJson().get_registered_components().items():
-            pass
+        for route in self.handler_dict["registered_components"]:
+            yield Label(route)
         # App Components
         # for component in ComponentFromJson.get_app_components():
         #     yield Component(component)

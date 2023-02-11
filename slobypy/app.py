@@ -87,7 +87,13 @@ class SlApp:
                component_data
         )
 
-        #SloDebugHandler.add_json(base_key="registered_components", sub_key=uri_checker(uri), add_item=component_data)  # add the registered_component to the handler
+        SloDebugHandler.add_json(base_key="registered_components", sub_key=uri_checker(uri), add_item={
+            "uri": uri_checker(uri),
+            "component": str(component),
+            "source_path": str(Path(source)),
+            "metadata": metadata,
+            "static": static,
+        })  # add the registered_component to the handler
 
         cls.only_components.append(component)
 
