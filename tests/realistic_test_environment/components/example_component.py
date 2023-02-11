@@ -13,7 +13,6 @@ class MyComponent1(Component):
 
     def body(self):
         yield P("test1", onClick=self.on_click)
-        yield P(self.context)
         yield MyComponent2(props={"important_data": "Woah, this is a hahao10!"})
 
 
@@ -41,5 +40,3 @@ class MyComponent2(Component):
 
     def body(self):
         yield P(self.props["important_data"], onClick=self.on_click)
-
-
