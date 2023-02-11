@@ -95,6 +95,7 @@ class SlApp:
             "static": static,
         })  # add the registered_component to the handler
 
+
         cls.only_components.append(component)
 
     @classmethod

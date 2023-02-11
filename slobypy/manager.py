@@ -456,7 +456,6 @@ class BufferWidget(Static):
         self.styles.height = len(self.buffer.split("\n"))
         return self.buffer
 
-
 class SloText(App):
     BINDINGS = [
         Binding(
@@ -609,6 +608,7 @@ class SloDebugHandlerUI(App):
 
 
     def __init__(self, handler_dict: dict):
+
         super().__init__()
         self.handler_dict = handler_dict
 
@@ -617,6 +617,7 @@ class SloDebugHandlerUI(App):
         # Registered components
         for route in self.handler_dict["registered_components"]:
             yield Label(route)
+
         # App Components
         # for component in ComponentFromJson.get_app_components():
         #     yield Component(component)
