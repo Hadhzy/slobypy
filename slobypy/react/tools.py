@@ -59,7 +59,9 @@ class SloDebugHandler:
 
     @classmethod
     def _create_file(cls, file_path):
+
         cls.path = file_path
+
         with open(file_path, "w") as file:
             file.write(SLO_DEBUG_HANDLER)
 
