@@ -12,8 +12,22 @@ class MyComponent1(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P("test", className="parent", onClick=self.on_click)
-        yield MyComponent2(props={"important_data": "Woah, this is a prop!"})
+
+        yield P("test1", onClick=self.on_click)
+        yield MyComponent2(props={"important_data": "Woah, this is a hahao10!"})
+
+
+@SlApp.component("/route3")
+class MyComponent3(Component):
+    @property
+    def name(self):
+        return "MyComponent1"
+
+    def on_click(self):
+        print(self.name, "has been clicked!")
+
+    def body(self):
+        yield P(self.context, onClick=self.on_click)
 
     def mount(self):
         pass
@@ -28,8 +42,5 @@ class MyComponent2(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
-        yield P(self.props["important_data"], className="parent", onClick=self.on_click)
-
-    def mount(self):
-        pass
+        yield P(self.props["important_data"], onClick=self.on_click)
 
