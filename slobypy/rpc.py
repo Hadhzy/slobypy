@@ -255,6 +255,7 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
         elif data["type"] == "get_route":
             await self.render_shard(conn, data["data"])
 
+    #noinspection PyMethodMayBeStatic
     async def send(self, conn: WebSocketServerProtocol, data: dict[str, Any]) -> None:
         """
         Sends data to the React frontend
@@ -268,7 +269,7 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
         """
         await conn.send(json.dumps(data))
 
-    async def wait_for_hearbeat(self, conn: WebSocketServerProtocol) -> None:
+    async def wait_for_heartbeat(self, conn: WebSocketServerProtocol) -> None:
         """
         Waits for a heartbeat from the React frontend
 
@@ -314,6 +315,7 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
                     await conn.close()
                     break
 
+    #noinspection PyProtectedMember
     async def heartbeat(self, conn: WebSocketServerProtocol) -> None:
         """
         Handles the heartbeat from the React frontend
@@ -395,7 +397,7 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
 
         # Create task to watch for heartbeat
         self.conn[conn_id - 1]["_internal_heartbeat"] = asyncio.ensure_future(
-            self.wait_for_hearbeat(conn)
+            self.wait_for_heartbeat(conn)
         )
 
     async def new_shard(
@@ -494,6 +496,7 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
         - None
         """
 
+    #noinspection PyProtectedMember
     async def get_route(self, route: str) -> str:
         """
         Gets the html of a route
@@ -545,6 +548,7 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
             },
         )
 
+    #noinspection PyProtectedMember
     async def get_css(self) -> str:
         """
         Renders the CSS in the application
@@ -560,6 +564,8 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
             return "\n".join([scss_data["scss_class"].render() for scss_data in Design._REGISTERED_CLASSES])  # type: ignore  # pylint: disable=protected-access
         return (await self.css_preprocessor()).read_text()
 
+    #noinspection PyMethodMayBeStatic
+    #noinspection PyProtectedMember
     def _check_shard_render_alone(self, shard_route: str) -> bool:
         if AppComponent._components:  # type: ignore  # pylint: disable=protected-access
             for app_component in AppComponent._components:  # type: ignore  # pylint: disable=protected-access
@@ -569,6 +575,8 @@ class RPC:  # pylint: disable=too-many-public-methods,too-many-instance-attribut
             return False
         return True
 
+    #noinspection PyMethodMayBeStatic
+    #noinspection PyProtectedMember
     async def _check_app_hot_reload(self, shard_route: str, routes: list[str]) -> bool:
         if AppComponent._components:  # type: ignore  # pylint: disable=protected-access
             for app_component in AppComponent._components:  # type: ignore  # pylint: disable=protected-access

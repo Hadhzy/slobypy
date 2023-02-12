@@ -25,6 +25,7 @@ from slobypy.rpc import RPC
 from slobypy._templates import *
 from slobypy.react.component import AppComponent
 from slobypy.react.tools import SloDebugHandler
+from slobypy.css.css_template import INPUT_CSS, OUTPUT_CSS, TAILWIND_CONFIG
 # Rich
 from rich.console import Console
 from rich.panel import Panel
@@ -95,7 +96,15 @@ def generate(path: Path, overwrite: bool = False, no_preprocessor=False):
 
         if selected_preprocessor == "tailwind":
             # Create tailwind dependencies here
-            pass
+            with open((path / "css" / "input.css"), "w") as f:
+                f.write(INPUT_CSS)
+
+            with open((path / "css" / "output.css"), "w") as f:
+                f.write(OUTPUT_CSS)
+
+            with open(path / "tailwind.config.js", "w") as f:
+                f.write(TAILWIND_CONFIG)
+
         elif selected_preprocessor == "sass":
             # Create sass dependencies here
             pass
@@ -119,11 +128,15 @@ def generate_delete(path: Path):
 
     config_file = Path(path / "sloby.config.json")
     debug_json_file = Path(path / "handler_debug.json")
+    css_input = Path(path / "css" / "input.css")
+    css_output = Path(path / "css" / "output.css")
+    tailwind_config = Path(path / "tailwind.config.js")
     app_file = Path(path / "app.py")
     example_component = Path(path / "components" / "example_component.py")
     preprocessor = Path(path / "preprocessor.py")
 
-    deleted_files = [config_file, app_file, example_component, debug_json_file, preprocessor]
+    deleted_files = [config_file, app_file, example_component, debug_json_file, preprocessor, css_input, css_output, tailwind_config]
+
 
     for file in deleted_files:
         try:
@@ -456,6 +469,7 @@ class BufferWidget(Static):
         self.styles.height = len(self.buffer.split("\n"))
         return self.buffer
 
+
 class SloText(App):
     BINDINGS = [
         Binding(
@@ -518,7 +532,7 @@ class SloText(App):
             self.current_header.text = f"[green]?[/green] Author [white](None)[/white]: [cyan]"
             self.current_header.input = ""
             self.current_header.text = f"[green]?[/green] Pick a UI framework preset: "
-            new_selection = ["None", "Tailwind", "Bootstrap", "Animate", "Sass"]
+            new_selection = ["None", "Tailwind", "Bootstrap", "Sass"]
             for old, new in zip(self.selection, new_selection):
                 old.original_text = new
                 old.text = new
@@ -615,9 +629,11 @@ class SloDebugHandlerUI(App):
     def compose(self):
         yield self.buffer
         # Registered components
+        yield Label("Registered Components:")
         for route in self.handler_dict["registered_components"]:
-            yield Label(route)
 
+            yield Label(route)
+        yield Label("App Components")
         # App Components
         # for component in ComponentFromJson.get_app_components():
         #     yield Component(component)

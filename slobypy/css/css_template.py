@@ -542,3 +542,13 @@ video {
   background-color: rgb(21 128 61 / var(--tw-bg-opacity));
 }
 """
+
+TAILWIND_CONFIG = """/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./components/**/*.py"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+"""
