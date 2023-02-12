@@ -18,7 +18,7 @@ class Context:
     Used to provide data transfer for the user.
     """
 
-    def __init__(self, starting_data) -> None:
+    def __init__(self, **starting_data) -> None:
         self.data = starting_data
 
     def __call__(self, *components: "component_file.Component") -> Self:

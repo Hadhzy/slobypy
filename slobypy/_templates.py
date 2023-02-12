@@ -36,7 +36,6 @@ class MyComponent1(Component):
         pass
 
 
-@SlApp.component("/route2")
 class MyComponent2(Component):
     @property
     def name(self):

@@ -1,6 +1,6 @@
+from slobypy import SlApp
 from slobypy.react import *
 from slobypy import *
-
 
 @SlApp.component("/route1")
 class MyComponent1(Component):
@@ -12,6 +12,7 @@ class MyComponent1(Component):
         print(self.name, "has been clicked!")
 
     def body(self):
+
         yield P("test1", onClick=self.on_click)
         yield MyComponent2(props={"important_data": "Woah, this is a hahao10!"})
 
@@ -28,6 +29,8 @@ class MyComponent3(Component):
     def body(self):
         yield P(self.context, onClick=self.on_click)
 
+    def mount(self):
+        pass
 
 
 class MyComponent2(Component):
@@ -40,3 +43,4 @@ class MyComponent2(Component):
 
     def body(self):
         yield P(self.props["important_data"], onClick=self.on_click)
+
